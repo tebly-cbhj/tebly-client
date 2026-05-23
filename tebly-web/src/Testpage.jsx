@@ -12,7 +12,7 @@ import Chip from './components/common/Chip';
 import TabBtn from './components/common/TabBtn';
 //import Calendar from './components/common/Calendar';
 import RoomListCard from './components/common/RoomListCard';
-import AddBtn from './components/common/AddBtn';
+//import AddBtn from './components/common/AddBtn';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
@@ -149,11 +149,6 @@ export default function Testpage() {
                     ))}
                 </div>
             </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '20px' }}>
-            <h3> 일정 추가 버튼</h3>
-            <AddBtn />
         </div>
     </ThemeProvider>
   );
