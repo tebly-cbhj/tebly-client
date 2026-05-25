@@ -21,13 +21,13 @@ const TabButton = styled.button`
 
   color: ${(props) => 
     props.$active 
-      ? props.theme.colors.red100 
+      ? props.theme.colors.primary100 
       : props.theme.colors.gray500};
 
   border: none; 
   border-bottom: ${(props) => 
     props.$active 
-      ? `1px solid ${props.theme.colors.red100}` 
+      ? `1px solid ${props.theme.colors.primary100}` 
       : 'none'}; // 활성화 된 탭에게만 빨간색 밑줄 부여
 `;
 

@@ -12,13 +12,16 @@ import Chip from './components/common/Chip';
 import TabBtn from './components/common/TabBtn';
 //import Calendar from './components/common/Calendar';
 import RoomListCard from './components/common/RoomListCard';
-//import AddBtn from './components/common/AddBtn';
+import AddBtn from './components/common/AddBtn';
+import RoomCover from './components/common/RoomCover';
+import FriendsSelect from './components/common/FriendsSelect';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
   const [isOn, setIsOn] = useState(false);
   const [badges, setBadges] = useState(['테이브', '캘박하조조조']);
   const [currentTab, setCurrentTab] = useState('tab1'); // 탭 확인용
+  const [selectedId, setSelectedId] = useState(null); // 친구 선택용
 
   const dummyRooms = [
     {
@@ -34,6 +37,12 @@ export default function Testpage() {
       avatars: [null, null], // 아바타 2개 겹침
     }
   ];
+
+  const dummyFriends = [
+    { id: 1, name: '홍길동', profileImage: null },
+    { id: 2, name: '김철수', profileImage: null },
+    { id: 3, name: '이영희', profileImage: null },
+    ];
 
   return (
     <ThemeProvider theme={theme}>
@@ -134,6 +143,7 @@ export default function Testpage() {
                 <h3> 달력 </h3>
                 <Calendar />
             </div>*/}
+        
 
             {/* 방 카드 */}
             <div>
@@ -148,6 +158,30 @@ export default function Testpage() {
                         />
                     ))}
                 </div>
+            </div>
+        </div>
+        <div style={{ display: 'flex', gap: '20px' }}>
+            {/* 일정 추가 버튼 */}
+            <div>
+                <h3> 일정 추가</h3>
+                <AddBtn />
+            </div>
+            {/* 방 커버 */}
+            <div>
+                <h3> 방 커버 </h3>
+                <RoomCover />
+            </div>
+            {/* 친구 리스트 */}
+            <div>
+                <h3> 친구 리스트 </h3>
+                {dummyFriends.map((friend) => (
+                    <FriendsSelect
+                    key={friend.id}
+                    friend={friend}
+                    selected={selectedId === friend.id}
+                    onToggle={() => setSelectedId(friend.id)}
+                    />
+                ))}
             </div>
         </div>
     </ThemeProvider>

@@ -17,14 +17,14 @@ const TopArea = styled.div`
   height: 177px;
   flex-shrink: 0;
   align-self: stretch;
-  background: ${(props) => props.theme.colors.red50}; 
+  background: ${(props) => props.theme.colors.primary50}; 
 `;
 
 // 방 이름, 설명 부분
 const BottomArea = styled.div`
   display: flex;
   height: 94px;
-  padding: 12px 20px 20px 20px;
+  padding: 16px 20px 20px 20px;
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
@@ -42,19 +42,19 @@ const Title = styled.h2`
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
+  min-height: 34px;
 `;
 
 // description 부분
 const DescRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   align-self: stretch;
-  flex: 1; 
 `;
 
 const DescText = styled.span`
-  color: ${(props) => props.theme.colors.gray800}; /* [cite: 1009] */
+  color: ${(props) => props.theme.colors.gray800};
   ${(props) => props.theme.typography.body2}
 `;
 
@@ -82,7 +82,27 @@ const Avatar = styled.div`
   }
 `;
 
+// 추가 인원수 관련 스타일
+const ExtraCount = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: ${(props) => props.theme.colors.gray900}80; 
+  color: ${(props) => props.theme.colors.white};
+  ${(props) => props.theme.typography.caption1}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export default function RoomListCard({ title, description, avatars }) {
+  const MAX_VISIBLE = 3;  // 최대 3명까지만 표시
+  const visibleAvatars = avatars ? avatars.slice(0, MAX_VISIBLE) : [];
+  const extraCount = avatars ? avatars.length - MAX_VISIBLE : 0;
+
   return (
     <CardWrapper>
       <TopArea />
@@ -91,8 +111,13 @@ export default function RoomListCard({ title, description, avatars }) {
         <DescRow>
           <DescText>{description}</DescText>
           <AvatarGroup>
-            {avatars && avatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl} />
+            {visibleAvatars.map((imgUrl, index) => (
+              <Avatar key={index} $imgUrl={imgUrl} $isLast={index === visibleAvatars.length - 1}>
+                {/* 마지막 프사 위에 +n 표시 */}
+                {index === visibleAvatars.length - 1 && extraCount > 0 && (
+                  <ExtraCount>+{extraCount}</ExtraCount>
+                )}
+              </Avatar>
             ))}
           </AvatarGroup>
         </DescRow>
