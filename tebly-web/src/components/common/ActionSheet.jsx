@@ -59,7 +59,7 @@ const ActionButton = styled.button`
 const ActionText = styled.span`
   ${({ theme }) => theme.typography.btn2};
   color: ${({ selected, theme }) => 
-    selected ? theme.colors.red100 : theme.colors.gray900};
+    selected ? theme.colors.primary100 : theme.colors.gray900};
 `;
 
 // 하단 버튼 텍스트
@@ -79,10 +79,15 @@ const CancelGroup = styled(ActionGroup)`
   margin-top: 12px;
 `;
 
-export default function ActionSheet({ visible, onClose, onOption1, onOption2 }) {
+export default function ActionSheet({ visible, onClose, onOption1, onOption2, option1Text, option2Text }) {
   const [selected, setSelected] = useState(null);
 
   if (!visible) return null;
+
+  const handleClose = () => {
+    setSelected(null);  // 추가
+    onClose();
+  };
 
   return (
     <Overlay onClick={onClose}>
@@ -90,11 +95,11 @@ export default function ActionSheet({ visible, onClose, onOption1, onOption2 }) 
         
         <ActionGroup>
           <ActionButton onClick={() => { setSelected('option1'); onOption1?.(); }}>
-            <ActionText selected={selected === 'option1'}>텍스트</ActionText>
+            <ActionText>{option1Text}</ActionText>
           </ActionButton>
           <Divider />
           <ActionButton onClick={() => { setSelected('option2'); onOption2?.(); }}>
-            <ActionText selected={selected === 'option2'}>텍스트</ActionText>
+            <ActionText>{option2Text}</ActionText>
           </ActionButton>
         </ActionGroup>
 

@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
 export const PageWrapper = styled.div`
-  // 가로 너비 세팅
-  width: 100%;
-  max-width: 390px; 
-  margin: 0 auto; 
-
+  width: 100%; /* 앱(웹뷰) 안에서는 스마트폰 화면 가로폭에 100% 딱 맞춤! */
+  max-width: 480px; /* 컴퓨터(PC) 브라우저에서 볼 때 너무 넓어지는 것만 방지 */
+  margin: 0 auto;
+  align-items: center;
+  
   // 세로 높이 세팅 - 헤더/네비게이션 바 제외한 나버지 부분 사용
   min-height: 100vh;
   

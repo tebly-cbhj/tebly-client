@@ -5,8 +5,9 @@ export const FieldWrapper = styled.div`
   width: 350px;
   height: 48px;
   padding: 12px;
-  align-items: center;
+  align-self: center;
   gap: 8px;
+  box-sizing: border-box;
 
   border-radius: 8px;
   background: ${(props) => {

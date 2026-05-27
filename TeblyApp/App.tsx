@@ -1,45 +1,38 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from 'react';
+import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { WebView } from 'react-native-webview';
+import { theme } from './src/theme';
+import BottomNavBar from './src/components/BottomNavBar';
+import { ThemeProvider } from 'styled-components/native';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
+export default function App() {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
+    // 💡 하단 바에서 theme.colors를 꺼내 쓸 수 있도록 전체를 감싸줍니다!
+    <ThemeProvider theme={theme}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="dark-content" />
+        
+        {/* 1. 알맹이 (리액트 웹뷰) */}
+        <WebView
+          source={{ uri: 'http://172.20.120.48:5173/' }} 
+          style={styles.webview}  {/* ← 변경 */}
+        />
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+        {/* 2. 껍데기 (하단 탭바) */}
+        <BottomNavBar />
+      </SafeAreaView>
+    </ThemeProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.bg,
+  },
+   webview: {
+    flex: 1,
+    width: '100%',    {/* ← 추가 */}
+    backgroundColor: theme.colors.bg,  {/* ← 추가: 웹 로딩 전 빈 공간도 bg색으로 */}
   },
 });
-
-export default App;

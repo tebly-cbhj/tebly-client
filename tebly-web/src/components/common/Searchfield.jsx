@@ -25,7 +25,6 @@ export default function SearchField({ placeholder = '검색' }) {
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
-      <SearchIcon />
     </FieldWrapper>
   );
 }

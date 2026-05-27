@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import RadioBtn from './RadioBtn'; // 만들어두신 라디오버튼
+import RadioBtn from './RadioBtn'; 
 
-// 전체 한 줄 (아이템 하나)
+// 전체 한 줄
 const FriendItem = styled.div`
   display: flex;
   width: 350px;
@@ -33,7 +33,7 @@ const ProfileImage = styled.div`
   flex-shrink: 0;
 `;
 
-// 이름 텍스트 (S2 스타일, gray900)
+// 이름 텍스트
 const FriendName = styled.span`
   ${(props) => props.theme.typography.S2}
   color: ${(props) => props.theme.colors.gray900};

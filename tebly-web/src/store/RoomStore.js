@@ -6,14 +6,13 @@ export const useRoomStore = create((set) => ({
     { id: 1, title: '캘박하조', description: '화이팅', avatars: [null, null, null, null] },
     { id: 2, title: '회의하조', description: '매주 토요일 사당역에서', avatars: [null, null] },
     { id: 3, title: '집에가조', description: '회의가 끝난 이후에', avatars: [null, null, null] },
-    { id: 4, title: '밥을 먹조', description: '아침 점심 저녁에', avatars: [null] },
   ],
 
   // 2. 새로운 방을 창고에 추가하는 함수
-  addRoom: (newTitle, newDesc) => set((state) => ({
+  addRoom: (newTitle, newDesc, avatars) => set((state) => ({
     rooms: [
-      ...state.rooms, 
-      { id: Date.now(), title: newTitle, description: newDesc, avatars: [null] }
+      ...state.rooms,
+      { id: Date.now(), title: newTitle, description: newDesc, avatars }
     ]
-  })),
+  }))
 }));

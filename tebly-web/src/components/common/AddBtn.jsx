@@ -16,7 +16,7 @@ const StyledIconButton = styled.img`
   transform: ${(props) => props.$isOpen ? 'rotate(45deg)' : 'rotate(0deg)'};
 `;
 
-const AddBtn = () => {
+const AddBtn = ({ onClick }) => {  // onClick props 받기
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -25,7 +25,10 @@ const AddBtn = () => {
         src={AddBtnIcon}
         alt="add"
         $isOpen={isOpen}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          onClick?.();  // 외부에서 넘긴 onClick도 실행
+        }}
       />
     </ButtonWrapper>
   );
