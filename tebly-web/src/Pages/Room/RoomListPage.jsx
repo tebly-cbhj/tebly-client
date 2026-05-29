@@ -5,6 +5,7 @@ import RoomListCard from '../../components/common/RoomListCard';
 import { useRoomStore } from '../../store/RoomStore';
 import AddBtn from '../../components/common/AddBtn';
 
+
 const RoomListContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -40,7 +41,8 @@ export default function RoomListPage() {
             key={room.id}
             title={room.title}
             description={room.description}
-            avatars={room.avatars}
+            members={room.members}
+            onClick={() => navigate(`/room/${room.id}`)}  
           />
         ))}
       </RoomListContainer>

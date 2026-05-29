@@ -7,6 +7,7 @@ import SearchField from "../../components/common/SearchField";
 import FriendsSelect from "../../components/common/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
+import { useFriendStore } from '../../store/FriendStore';
 
 // 헤더 아래 16px
 const ContentArea = styled.div`
@@ -46,9 +47,9 @@ const BadgeScrollArea = styled.div`
   flex-direction: row;
   gap: 8px;
   overflow-x: auto;
-  flex-wrap: nowrap;   /* 추가 - 줄바꿈 방지 */
-  width: 100%;         /* 추가 */
-  min-width: 0;        /* 추가 */
+  flex-wrap: nowrap;  
+  width: 100%;       
+  min-width: 0;        
   flex-shrink: 0;
 
   &::-webkit-scrollbar {
@@ -62,47 +63,50 @@ const BtnWrapper = styled.div`
   align-self: center;
 `;
 
-// 임시 데이터
-const TEMP_FRIENDS = [
-  { id: 1, name: '김돌리', profileImage: null },
-  { id: 2, name: '최또치', profileImage: null },
-  { id: 3, name: '고길동', profileImage: null },
-  { id: 4, name: '희동이', profileImage: null },
-  { id: 5, name: '마이쿨', profileImage: null },
-];
-
 const SelectFriendPage = () => {
-  const [selected, setSelected] = useState([]); // 선택된 친구 목록
+  const navigate = useNavigate();
+  const location = useLocation();
+  const addRoom = useRoomStore((state) => state.addRoom);
+  const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
 
+  // 💡 3. FriendStore에서 전체 친구 목록을 꺼내옵니다.
+  const friendsList = useFriendStore((state) => state.friends);
+
+  // 1. 출발지에서 넘겨준 방 번호와 방 정보를 확인합니다.
+  const currentRoomId = location.state?.roomId;
+  const existingRoom = useRoomStore((state) => 
+    state.rooms.find((r) => r.id === currentRoomId)
+  );
+
+  // 기존 방 멤버가 있으면 그 멤버들로 초기값 세팅, 아니면 빈 배열!
+  const [selected, setSelected] = useState(existingRoom ? existingRoom.members : []); 
   const isActive = selected.length > 0;
 
+  // 체크박스 토글 함수
   const handleToggle = (friend) => {
     setSelected((prev) =>
       prev.find((f) => f.id === friend.id)
         ? prev.filter((f) => f.id !== friend.id) // 이미 선택됐으면 제거
-        : [...prev, friend]                       // 없으면 추가
+        : [...prev, friend]                      // 없으면 추가
     );
   };
 
+  // 뱃지 X 버튼 삭제 함수
   const handleRemove = (friendId) => {
     setSelected((prev) => prev.filter((f) => f.id !== friendId));
   };
-
-  const navigate = useNavigate();
-  const location = useLocation();
-  const addRoom = useRoomStore((state) => state.addRoom);
 
   return (
     <PageWrapper>
       <ContentArea>
         <SearchField placeholder="초대 할 친구 검색" />
         <FriendsWrapper>
-            {TEMP_FRIENDS.map((friend) => (
+            {friendsList.map((friend) => (
                 <FriendsSelect
-                key={friend.id}
-                friend={friend}
-                selected={!!selected.find((f) => f.id === friend.id)}
-                onToggle={() => handleToggle(friend)}
+                  key={friend.id}
+                  friend={friend}
+                  selected={!!selected.find((f) => f.id === friend.id)}
+                  onToggle={() => handleToggle(friend)}
                 />
             ))}
         </FriendsWrapper>
@@ -124,11 +128,20 @@ const SelectFriendPage = () => {
             text="완료"
             disabled={!isActive}
             onClick={() => {
-                const { roomName, description } = location.state;
-                addRoom(roomName, description, selected.map((f) => f.profileImage)); // 추가
-                navigate('/');
+                // 💡 5. 완료 버튼 로직 완성!
+                if (currentRoomId) {
+                  // 기존 방 번호가 있다면 업데이트 함수 실행!
+                  updateRoomMembers(currentRoomId, selected);
+                } else {
+                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행!
+                  const { roomName, description } = location.state || {};
+                  addRoom(roomName, description, selected); 
+                }
+                
+                // 완료 후 메인 홈(또는 이전 페이지)으로 이동
+                navigate(-1); // navigate('/') 도 좋지만, 보통 '완료' 후엔 방금 전 방 화면으로 돌아가는게 자연스럽습니다.
             }}
-            />
+          />
         </BtnWrapper>
       </SelectListContainer>
     </PageWrapper>

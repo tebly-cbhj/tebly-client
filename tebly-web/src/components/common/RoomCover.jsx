@@ -12,8 +12,8 @@ const UploadButton = styled.button`
   align-items: center;
   border: none;
   cursor: pointer;
-  position: relative;  /* ← 사진이 덮을 수 있게 */
-  overflow: hidden;    /* ← 사진이 밖으로 안 나가게 */
+  position: relative;  
+  overflow: hidden;    
 `;
 
 const Inner = styled.div`

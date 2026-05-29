@@ -98,13 +98,14 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomListCard({ title, description, avatars }) {
+export default function RoomListCard({ title, description, members, onClick }) { 
   const MAX_VISIBLE = 3;  // 최대 3명까지만 표시
-  const visibleAvatars = avatars ? avatars.slice(0, MAX_VISIBLE) : [];
-  const extraCount = avatars ? avatars.length - MAX_VISIBLE : 0;
+  const avatarList = members ? members.map(m => m.profileImage) : [];
+  const visibleAvatars = avatarList.slice(0, MAX_VISIBLE);
+  const extraCount = avatarList.length - MAX_VISIBLE;
 
   return (
-    <CardWrapper>
+    <CardWrapper onClick={onClick}>
       <TopArea />
       <BottomArea>
         <Title>{title}</Title>
