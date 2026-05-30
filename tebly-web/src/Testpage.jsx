@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -8,7 +8,10 @@ import RadioBtn from './components/common/RadioBtn';
 import Badge from './components/common/Badge';
 import SearchField from './components/common/Searchfield';
 import DateField from './components/common/DateField';
+import DatePicker from './components/room/DatePicker';
 import Chip from './components/common/Chip';
+import ChipFilter from './components/room/ChipFilter';
+import ChipScheduleOption from './components/room/ChipScheduleOption';
 import TabBtn from './components/common/TabBtn';
 //import Calendar from './components/common/Calendar';
 import RoomListCard from './components/common/RoomListCard';
@@ -16,6 +19,11 @@ import RoomListCard from './components/common/RoomListCard';
 import ActionSheet from './components/common/ActionSheet';
 import RoomCover from './components/common/RoomCover';
 import FriendsSelect from './components/common/FriendsSelect';
+import SelectRow from './components/room/SelectRow';
+import TimeOptionCard from './components/room/TimeOptionCard';
+import OptionItem from './components/room/OptionItem';
+import MessageBubble from './components/room/MessageBubble';
+import ProfileItem from './components/room/ProfileItem';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
@@ -25,6 +33,16 @@ export default function Testpage() {
   const [isSheetVisible, setIsSheetVisible] = useState(false)
   const [selectedId, setSelectedId] = useState(null); // 친구 선택 확인용
   const [coverImage, setCoverImage] = useState(null); // 커버 이미지 확인용
+  const [selectRowText, setSelectRowText] = useState('');
+  const [selectRowOpen, setSelectRowOpen] = useState(false);
+  const [selectedTimeOption, setSelectedTimeOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [dateRange, setDateRange] = useState(null);
+
+  const dateRangeText = dateRange
+    ? `${dateRange.start.month}.${dateRange.start.day}-${dateRange.end.month}.${dateRange.end.day}`
+    : '날짜 미선택';
+  const selectRowInputRef = useRef(null);
 
 
   const dummyRooms = [
@@ -126,6 +144,23 @@ export default function Testpage() {
                 </div>
             </div>
 
+            {/* 칩 필터 */}
+            <div>
+                <h3> 칩 필터 </h3>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <ChipFilter text="텍스트" />
+                </div>
+            </div>
+
+            {/* 칩 스케줄 옵션 */}
+            <div>
+                <h3> 칩 스케줄 옵션 </h3>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <ChipScheduleOption text={dateRangeText} />
+                </div>
+            </div>
+
+
             {/* 입력 필드 */}
             <div>
                 <h3> 검색 필드 </h3>
@@ -134,6 +169,10 @@ export default function Testpage() {
                     <DateField />
                 </div>
             </div>
+        </div>
+        <div style={{ padding: '40px 40px 0' }}>
+            <h3> 방-일정선택 </h3>
+            <DatePicker onChange={setDateRange} />
         </div>
         <div style={{ display: 'flex', gap: '20px' }}>
             {/* 탭 버튼 */}
@@ -200,6 +239,66 @@ export default function Testpage() {
             ))}
             </div>
         </div>
+        <div>
+            <h3>셀렉트 로우</h3>
+            <div style={{ width: '350px', backgroundColor: '#EFEFEF', padding: '0 20px', boxSizing: 'border-box' }}>
+                <div style={{ position: 'relative' }}>
+                    <SelectRow
+                        left_icon={true}
+                        right_icon={true}
+                        text_empty="텍스트를 입력하세요"
+                        text_selected={selectRowText}
+                        text_typing={selectRowText}
+                        state={selectRowOpen ? 'typing' : selectRowText === '' ? 'empty' : 'selected'}
+                        onClick={() => {
+                            setSelectRowOpen(true);
+                            setTimeout(() => selectRowInputRef.current?.focus(), 0);
+                        }}
+                    />
+                    {selectRowOpen && (
+                        <input
+                            ref={selectRowInputRef}
+                            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'text', width: '100%' }}
+                            value={selectRowText}
+                            onChange={(e) => setSelectRowText(e.target.value)}
+                            onBlur={() => setSelectRowOpen(false)}
+                        />
+                    )}
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3>프로필 아이템</h3>
+            <div style={{ display: 'flex', gap: '16px' }}>
+                <ProfileItem name="테이브" />
+                <ProfileItem name="캘박하조" />
+                <ProfileItem name="연합 프로젝트" />
+            </div>
+        </div>
+        <div style={{ padding: '40px 40px 0' }}>
+            <h3>시간대 추천 선택</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <TimeOptionCard date={22} dayOfWeek="금요일" timeRange="11:00~13:00" memberCount={4} totalCount={6} selected={selectedTimeOption === 0} onClick={() => setSelectedTimeOption(0)} />
+                <TimeOptionCard date={23} dayOfWeek="토요일" timeRange="14:00~16:00" memberCount={2} totalCount={6} selected={selectedTimeOption === 1} onClick={() => setSelectedTimeOption(1)} />
+            </div>
+        </div>
+        <div style={{ padding: '40px 40px 0' }}>
+            <h3>옵션 아이템</h3>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <OptionItem text="옵션 1" selected={selectedOption === 0} onClick={() => setSelectedOption(0)} />
+                <OptionItem text="옵션 2" selected={selectedOption === 1} onClick={() => setSelectedOption(1)} />
+                <OptionItem text="옵션 3" selected={selectedOption === 2} onClick={() => setSelectedOption(2)} />
+            </div>
+        </div>
+        <div style={{ padding: '40px 40px 0' }}>
+            <h3>메시지 버블</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '350px', background: '#F6F6F6', padding: '16px', boxSizing: 'border-box' }}>
+                <MessageBubble type="received-shown" senderName="테이브" text="안녕하세요! 일정 확인해주세요." profileImage={null} />
+                <MessageBubble type="received-hidden" text="내일 오후 2시에 만나요." />
+                <MessageBubble type="sent" text="넵 확인했습니다!" />
+            </div>
+        </div>
     </ThemeProvider>
+
   );
 }

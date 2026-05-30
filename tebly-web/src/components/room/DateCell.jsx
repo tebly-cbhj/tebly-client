@@ -58,11 +58,11 @@ const DateText = styled.span`
 
 const TodayDot = styled.span`
   position: absolute;
-  bottom: 4px;
+  bottom: 0.25rem;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
+  width: 0.25rem;
+  height: 0.25rem;
   border-radius: 50%;
   background: ${(props) => props.theme.colors.primary100};
   z-index: 2;

@@ -6,7 +6,11 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig({
   plugins: [react(), svgr()],
   server: {
-    host: '0.0.0.0', // 이 줄 추가! 외부 기기 접근 허용
+    host: '0.0.0.0',
     port: 5173,
+    watch: {
+      usePolling: true,
+      interval: 300,
+    },
   },
 })
