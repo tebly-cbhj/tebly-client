@@ -29,7 +29,7 @@ export const useRoomStore = create((set) => ({
     },
   ],
 
-  // 새로운 방을 추가 함수
+  // 새로운 방을 추가하는 함수
   addRoom: (newTitle, newDesc, members) => set((state) => ({
     rooms: [
       ...state.rooms,

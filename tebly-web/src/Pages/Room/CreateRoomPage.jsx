@@ -6,6 +6,7 @@ import TextField from "../../components/common/TextField";
 import { PageWrapper } from '../../PageWrapper';
 import Btn from "../../components/common/Btn";
 import ActionSheet from "../../components/common/ActionSheet";
+import Header from "../../components/common/Header";
 
 // 헤더 아래 16px 간격
 const ContentArea = styled.div`
@@ -45,6 +46,12 @@ const CreateRoom = () => {
 
   return (
     <PageWrapper style={{ alignItems: 'center' }}>
+      <Header 
+        title="방 만들기"
+        leftIcon="chevron-left"
+        onLeft={() => navigate(-1)}
+        icons={[]}
+      />
       <ContentArea>
         <RoomCover onClick={() => setSheetVisible(true)} />
 

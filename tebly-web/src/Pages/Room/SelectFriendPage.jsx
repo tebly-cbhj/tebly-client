@@ -8,6 +8,7 @@ import FriendsSelect from "../../components/common/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
 import { useFriendStore } from '../../store/FriendStore';
+import Header from "../../components/common/Header";
 
 // 헤더 아래 16px
 const ContentArea = styled.div`
@@ -98,6 +99,12 @@ const SelectFriendPage = () => {
 
   return (
     <PageWrapper>
+      <Header 
+              title="친구 선택"
+              leftIcon="chevron-left"
+              onLeft={() => navigate(-1)}
+              icons={[]}
+            />
       <ContentArea>
         <SearchField placeholder="초대 할 친구 검색" />
         <FriendsWrapper>
@@ -128,18 +135,16 @@ const SelectFriendPage = () => {
             text="완료"
             disabled={!isActive}
             onClick={() => {
-                // 💡 5. 완료 버튼 로직 완성!
                 if (currentRoomId) {
-                  // 기존 방 번호가 있다면 업데이트 함수 실행!
+                  // 기존 방 번호가 있다면 업데이트 함수 실행
                   updateRoomMembers(currentRoomId, selected);
+                  navigate(-1);
                 } else {
-                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행!
+                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행
                   const { roomName, description } = location.state || {};
                   addRoom(roomName, description, selected); 
+                  navigate('/');
                 }
-                
-                // 완료 후 메인 홈(또는 이전 페이지)으로 이동
-                navigate(-1); // navigate('/') 도 좋지만, 보통 '완료' 후엔 방금 전 방 화면으로 돌아가는게 자연스럽습니다.
             }}
           />
         </BtnWrapper>

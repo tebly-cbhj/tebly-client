@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom'; 
 import { useNavigate } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
+import {useRoomStore} from '../../store/RoomStore';
 import RoomSummarySection from '../../components/common/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
 import ScheduleCard from '../../components/common/ScheduleCard';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
+import Header from '../../components/common/Header';
 
 const CardList = styled.div`
   display: flex;
@@ -30,9 +32,16 @@ export default function RoomInfoPage() {
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('tab1');
   const { schedules } = useScheduleStore();
+  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
 
   return (
     <PageWrapper>
+      <Header 
+        title={room?.title}
+        leftIcon="chevron-left"
+        onLeft={() => navigate(-1)}
+        icons={['bubble', 'more']}
+      />
         <SummaryWrapper>
             <RoomSummarySection roomId={Number(roomId)} />    
         </SummaryWrapper>
