@@ -90,11 +90,11 @@ export default function ActionSheet({ visible, onClose, onOption1, onOption2, op
         
         <ActionGroup>
           <ActionButton onClick={() => { setSelected('option1'); onOption1?.(); }}>
-            <ActionText selected={selected === 'option1'}>텍스트</ActionText>
+            <ActionText selected={selected === 'option1'}>{option1Text}</ActionText>  {/* ← 수정 */}
           </ActionButton>
           <Divider />
           <ActionButton onClick={() => { setSelected('option2'); onOption2?.(); }}>
-            <ActionText selected={selected === 'option2'}>텍스트</ActionText>
+            <ActionText selected={selected === 'option2'}>{option2Text}</ActionText>  {/* ← 수정 */}
           </ActionButton>
         </ActionGroup>
 

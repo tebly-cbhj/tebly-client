@@ -5,6 +5,7 @@ const Card = styled.div`
   padding: 20px 20px 24px 20px;
   align-items: center;
   gap: 20px;
+  cursor: pointer;  // ← 추가
 `;
 
 const Thumbnail = styled.div`
@@ -89,9 +90,9 @@ const SliderFill = styled.div`
   transition: width 0.3s ease;
 `;
 
-export default function ScheduleCard({ title, date, location, acceptedCount, totalCount }) {
+export default function ScheduleCard({ title, date, location, acceptedCount, totalCount, onClick }) {
   return (
-    <Card>
+    <Card onClick={onClick}>
       <Thumbnail />
       <RightSection>
         <Title>{title}</Title>

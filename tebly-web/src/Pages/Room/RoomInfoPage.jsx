@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
+import ActionSheet from '../../components/common/ActionSheet';
 
 const CardList = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ export default function RoomInfoPage() {
   const [currentTab, setCurrentTab] = useState('tab1');
   const { schedules } = useScheduleStore();
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
+  const [isSheetOpen, setIsSheetOpen] = useState(false);  
 
   return (
     <PageWrapper>
@@ -41,6 +43,9 @@ export default function RoomInfoPage() {
         leftIcon="chevron-left"
         onLeft={() => navigate(-1)}
         icons={['bubble', 'more']}
+        onIconClick={(icon) => {
+          if (icon === 'more') setIsSheetOpen(true);  // ← more 클릭시 열기
+        }}
       />
         <SummaryWrapper>
             <RoomSummarySection roomId={Number(roomId)} />    
@@ -62,6 +67,16 @@ export default function RoomInfoPage() {
         <FloatingWrapper>
             <AddBtn onClick={() => navigate('/test')} />
       </FloatingWrapper>
+      {isSheetOpen && (
+        <ActionSheet
+          visible={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          option1Text="방 수정하기"
+          option2Text="방 나가기"
+          onOption1={() => { setIsSheetOpen(false); }}
+          onOption2={() => { setIsSheetOpen(false); }}
+        />
+      )}
     </PageWrapper>
   );
 }
