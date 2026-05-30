@@ -59,7 +59,7 @@ const ActionButton = styled.button`
 const ActionText = styled.span`
   ${({ theme }) => theme.typography.btn2};
   color: ${({ selected, theme }) => 
-    selected ? theme.colors.red100 : theme.colors.gray900};
+    selected ? theme.colors.primary100 : theme.colors.gray900};
 `;
 
 // 하단 버튼 텍스트
@@ -79,7 +79,7 @@ const CancelGroup = styled(ActionGroup)`
   margin-top: 12px;
 `;
 
-export default function ActionSheet({ visible, onClose, onOption1, onOption2 }) {
+export default function ActionSheet({ visible, onClose, onOption1, onOption2, option1Text, option2Text }) {
   const [selected, setSelected] = useState(null);
 
   if (!visible) return null;

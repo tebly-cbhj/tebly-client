@@ -1,9 +1,11 @@
 export const theme = {
 // 컬러 팔레트
   colors: {
-    red100: '#B92D2D', // primary color
-    red50: '#CE6C6C', 
-    red30: '#E3ABAB',  
+    primary100: '#34BAA0', // primary color
+    primary50: '#81D0C1', 
+    primary30: '#92F2DE',  
+    primary10: '#EFFFFB',
+    alert: "#E31818",
     gray900: '#1A1A1A',  
     gray800: '#525252', 
     gray500: '#A3A3A3', 

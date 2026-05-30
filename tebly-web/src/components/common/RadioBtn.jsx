@@ -8,8 +8,8 @@ const RadioOuter = styled.div`
 
   border-radius: 24px;
   border: 2px solid ${(props) => props.$selected
-    ? props.theme.colors.red30
-    : props.theme.colors.gray300};      //클릭 되면 red30, 안되면 gray300
+    ? props.theme.colors.primary30
+    : props.theme.colors.gray300};      //클릭 되면 primary30, 안되면 gray300
   background: ${(props) => props.theme.colors.gray100};
 
   display: flex;
@@ -26,7 +26,7 @@ const RadioInner = styled.div`
   aspect-ratio: 1/1;
 
   border-radius: 14px;
-  background: ${(props) => props.theme.colors.red100};
+  background: ${(props) => props.theme.colors.primary100};
 
   opacity: ${(props) => props.$selected ? 1 : 0};
   transition: opacity 0.2s ease;
