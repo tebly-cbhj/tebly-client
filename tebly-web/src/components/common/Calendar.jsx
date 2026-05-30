@@ -57,10 +57,10 @@ const DateNumber = styled.div`
   line-height: 140%; 
   letter-spacing: -0.35px;
 
-  // 선택된 날짜의 글씨 색은 red100, 아니면 gray900
+  // 선택된 날짜의 글씨 색은 primary100, 아니면 gray900
   color: ${(props) => 
     props.$isSelected && props.$hasMemo 
-      ? props.theme.colors.red100 
+      ? props.theme.colors.primary100 
       : props.theme.colors.gray900};
 `;
 
@@ -80,10 +80,10 @@ const EventContainer = styled.div`
   line-height: 140%;
   letter-spacing: -0.25px;
 
-    // 선택된 날짜의 이벤트 글씨 색은 red100, 아니면 gray900
+    // 선택된 날짜의 이벤트 글씨 색은 primary100, 아니면 gray900
   color: ${(props) => 
     props.$isSelected
-      ? props.theme.colors.red100 
+      ? props.theme.colors.primary100 
       : props.theme.colors.gray900};
 `;
 

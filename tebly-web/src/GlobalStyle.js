@@ -6,10 +6,13 @@ export const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
 
-  body {
+  html, body, #root {
+    height: 100%;
     margin: 0;
     padding: 0;
-    
+  }
+
+  body {  
     background-color: ${(props) => props.theme.colors.bg};
     color: ${(props) => props.theme.colors.gray900};
   }

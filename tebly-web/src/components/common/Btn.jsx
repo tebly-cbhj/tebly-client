@@ -5,18 +5,23 @@ const StyledButton = styled.button`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 16px 10px;
   border: none;
   width: 100%;
+  white-space: nowrap;
 
   // small 버튼 높이, 둥글기, 폰트 조절
   height: ${(props) => props.$size === 'small' ? '33px' : '54px'};
-  border-radius: ${(props) => props.$size === 'small' ? '8px' : '16px'};
+  border-radius: ${(props) => props.$size === 'large' ? '16px' : '8px'};
   ${(props) => props.theme.typography[props.$size === 'small' ? 'btn3' : 'btn2']}
+  padding: ${(props) => props.$size === 'small' ? '8px 12px' : '16px 10px'};
   
   
   background-color: ${(props) => 
-    props.disabled ? props.theme.colors.red30 : props.theme.colors.red100};
+  props.disabled 
+    ? props.theme.colors.primary30 
+    : props.defaultTheme
+      ? props.theme.colors.white 
+      : props.theme.colors.primary100};
   
   color: ${(props) => props.theme.colors.white};
   
@@ -29,9 +34,9 @@ const StyledButton = styled.button`
 `;
 
 // 기본 폰트는 btn1 - small size는 사용 시 사이즈 small이라는 것 명시 필요
-export default function Btn({ text, onClick, disabled = false, size = 'large' }) {
+export default function Btn({ text, onClick, disabled = false, size = 'large', defaultTheme = false }) {
   return (
-    <StyledButton onClick={onClick} disabled={disabled} $size={size}>
+    <StyledButton onClick={onClick} disabled={disabled} $size={size} $defaultTheme={defaultTheme}>
       {text}
     </StyledButton>
   );

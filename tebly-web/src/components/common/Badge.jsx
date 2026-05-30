@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import BadgeXIcon from '../../assets/icons/badgeX.svg';
+import BadgeXIcon from '../../assets/icons/close-s.svg';
 
 // 뱃지 프레임
 const BadgeWrapper = styled.div`
@@ -10,6 +10,7 @@ const BadgeWrapper = styled.div`
   gap: 4px;
   border-radius: 8px;
   background: ${(props) => props.theme.colors.white};
+  box-sizing: border-box
 `;
 
 // 프로필 사진
@@ -27,6 +28,7 @@ const ProfileCircle = styled.div`
 // 사용자 이름
 const BadgeText = styled.span`
   ${(props) => props.theme.typography.btn3}
+  white-space: nowrap; 
 `;
 
 // 뱃지 내부 프레임 - 프로필 사진, 사용자 이름

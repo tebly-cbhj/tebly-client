@@ -1,0 +1,151 @@
+import { useState } from "react";
+import styled from "styled-components";
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useRoomStore } from '../../store/RoomStore';
+import { PageWrapper } from '../../PageWrapper';
+import SearchField from "../../components/common/SearchField";
+import FriendsSelect from "../../components/common/FriendsSelect";
+import Badge from "../../components/common/Badge";
+import Btn from "../../components/common/Btn";
+import { useFriendStore } from '../../store/FriendStore';
+
+// 헤더 아래 16px
+const ContentArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+  flex: 1;
+`;
+
+// SearchField ~ FriendsSelect 간격
+const FriendsWrapper = styled.div`
+  margin-top: 12px;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+// 하단 고정 컨테이너
+const SelectListContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background-color: ${({ theme }) => theme.colors.bg};
+  display: flex;
+  flex-direction: column;
+  padding: 12px 20px 34px 20px;  /* 하단 34px */
+  box-sizing: border-box;
+  max-width: 480px;
+`;
+
+// 뱃지 가로 스크롤
+const BadgeScrollArea = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  overflow-x: auto;
+  flex-wrap: nowrap;  
+  width: 100%;       
+  min-width: 0;        
+  flex-shrink: 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const BtnWrapper = styled.div`
+  margin-top: 22px;
+  width: 350px;
+  align-self: center;
+`;
+
+const SelectFriendPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const addRoom = useRoomStore((state) => state.addRoom);
+  const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
+
+  // 💡 3. FriendStore에서 전체 친구 목록을 꺼내옵니다.
+  const friendsList = useFriendStore((state) => state.friends);
+
+  // 1. 출발지에서 넘겨준 방 번호와 방 정보를 확인합니다.
+  const currentRoomId = location.state?.roomId;
+  const existingRoom = useRoomStore((state) => 
+    state.rooms.find((r) => r.id === currentRoomId)
+  );
+
+  // 기존 방 멤버가 있으면 그 멤버들로 초기값 세팅, 아니면 빈 배열!
+  const [selected, setSelected] = useState(existingRoom ? existingRoom.members : []); 
+  const isActive = selected.length > 0;
+
+  // 체크박스 토글 함수
+  const handleToggle = (friend) => {
+    setSelected((prev) =>
+      prev.find((f) => f.id === friend.id)
+        ? prev.filter((f) => f.id !== friend.id) // 이미 선택됐으면 제거
+        : [...prev, friend]                      // 없으면 추가
+    );
+  };
+
+  // 뱃지 X 버튼 삭제 함수
+  const handleRemove = (friendId) => {
+    setSelected((prev) => prev.filter((f) => f.id !== friendId));
+  };
+
+  return (
+    <PageWrapper>
+      <ContentArea>
+        <SearchField placeholder="초대 할 친구 검색" />
+        <FriendsWrapper>
+            {friendsList.map((friend) => (
+                <FriendsSelect
+                  key={friend.id}
+                  friend={friend}
+                  selected={!!selected.find((f) => f.id === friend.id)}
+                  onToggle={() => handleToggle(friend)}
+                />
+            ))}
+        </FriendsWrapper>
+      </ContentArea>
+
+      <SelectListContainer>
+        <BadgeScrollArea>
+          {selected.map((friend) => (
+            <Badge
+                key={friend.id}
+                text={friend.name}
+                profileImg={friend.profileImage}
+                onRemove={() => handleRemove(friend.id)}
+            />
+          ))}
+        </BadgeScrollArea>
+        <BtnWrapper>
+          <Btn
+            text="완료"
+            disabled={!isActive}
+            onClick={() => {
+                // 💡 5. 완료 버튼 로직 완성!
+                if (currentRoomId) {
+                  // 기존 방 번호가 있다면 업데이트 함수 실행!
+                  updateRoomMembers(currentRoomId, selected);
+                } else {
+                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행!
+                  const { roomName, description } = location.state || {};
+                  addRoom(roomName, description, selected); 
+                }
+                
+                // 완료 후 메인 홈(또는 이전 페이지)으로 이동
+                navigate(-1); // navigate('/') 도 좋지만, 보통 '완료' 후엔 방금 전 방 화면으로 돌아가는게 자연스럽습니다.
+            }}
+          />
+        </BtnWrapper>
+      </SelectListContainer>
+    </PageWrapper>
+  );
+};
+
+export default SelectFriendPage;

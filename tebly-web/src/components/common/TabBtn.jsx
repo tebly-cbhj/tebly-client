@@ -4,6 +4,8 @@ const TabContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: center; 
+  gap: 16px;
+  padding: 12px 20px;
 `;
 
 const TabButton = styled.button`
@@ -21,14 +23,14 @@ const TabButton = styled.button`
 
   color: ${(props) => 
     props.$active 
-      ? props.theme.colors.red100 
+      ? props.theme.colors.primary100 
       : props.theme.colors.gray500};
 
   border: none; 
   border-bottom: ${(props) => 
     props.$active 
-      ? `1px solid ${props.theme.colors.red100}` 
-      : 'none'}; // 활성화 된 탭에게만 빨간색 밑줄 부여
+      ? `1px solid ${props.theme.colors.primary100}` 
+      : 'none'}; // 활성화 된 탭에게만 밑줄 부여
 `;
 
 export default function TabBtn({ activeTab, onTabClick }) {

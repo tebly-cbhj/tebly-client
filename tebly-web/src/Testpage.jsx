@@ -13,12 +13,19 @@ import TabBtn from './components/common/TabBtn';
 //import Calendar from './components/common/Calendar';
 import RoomListCard from './components/common/RoomListCard';
 //import AddBtn from './components/common/AddBtn';
+import ActionSheet from './components/common/ActionSheet';
+import RoomCover from './components/common/RoomCover';
+import FriendsSelect from './components/common/FriendsSelect';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
   const [isOn, setIsOn] = useState(false);
   const [badges, setBadges] = useState(['테이브', '캘박하조조조']);
   const [currentTab, setCurrentTab] = useState('tab1'); // 탭 확인용
+  const [isSheetVisible, setIsSheetVisible] = useState(false)
+  const [selectedId, setSelectedId] = useState(null); // 친구 선택 확인용
+  const [coverImage, setCoverImage] = useState(null); // 커버 이미지 확인용
+
 
   const dummyRooms = [
     {
@@ -34,6 +41,12 @@ export default function Testpage() {
       avatars: [null, null], // 아바타 2개 겹침
     }
   ];
+
+  const DummyFriends = [
+    { id: 1, name: '테이브', profileImage: null },
+    { id: 2, name: '캘박하조', profileImage: null },
+    { id: 3, name: '연합 프로젝트', profileImage: null },
+    ];
 
   return (
     <ThemeProvider theme={theme}>
@@ -134,6 +147,7 @@ export default function Testpage() {
                 <h3> 달력 </h3>
                 <Calendar />
             </div>*/}
+        
 
             {/* 방 카드 */}
             <div>
@@ -148,6 +162,42 @@ export default function Testpage() {
                         />
                     ))}
                 </div>
+            </div>
+        </div>
+        <div style={{ display: 'flex', gap: '20px' }}>
+            {/* 액션 시트 */}
+            <div>
+                <h3> 액션 시트 </h3>
+                <button onClick={() => setIsSheetVisible(true)}>
+                    액션 시트 열기
+                </button>
+                <ActionSheet 
+                    visible={isSheetVisible} 
+                    onClose={() => setIsSheetVisible(false)} 
+                    onOption1={() => console.log('첫 번째 버튼 클릭됨!')}
+                    onOption2={() => console.log('두 번째 버튼 클릭됨!')}
+                />
+            </div>
+            {/* 커버 이미지 업로드 */} 
+            <div>
+                <h3> 커버 이미지 업로드 </h3>
+                <RoomCover
+                    imageUrl={coverImage}
+                    onClick={() => { /* 갤러리 열기 */ }}
+                />
+            </div>
+
+            {/* 친구 선택 */}
+            <div>
+                <h3> 친구 선택 </h3>
+                {DummyFriends.map((friend) => (
+                    <FriendsSelect
+                    key={friend.id}
+                    friend={friend}
+                    selected={selectedId === friend.id}
+                    onToggle={() => setSelectedId(friend.id)}
+                    />
+            ))}
             </div>
         </div>
     </ThemeProvider>

@@ -14,7 +14,7 @@ const ToggleWrapper = styled.button`
   
   // 배경 색상
   background-color: ${(props) =>
-    props.$isOn ? props.theme.colors.red100 : props.theme.colors.gray500};
+    props.$isOn ? props.theme.colors.primary100 : props.theme.colors.gray500};
 
   transition: all 0.3s ease-in-out;
 `;
