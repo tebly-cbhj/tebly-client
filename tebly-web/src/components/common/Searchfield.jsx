@@ -10,18 +10,17 @@ const SearchIcon = styled(SearchIconSvg)`
   color: ${(props) => props.theme.colors.gray800};
 `;
 
-export default function SearchField({ placeholder = '검색' }) {
-  const [value, setValue] = useState('');
+export default function SearchField({ placeholder = '검색', value, onChange }) {
   const [focused, setFocused] = useState(false);
 
   return (
     <FieldWrapper $focused={focused}>
       <SearchIcon />
       <FieldInput
-        value={value}
+        value={value}               // ← 밖에서 받은 값 사용
         placeholder={placeholder}
         $hasValue={value.length > 0}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={onChange}         // ← 밖에서 받은 함수 사용
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
