@@ -84,22 +84,17 @@ export default function ActionSheet({ visible, onClose, onOption1, onOption2, op
 
   if (!visible) return null;
 
-  const handleClose = () => {
-    setSelected(null);  // 추가
-    onClose();
-  };
-
   return (
     <Overlay onClick={onClose}>
       <SheetContainer onClick={(e) => e.stopPropagation()}>
         
         <ActionGroup>
           <ActionButton onClick={() => { setSelected('option1'); onOption1?.(); }}>
-            <ActionText>{option1Text}</ActionText>
+            <ActionText selected={selected === 'option1'}>텍스트</ActionText>
           </ActionButton>
           <Divider />
           <ActionButton onClick={() => { setSelected('option2'); onOption2?.(); }}>
-            <ActionText>{option2Text}</ActionText>
+            <ActionText selected={selected === 'option2'}>텍스트</ActionText>
           </ActionButton>
         </ActionGroup>
 

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import BadgeXIcon from '../../assets/icons/badgeX.svg';
+import BadgeXIcon from '../../assets/icons/close-s.svg';
 
 // 뱃지 프레임
 const BadgeWrapper = styled.div`

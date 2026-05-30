@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import RadioBtn from './RadioBtn'; 
+import RadioBtn from './RadioBtn'; // 만들어두신 라디오버튼
 
-// 전체 한 줄
+// 전체 한 줄 (아이템 하나)
 const FriendItem = styled.div`
   display: flex;
   width: 350px;
