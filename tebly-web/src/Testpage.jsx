@@ -24,6 +24,7 @@ import TimeOptionCard from './components/room/TimeOptionCard';
 import OptionItem from './components/room/OptionItem';
 import MessageBubble from './components/room/MessageBubble';
 import ProfileItem from './components/room/ProfileItem';
+import MessageInput from './components/room/MessageInput';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
@@ -38,6 +39,7 @@ export default function Testpage() {
   const [selectedTimeOption, setSelectedTimeOption] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [dateRange, setDateRange] = useState(null);
+  const [messageValue, setMessageValue] = useState('');
 
   const dateRangeText = dateRange
     ? `${dateRange.start.month}.${dateRange.start.day}-${dateRange.end.month}.${dateRange.end.day}`
@@ -296,6 +298,26 @@ export default function Testpage() {
                 <MessageBubble type="received-shown" senderName="테이브" text="안녕하세요! 일정 확인해주세요." profileImage={null} />
                 <MessageBubble type="received-hidden" text="내일 오후 2시에 만나요." />
                 <MessageBubble type="sent" text="넵 확인했습니다!" />
+            </div>
+        </div>
+        <div style={{ padding: '40px 40px 0' }}>
+            <h3>메시지 인풋</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#888' }}>빈 상태 (inactive)</p>
+                <MessageInput
+                    value=""
+                    onChange={() => {}}
+                    onSend={() => {}}
+                />
+                <p style={{ margin: 0, fontSize: '14px', color: '#888' }}>입력 상태 (active)</p>
+                <MessageInput
+                    value={messageValue}
+                    onChange={(e) => setMessageValue(e.target.value)}
+                    onSend={() => {
+                        console.log('전송:', messageValue);
+                        setMessageValue('');
+                    }}
+                />
             </div>
         </div>
     </ThemeProvider>
