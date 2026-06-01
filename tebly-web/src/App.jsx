@@ -6,6 +6,7 @@ import CreateRoomPage from './Pages/Room/CreateRoomPage';
 import SelectFriendPage from './Pages/Room/SelectFriendPage';
 import RoomInfoPage from './Pages/Room/RoomInfoPage';
 import TestPage from './TestPage';
+import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/select-friend" element={<SelectFriendPage />} />
           <Route path="/room/:roomId" element={<RoomInfoPage />} />
           <Route path="/test" element={<TestPage />} />
+          <Route path="/my-appointments" element={<MyAppointMentPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

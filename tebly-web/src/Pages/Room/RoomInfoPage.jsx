@@ -3,9 +3,9 @@ import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import {useRoomStore} from '../../store/RoomStore';
-import RoomSummarySection from '../../components/common/RoomSummarySection';
+import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
-import ScheduleCard from '../../components/common/ScheduleCard';
+import ScheduleCard from '../../components/room/ScheduleCard';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
@@ -32,7 +32,8 @@ export default function RoomInfoPage() {
   const { roomId } = useParams();  
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('tab1');
-  const { schedules } = useScheduleStore();
+  const allSchedules = useScheduleStore((state) => state.schedules);
+  const schedules = allSchedules.filter((s) => s.roomId === Number(roomId));
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
   const [isSheetOpen, setIsSheetOpen] = useState(false);  
 
@@ -52,20 +53,26 @@ export default function RoomInfoPage() {
         </SummaryWrapper>
         <TabBtn activeTab={currentTab} onTabClick={setCurrentTab} />
         <CardList>
-            {schedules.map((schedule) => (
-                <ScheduleCard
-                    key={schedule.id}
-            title={schedule.title}
-            date={schedule.date}
-            location={schedule.location}
-            acceptedCount={schedule.acceptedCount}
-            totalCount={schedule.totalCount}
-          />
-        ))}
-      </CardList>
+          {schedules.map((schedule) => (
+            <ScheduleCard
+              key={schedule.id}
+              title={schedule.title}
+              date={schedule.date}
+              location={schedule.location}
+              acceptedCount={schedule.acceptedIds.length}
+              totalCount={schedule.memberIds.length}
+              onClick={() => navigate('/my-appointments', {
+                state: {
+                  scheduleId: schedule.id,
+                  roomId: Number(roomId)
+                }
+              })}
+            />
+          ))}
+        </CardList>
 
         <FloatingWrapper>
-            <AddBtn onClick={() => navigate('/test')} />
+            <AddBtn onClick={() => navigate('/my-appointments')} />
       </FloatingWrapper>
       {isSheetOpen && (
         <ActionSheet
@@ -73,6 +80,7 @@ export default function RoomInfoPage() {
           onClose={() => setIsSheetOpen(false)}
           option1Text="방 수정하기"
           option2Text="방 나가기"
+          option2Color= "#E31818"
           onOption1={() => { setIsSheetOpen(false); }}
           onOption2={() => { setIsSheetOpen(false); }}
         />

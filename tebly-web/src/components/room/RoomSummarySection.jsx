@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import Btn from './Btn';
+import Btn from '../common/Btn';
 import { useRoomStore } from '../../store/RoomStore';
 
 const Container = styled.div`

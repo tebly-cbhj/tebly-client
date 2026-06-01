@@ -4,13 +4,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
 import { PageWrapper } from '../../PageWrapper';
 import SearchField from "../../components/common/SearchField";
-import FriendsSelect from "../../components/common/FriendsSelect";
+import FriendsSelect from "../../components/room/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
 import { useFriendStore } from '../../store/FriendStore';
 import Header from "../../components/common/Header";
 
-// 헤더 아래 16px
+
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;

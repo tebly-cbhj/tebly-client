@@ -2,25 +2,42 @@ import { create } from 'zustand';
 
 export const useScheduleStore = create((set) => ({
   schedules: [
-    {
-      id: 1,
-      title: '떡볶이 모임',
-      date: '2026.05.12 (화)',
-      location: '엽기떡볶이 신촌점',
-      acceptedCount: 4,
-      totalCount: 6
-    },
-    {
-      id: 2,
-      title: '카페 모임',
-      date: '2026.05.15 (금)',
-      location: '스타벅스 강남점',
-      acceptedCount: 2,
-      totalCount: 5
-    },
-  ],
+  {
+    id: 1,
+    roomId: 1,
+    title: '떡볶이 모임',
+    date: '2026.05.12 (화)',
+    location: '엽기떡볶이 신촌점',
+    category: '약속',
+    alarmTime: '30분 전',
+    memberIds: [1, 2],  // RoomStore 1번 방 멤버 id 그대로
+    acceptedIds: [1],
+  },
+  {
+    id: 2,
+    roomId: 1,
+    title: '카페 모임',
+    date: '2026.05.15 (금)',
+    location: '스타벅스 강남점',
+    category: '카페',
+    alarmTime: '1시간 전',
+    memberIds: [1, 2],  // RoomStore 1번 방 멤버 id 그대로
+    acceptedIds: [1, 2],
+  },
+],
 
-  addSchedule: (newSchedule) => set((state) => ({
-    schedules: [...state.schedules, { id: Date.now(), ...newSchedule }]
-  }))
+  categories: ['약속', '동아리', '가족', '자기개발', '알바', '수업', '여가', '팀 프로젝트', '기타'],
+  alarmOptions: ['1일 전', '1시간 전', '30분 전', '15분 전'],
+
+  addSchedule: (roomId, newSchedule) => set((state) => ({
+    schedules: [...state.schedules, { id: Date.now(), roomId, ...newSchedule }]
+  })),
+
+  addCategory: (newCategory) => set((state) => ({
+    categories: [...state.categories, newCategory]
+  })),
+
+  deleteSchedule: (scheduleId) => set((state) => ({
+    schedules: state.schedules.filter((s) => s.id !== scheduleId)
+  })),
 }));

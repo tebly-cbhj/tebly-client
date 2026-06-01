@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import CategoryIcon from '../../assets/icons/category.svg?react';
 import ChevronRightIcon from '../../assets/icons/chevron-right.svg?react';
 
 const Row = styled.div`
@@ -41,7 +40,7 @@ const Cursor = styled.div`
 `;
 
 export default function SelectRow({
-  left_icon = false,
+  LeftIcon = null,   // 아이콘 컴포넌트를 직접 받음 (예: PlaceIcon)
   right_icon = false,
   text_empty = '',
   text_selected = '',
@@ -56,7 +55,7 @@ export default function SelectRow({
 
   return (
     <Row onClick={onClick}>
-      {left_icon && <IconWrapper><CategoryIcon /></IconWrapper>}
+      {LeftIcon && <IconWrapper><LeftIcon /></IconWrapper>}
       <Label>
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Text $state={state}>{text}</Text>

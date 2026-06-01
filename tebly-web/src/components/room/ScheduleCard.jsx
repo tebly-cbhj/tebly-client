@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import MemberIcon from '../../assets/icons/member.svg?react';
 
 const Card = styled.div`
   display: flex;
@@ -58,13 +59,6 @@ const CountContainer = styled.div`
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-`;
-
-const MemberIcon = styled.div`
-  width: 16px;
-  height: 16px;
-  background-color: ${({ theme }) => theme.colors.gray500}; /* 아이콘 임시 */
-  border-radius: 50%;
 `;
 
 const CountText = styled.span`

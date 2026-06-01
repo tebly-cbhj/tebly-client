@@ -1,4 +1,4 @@
-import { useState } from 'react';
+//import { useState } from 'react';
 import styled from 'styled-components';
 
 const ChipWrapper = styled.div`
@@ -28,17 +28,10 @@ const ChipText = styled.span`
     $selected ? theme.colors.primary100 : theme.colors.gray800};
 `;
 
-export default function ChipFilter({ text = '', onClick }) {
-  const [isSelected, setIsSelected] = useState(false);
-
-  const handleClick = (e) => {
-    setIsSelected(!isSelected);
-    if (onClick) onClick(e);
-  };
-
+export default function ChipFilter({ text = '', selected = false, onClick }) {
   return (
-    <ChipWrapper $selected={isSelected} onClick={handleClick}>
-      <ChipText $selected={isSelected}>{text}</ChipText>
+    <ChipWrapper $selected={selected} onClick={onClick}>
+      <ChipText $selected={selected}>{text}</ChipText>
     </ChipWrapper>
   );
 }
