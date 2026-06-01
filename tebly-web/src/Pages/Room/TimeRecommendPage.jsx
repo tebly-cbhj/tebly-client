@@ -168,7 +168,7 @@ const MonthHeader = styled.div`
   width: 21rem;
   justify-content: space-between;
   align-items: center;
-  
+  margin-bottom: 2.25rem;
 `;
 
 const MonthLabel = styled.span`
@@ -208,7 +208,8 @@ const CalendarGrid = styled.div`
 const DateButtonRow = styled.div`
   display: flex;
   gap: 0.75rem;
-  padding: 0.75rem 1.25rem 2.125rem;
+  padding: 0 1.25rem 2.125rem;
+  margin-top: 0.75rem;
   flex-shrink: 0;
 `;
 
