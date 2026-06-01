@@ -17,6 +17,7 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 /* ✅ 폰트 기본 설정 (Pretendard는 theme.js에서 관리하므로 최소한만) */

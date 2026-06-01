@@ -30,9 +30,9 @@ function CalendarIcon() {
   );
 }
 
-export default function ChipScheduleOption({ text }) {
+export default function ChipScheduleOption({ text, onClick }) {
   return (
-    <Chip>
+    <Chip onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <CalendarIcon />
       <Text>{text}</Text>
     </Chip>
