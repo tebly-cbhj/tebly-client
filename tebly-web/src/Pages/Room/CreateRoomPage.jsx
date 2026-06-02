@@ -1,13 +1,14 @@
 import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import RoomCover from "../../components/common/RoomCover";
+import RoomCover from "../../components/room/RoomCover";
 import TextField from "../../components/common/TextField";
 import { PageWrapper } from '../../PageWrapper';
 import Btn from "../../components/common/Btn";
 import ActionSheet from "../../components/common/ActionSheet";
+import Header from "../../components/common/Header";
 
-// 헤더 아래 16px 간격
+
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
@@ -45,6 +46,12 @@ const CreateRoom = () => {
 
   return (
     <PageWrapper style={{ alignItems: 'center' }}>
+      <Header 
+        title="방 만들기"
+        leftIcon="chevron-left"
+        onLeft={() => navigate(-1)}
+        icons={[]}
+      />
       <ContentArea>
         <RoomCover onClick={() => setSheetVisible(true)} />
 

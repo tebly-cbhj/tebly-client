@@ -27,7 +27,7 @@ const AddBtn = ({ onClick }) => {  // onClick props 받기
         $isOpen={isOpen}
         onClick={() => {
           setIsOpen(!isOpen);
-          onClick?.();  // 외부에서 넘긴 onClick도 실행
+          onClick?.();  
         }}
       />
     </ButtonWrapper>

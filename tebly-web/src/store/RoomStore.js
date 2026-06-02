@@ -9,6 +9,9 @@ export const useRoomStore = create((set) => ({
       members: [
         { id: 1, name: '김돌리', profileImage: null },
         { id: 2, name: '최또치', profileImage: null },
+        { id: 3, name: '고길동', profileImage: null },
+        { id: 4, name: '희동이', profileImage: null },
+        { id: 5, name: '마이쿨', profileImage: null },
       ] 
     },
     { 
@@ -29,7 +32,7 @@ export const useRoomStore = create((set) => ({
     },
   ],
 
-  // 새로운 방을 추가 함수
+  // 새로운 방을 추가하는 함수
   addRoom: (newTitle, newDesc, members) => set((state) => ({
     rooms: [
       ...state.rooms,

@@ -4,12 +4,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
 import { PageWrapper } from '../../PageWrapper';
 import SearchField from "../../components/common/SearchField";
-import FriendsSelect from "../../components/common/FriendsSelect";
+import FriendsSelect from "../../components/room/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
 import { useFriendStore } from '../../store/FriendStore';
+import Header from "../../components/common/Header";
 
-// 헤더 아래 16px
+
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
@@ -68,17 +69,18 @@ const SelectFriendPage = () => {
   const location = useLocation();
   const addRoom = useRoomStore((state) => state.addRoom);
   const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
+  const [searchText, setSearchText] = useState("");
 
-  // 💡 3. FriendStore에서 전체 친구 목록을 꺼내옵니다.
-  const friendsList = useFriendStore((state) => state.friends);
+  const friendsList = useFriendStore((state) => state.friends);  
+  const filteredFriends = friendsList.filter((friend) =>         
+    friend.name.includes(searchText)
+  );
 
-  // 1. 출발지에서 넘겨준 방 번호와 방 정보를 확인합니다.
   const currentRoomId = location.state?.roomId;
   const existingRoom = useRoomStore((state) => 
     state.rooms.find((r) => r.id === currentRoomId)
   );
 
-  // 기존 방 멤버가 있으면 그 멤버들로 초기값 세팅, 아니면 빈 배열!
   const [selected, setSelected] = useState(existingRoom ? existingRoom.members : []); 
   const isActive = selected.length > 0;
 
@@ -98,10 +100,20 @@ const SelectFriendPage = () => {
 
   return (
     <PageWrapper>
+      <Header 
+              title="친구 선택"
+              leftIcon="chevron-left"
+              onLeft={() => navigate(-1)}
+              icons={[]}
+            />
       <ContentArea>
-        <SearchField placeholder="초대 할 친구 검색" />
+        <SearchField
+          placeholder="초대 할 친구 검색"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
         <FriendsWrapper>
-            {friendsList.map((friend) => (
+            {filteredFriends.map((friend) => (
                 <FriendsSelect
                   key={friend.id}
                   friend={friend}
@@ -128,18 +140,16 @@ const SelectFriendPage = () => {
             text="완료"
             disabled={!isActive}
             onClick={() => {
-                // 💡 5. 완료 버튼 로직 완성!
                 if (currentRoomId) {
-                  // 기존 방 번호가 있다면 업데이트 함수 실행!
+                  // 기존 방 번호가 있다면 업데이트 함수 실행
                   updateRoomMembers(currentRoomId, selected);
+                  navigate(-1);
                 } else {
-                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행!
+                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행
                   const { roomName, description } = location.state || {};
                   addRoom(roomName, description, selected); 
+                  navigate('/');
                 }
-                
-                // 완료 후 메인 홈(또는 이전 페이지)으로 이동
-                navigate(-1); // navigate('/') 도 좋지만, 보통 '완료' 후엔 방금 전 방 화면으로 돌아가는게 자연스럽습니다.
             }}
           />
         </BtnWrapper>

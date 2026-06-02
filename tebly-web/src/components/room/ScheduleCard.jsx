@@ -1,19 +1,28 @@
 import styled from 'styled-components';
+import MemberIcon from '../../assets/icons/member.svg?react';
 
 const Card = styled.div`
   display: flex;
   padding: 20px 20px 24px 20px;
   align-items: center;
   gap: 20px;
+  cursor: pointer;
 `;
 
 const Thumbnail = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: ${({ theme }) => theme.colors.primary100};
+  background-color: ${({ theme }) => theme.colors.primary10};
   flex-shrink: 0;
   transform: translateY(2px);
+  overflow: hidden;
+
+  svg {
+    width: 80px;
+    height: 80px;
+    display: block;
+  }
 `;
 
 const RightSection = styled.div`
@@ -26,21 +35,13 @@ const RightSection = styled.div`
 `;
 
 const Title = styled.span`
+  ${({ theme }) => theme.typography.s1};
   color: ${({ theme }) => theme.colors.gray900};
-  font-family: Pretendard;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 140%;
-  letter-spacing: -0.45px;
 `;
 
 const SubText = styled.span`
+  ${({ theme }) => theme.typography.body3};
   color: ${({ theme }) => theme.colors.gray500};
-  font-family: Pretendard;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: -0.35px;
 `;
 
 const ParticipantContainer = styled.div`
@@ -49,7 +50,7 @@ const ParticipantContainer = styled.div`
   align-items: flex-end;
   gap: 4px;
   align-self: stretch;
-  margin-top: -8px; /* 텍스트 컨테이너랑 8px 겹치게 */
+  margin-top: -8px;
 `;
 
 const CountContainer = styled.div`
@@ -59,20 +60,9 @@ const CountContainer = styled.div`
   gap: 4px;
 `;
 
-const MemberIcon = styled.div`
-  width: 16px;
-  height: 16px;
-  background-color: ${({ theme }) => theme.colors.gray500}; /* 아이콘 임시 */
-  border-radius: 50%;
-`;
-
 const CountText = styled.span`
+  ${({ theme }) => theme.typography.body3};
   color: ${({ theme }) => theme.colors.gray500};
-  font-family: Pretendard;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: -0.35px;
 `;
 
 const SliderTrack = styled.div`
@@ -89,21 +79,38 @@ const SliderFill = styled.div`
   transition: width 0.3s ease;
 `;
 
-export default function ScheduleCard({ title, date, location, acceptedCount, totalCount }) {
+export default function ScheduleCard({
+  title,
+  date,
+  location,
+  acceptedCount,
+  totalCount,
+  CategoryImage,
+  onClick,
+}) {
+  const ratio = totalCount > 0 ? acceptedCount / totalCount : 0;
+
   return (
-    <Card>
-      <Thumbnail />
+    <Card onClick={onClick}>
+      <Thumbnail>
+        {CategoryImage && <CategoryImage />}
+      </Thumbnail>
+
       <RightSection>
         <Title>{title}</Title>
         <SubText>{date}</SubText>
         <SubText>{location}</SubText>
+
         <ParticipantContainer>
           <CountContainer>
             <MemberIcon />
-            <CountText>{acceptedCount}/{totalCount}</CountText>
+            <CountText>
+              {acceptedCount}/{totalCount}
+            </CountText>
           </CountContainer>
+
           <SliderTrack>
-            <SliderFill $ratio={acceptedCount / totalCount} />
+            <SliderFill $ratio={ratio} />
           </SliderTrack>
         </ParticipantContainer>
       </RightSection>

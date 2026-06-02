@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import Btn from './Btn';
-import { useRoomStore } from '../../store/roomStore';
+import Btn from '../common/Btn';
+import { useRoomStore } from '../../store/RoomStore';
 
 const Container = styled.div`
   display: flex;
@@ -91,7 +91,7 @@ export default function RoomSummarySection({ roomId, avatars }) {
   
   // store에서 방 정보를 찾아옵니다
   const room = useRoomStore((state) => 
-    state.rooms.find((r) => r.id === roomId)
+    state.rooms.find((r) => String(r.id) === String(roomId))
   );
 
   const avatarList = avatars || (room?.members ? room.members.map(m => m.profileImage) : []);

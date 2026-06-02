@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
-import RoomListCard from '../../components/common/RoomListCard';
+import RoomListCard from '../../components/room/RoomListCard';
 import { useRoomStore } from '../../store/RoomStore';
 import AddBtn from '../../components/common/AddBtn';
+import Header2 from '../../components/common/Header2'
 
 
 const RoomListContainer = styled.div`
@@ -35,6 +36,7 @@ export default function RoomListPage() {
 
   return (
     <PageWrapper>
+      <Header2 title="방" icons={['letter', 'bell']} />
       <RoomListContainer>
         {rooms.map((room) => (
           <RoomListCard
