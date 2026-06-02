@@ -5,17 +5,40 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 import { useRoomStore } from '../../store/RoomStore';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
-import ScheduleCard from '../../components/room/ScheduleCard';
 import SelectRow from '../../components/room/SelectRow';
 import ProfileItem from '../../components/room/ProfileItem';
 import ChipFilter from '../../components/room/ChipFilter';
 import Btn from '../../components/common/Btn';
 import ActionSheet from '../../components/common/ActionSheet';
+import ScheduleInfo from '../../components/room/ScheduleInfo';
+import PokePopup from '../../components/room/PokePopup';
 
 import PlaceIcon from '../../assets/icons/place.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
 import FriendsIcon from '../../assets/icons/friends.svg?react';
+
+import Appointment from '../../assets/category/appointment_selected.svg?react';
+import Class from '../../assets/category/class_selected.svg?react';
+import Club from '../../assets/category/club_selected.svg?react';
+import Family from '../../assets/category/famliy_selected.svg?react';
+import Free from '../../assets/category/free_selected.svg?react';
+import Others from '../../assets/category/others_selected.svg?react';
+import SelfStudy from '../../assets/category/selfstudy_selected.svg?react';
+import TeamProject from '../../assets/category/teamproject_selected.svg?react';
+import Work from '../../assets/category/work_selected.svg?react';
+
+const categoryImageMap = {
+  약속: Appointment,
+  동아리: Club,
+  가족: Family,
+  자기개발: SelfStudy,
+  알바: Work,
+  수업: Class,
+  여가: Free,
+  '팀 프로젝트': TeamProject,
+  기타: Others,
+};
 
 const ContentArea = styled.div`
   display: flex;
@@ -112,11 +135,11 @@ export default function MyAppointmentPage() {
 
   // RoomStore 멤버에서 schedule.memberIds에 해당하는 사람만 필터링
   const scheduleMembers = room?.members.filter(m => schedule?.memberIds.includes(m.id)) ?? [];
-  const acceptedCount = schedule?.acceptedIds.length ?? 0;
   const totalCount = schedule?.memberIds.length ?? 0;
 
   const [selectedChip, setSelectedChip] = useState(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
 
   return (
     <PageWrapper>
@@ -133,12 +156,11 @@ export default function MyAppointmentPage() {
       <ContentArea>
         <CardWrapper>
           {schedule && (
-            <ScheduleCard
+            <ScheduleInfo
               title={schedule.title}
               date={schedule.date}
-              location={schedule.location}
-              acceptedCount={acceptedCount}
-              totalCount={totalCount}
+              time={schedule.time}
+              CategoryImage={categoryImageMap[schedule.category]}
             />
           )}
         </CardWrapper>
@@ -191,6 +213,7 @@ export default function MyAppointmentPage() {
               key={member.id}
               name={member.name}
               src={member.profileImage}
+              onClick={() => setSelectedMember(member)}
             />
           ))}
         </AttendanceWrapper>
@@ -212,6 +235,16 @@ export default function MyAppointmentPage() {
             navigate(-1);
           }}
         />
+
+        {selectedMember && (
+          <PokePopup
+            memberName={selectedMember.name}
+            onClose={() => setSelectedMember(null)}
+            onPoke={() => {
+              setSelectedMember(null);
+            }}
+          />
+        )}
       </ContentArea>
     </PageWrapper>
   );

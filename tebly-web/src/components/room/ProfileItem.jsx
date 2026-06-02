@@ -6,6 +6,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 `;
 
 const Avatar = styled.img`
@@ -25,9 +26,12 @@ const Name = styled.span`
   letter-spacing: -0.02188rem;
 `;
 
-export default function ProfileItem({ name, src = defaultProfile }) {
+export default function ProfileItem({ name, src = defaultProfile, onClick }) {
   return (
-    <Wrapper>
+    <Wrapper
+      onClick={onClick}
+      $clickable={!!onClick}
+    >
       <Avatar src={src} alt={name} />
       <Name>{name}</Name>
     </Wrapper>
