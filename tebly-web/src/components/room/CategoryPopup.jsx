@@ -61,7 +61,7 @@ const Overlay = styled.div`
 
 const Sheet = styled.div`
   width: 390px;
-  height: 539px;
+  height: 534px;
   border-radius: 32px 32px 0 0;
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0 -4px 12px 0 rgba(68, 68, 68, 0.08);
@@ -70,7 +70,7 @@ const Sheet = styled.div`
 const DragHandleWrapper = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 12px;
+  margin-top: 14px;
 
   svg {
     display: block;
@@ -130,7 +130,7 @@ const CategoryName = styled.div`
 const ButtonRow = styled.div`
   display: flex;
   gap: 12px;
-  margin-top: 36px;
+  margin-top: 46.33px;
   padding: 0 27px;
 `;
 

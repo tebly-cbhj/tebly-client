@@ -50,7 +50,7 @@ const SelectRowContainer = styled.div`
 const BtnWrapper = styled.div`
   position: fixed;
   left: 50%;
-  bottom: 34px;
+  bottom: 21px;
   transform: translateX(-50%);
   width: 350px;
 `;
