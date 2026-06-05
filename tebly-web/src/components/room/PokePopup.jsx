@@ -83,7 +83,7 @@ const PopupBtnWrapper = styled.div`
   right: 20px;
 `;
 
-export default function PokePopup({ memberName, onClose, onPoke }) {
+export default function PokePopup({ onClose, onPoke }) {
   return (
     <Overlay onClick={onClose}>
       <Popup onClick={(e) => e.stopPropagation()}>

@@ -39,14 +39,37 @@ const Cursor = styled.div`
   background: var(--grayscale-gray-800, #525252);
 `;
 
+const Input = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  color: ${({ theme }) => theme.colors.gray900};
+  font-family: Pretendard, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: -0.025rem;
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.gray800};
+  }
+`;
+
 export default function SelectRow({
-  LeftIcon = null,   // 아이콘 컴포넌트를 직접 받음 (예: PlaceIcon)
+  LeftIcon = null,
   right_icon = false,
   text_empty = '',
   text_selected = '',
   text_typing = '',
   state = 'empty',
+  value = '',
   onClick,
+  onChange,
+  onBlur,
+  onKeyDown,
 }) {
   const text =
     state === 'selected' ? text_selected :
@@ -57,10 +80,19 @@ export default function SelectRow({
     <Row onClick={onClick}>
       {LeftIcon && <IconWrapper><LeftIcon /></IconWrapper>}
       <Label>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        {state === 'typing' ? (
+          <Input
+            value={value}
+            onChange={onChange}
+            onBlur={onBlur}
+            onKeyDown={onKeyDown}
+            autoFocus
+            placeholder={text_empty}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
           <Text $state={state}>{text}</Text>
-          {state === 'typing' && <Cursor />}
-        </div>
+        )}
       </Label>
       {right_icon && <IconWrapper><ChevronRightIcon /></IconWrapper>}
     </Row>

@@ -9,6 +9,7 @@ import RoomInfoPage from './Pages/Room/RoomInfoPage';
 import TimeRecommendPage from './Pages/Room/TimeRecommendPage';
 import TestPage from './TestPage';
 import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
+import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/time-recommend" element={<TimeRecommendPage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/my-appointments" element={<MyAppointMentPage />} />
+          <Route path="/create-appointment" element={<CreateAppointmentPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

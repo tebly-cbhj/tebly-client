@@ -2,7 +2,9 @@ import styled from 'styled-components';
 
 export const FieldWrapper = styled.div`
   display: flex;
-  width: 350px;
+  width: ${({ $width }) => {
+    return $width || '350px';
+  }};
   height: 48px;
   padding: 12px;
   align-self: center;

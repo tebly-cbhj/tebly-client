@@ -7,7 +7,8 @@ export const PageWrapper = styled.div`
   align-items: center;
   
   // 세로 높이 세팅 - 헤더/네비게이션 바 제외한 나버지 부분 사용
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   
   // 배경 색
   background-color: ${(props) => props.theme.colors.bg};

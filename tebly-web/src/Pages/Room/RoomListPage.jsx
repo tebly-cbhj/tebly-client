@@ -10,14 +10,19 @@ import Header2 from '../../components/common/Header2'
 const RoomListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px; // 카드간 간격
-  margin-top: 12px; 
-  padding-bottom: 30px; 
+  gap: 20px;
+  margin-top: 12px;
+  padding-bottom: 90px;
   flex: 1;
-  overflow-y: auto; // 세로 스크롤
+  min-height: 0;
+  overflow-y: auto;
   align-items: center;
-  
-  // 스크롤바 숨기기
+  width: 100%;
+
+  & > * {
+    flex-shrink: 0;
+  }
+
   &::-webkit-scrollbar {
     display: none;
   }

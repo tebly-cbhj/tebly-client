@@ -415,7 +415,7 @@ export default function TimeRecommendPage() {
       </CardList>
 
       <BottomArea>
-        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} />
+        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
       </BottomArea>
 
       <LoadingOverlay isLoading={isLoading} />
