@@ -17,15 +17,15 @@ import TeamProjectSelected from '../../assets/category/teamproject_selected.svg?
 import OthersSelected from '../../assets/category/others_selected.svg?react';
 
 const CATEGORY_ICONS = [
-  { id: '약속', Icon: AppointmentSelected },
-  { id: '동아리', Icon: ClubSelected },
-  { id: '가족', Icon: FamilySelected },
-  { id: '자기개발', Icon: SelfStudySelected },
-  { id: '알바', Icon: WorkSelected },
-  { id: '수업', Icon: ClassSelected },
-  { id: '여가', Icon: FreeSelected },
-  { id: '팀 프로젝트', Icon: TeamProjectSelected },
-  { id: '기타', Icon: OthersSelected },
+  { id: 'Appointment', Icon: AppointmentSelected },
+  { id: 'Club', Icon: ClubSelected },
+  { id: 'Family', Icon: FamilySelected },
+  { id: 'SelfDevelopment', Icon: SelfStudySelected },
+  { id: 'Work', Icon: WorkSelected },
+  { id: 'Class', Icon: ClassSelected },
+  { id: 'Leisure', Icon: FreeSelected },
+  { id: 'TeamProject', Icon: TeamProjectSelected },
+  { id: 'Other', Icon: OthersSelected },
 ];
 
 const PopupBox = styled.div`

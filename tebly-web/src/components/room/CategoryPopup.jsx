@@ -6,44 +6,7 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 
 import DragHandleIcon from '../../assets/icons/drag-handle.svg?react';
 
-import Appointment from '../../assets/category/appointment.svg?react';
-import AppointmentSelected from '../../assets/category/appointment_selected.svg?react';
-
-import Club from '../../assets/category/club.svg?react';
-import ClubSelected from '../../assets/category/club_selected.svg?react';
-
-import Family from '../../assets/category/family.svg?react';
-import FamilySelected from '../../assets/category/famliy_selected.svg?react';
-
-import SelfStudy from '../../assets/category/selfstudy.svg?react';
-import SelfStudySelected from '../../assets/category/selfstudy_selected.svg?react';
-
-import Work from '../../assets/category/work.svg?react';
-import WorkSelected from '../../assets/category/work_selected.svg?react';
-
-import Class from '../../assets/category/class.svg?react';
-import ClassSelected from '../../assets/category/class_selected.svg?react';
-
-import Free from '../../assets/category/free.svg?react';
-import FreeSelected from '../../assets/category/free_selected.svg?react';
-
-import TeamProject from '../../assets/category/teamproject.svg?react';
-import TeamProjectSelected from '../../assets/category/teamproject_selected.svg?react';
-
-import Others from '../../assets/category/others.svg?react';
-import OthersSelected from '../../assets/category/others_selected.svg?react';
-
-const CATEGORY_ICON_MAP = {
-  약속: { Icon: Appointment, SelectedIcon: AppointmentSelected },
-  동아리: { Icon: Club, SelectedIcon: ClubSelected },
-  가족: { Icon: Family, SelectedIcon: FamilySelected },
-  자기개발: { Icon: SelfStudy, SelectedIcon: SelfStudySelected },
-  알바: { Icon: Work, SelectedIcon: WorkSelected },
-  수업: { Icon: Class, SelectedIcon: ClassSelected },
-  여가: { Icon: Free, SelectedIcon: FreeSelected },
-  '팀 프로젝트': { Icon: TeamProject, SelectedIcon: TeamProjectSelected },
-  기타: { Icon: Others, SelectedIcon: OthersSelected },
-};
+import { CATEGORY_ICON_MAP } from './categoryIcons';
 
 const Overlay = styled.div`
   position: fixed;
@@ -198,6 +161,7 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
             text="추가하기"
             size="medium"
             variant="gray"
+            disabled={!currentCategory}
             onClick={() => setIsAddPopupOpen(true)}
           />
         </ResetButtonWrapper>
@@ -206,6 +170,7 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
           <Btn
             text="선택 완료"
             size="medium"
+            disabled={!currentCategory}
             onClick={() => onSelect(currentCategory)}
           />
         </ConfirmButtonWrapper>
