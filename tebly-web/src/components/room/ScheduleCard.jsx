@@ -3,10 +3,12 @@ import MemberIcon from '../../assets/icons/member.svg?react';
 
 const Card = styled.div`
   display: flex;
+  width: 390px;
   padding: 20px 20px 24px 20px;
   align-items: center;
   gap: 20px;
   cursor: pointer;
+  box-sizing: border-box;
 `;
 
 const Thumbnail = styled.div`

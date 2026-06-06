@@ -51,7 +51,9 @@ const DateText = styled.span`
   line-height: 1.4rem;
   letter-spacing: -0.025rem;
   color: ${({ $state, theme }) => {
-    if ($state === 'start' || $state === 'end') return theme.colors.white;
+    if ($state === 'start' || $state === 'end' || $state === 'single') {
+      return theme.colors.white;
+    }
     return theme.colors.gray900;
   }};
 `;
@@ -69,7 +71,7 @@ const TodayDot = styled.span`
 `;
 
 export default function DateCell({ date, state = 'default', isToday = false, onClick, onMouseEnter }) {
-  const isSelected = state === 'start' || state === 'end';
+  const isSelected = state === 'start' || state === 'end' || state === 'single';
 
   let rangeBg = 'none';
   if (state === 'start') rangeBg = 'start';

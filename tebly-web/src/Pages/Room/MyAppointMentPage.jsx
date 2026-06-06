@@ -238,7 +238,6 @@ export default function MyAppointmentPage() {
 
         {selectedMember && (
           <PokePopup
-            memberName={selectedMember.name}
             onClose={() => setSelectedMember(null)}
             onPoke={() => {
               setSelectedMember(null);

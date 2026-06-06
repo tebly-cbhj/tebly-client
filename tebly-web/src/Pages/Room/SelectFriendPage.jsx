@@ -102,7 +102,7 @@ const SelectFriendPage = () => {
     <PageWrapper>
       <Header 
               title="친구 선택"
-              leftIcon="chevron-left"
+              leftIcon="back"
               onLeft={() => navigate(-1)}
               icons={[]}
             />

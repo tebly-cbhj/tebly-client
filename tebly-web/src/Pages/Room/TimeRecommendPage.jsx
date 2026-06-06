@@ -9,32 +9,9 @@ import ChipScheduleOption from '../../components/room/ChipScheduleOption';
 import SortButton from '../../components/common/SortButton';
 import OptionItem from '../../components/room/OptionItem';
 import DateCell from '../../components/room/DateCell';
-import ChevronLeft from '../../assets/icons/chevron-left.svg?react';
+import Header from '../../components/common/Header';
 
 // ─── 페이지 레이아웃 ────────────────────────────────────────────
-
-const Header = styled.div`
-  display: flex;
-  width: 24.375rem;
-  padding: 4.25rem 1.25rem 0.75rem 1.25rem;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const BackButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-`;
-
-const Title = styled.h1`
-  ${({ theme }) => theme.typography.s1}
-  color: ${({ theme }) => theme.colors.gray900};
-  margin: 0;
-`;
 
 const FilterBar = styled.div`
   display: flex;
@@ -377,13 +354,7 @@ export default function TimeRecommendPage() {
 
   return (
     <PageWrapper>
-      <Header>
-        <BackButton onClick={() => navigate(-1)}>
-          <ChevronLeft />
-        </BackButton>
-        <Title>약속 만들기</Title>
-        <span style={{ width: '24px' }} />
-      </Header>
+      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
 
       <FilterBar>
         <ChipScheduleOption
@@ -415,7 +386,7 @@ export default function TimeRecommendPage() {
       </CardList>
 
       <BottomArea>
-        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} />
+        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
       </BottomArea>
 
       <LoadingOverlay isLoading={isLoading} />
