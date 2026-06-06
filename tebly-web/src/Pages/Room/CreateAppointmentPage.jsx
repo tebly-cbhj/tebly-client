@@ -77,7 +77,7 @@ export default function CreateAppointmentPage() {
 
   return (
     <PageWrapper>
-      <Header title="약속 만들기" />
+      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
 
       <ContentArea>
         <InputContainer>

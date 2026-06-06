@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import ChevronLeft from '../../assets/icons/chevron-left.svg?react';
+import Back from '../../assets/icons/back.svg?react';
 import Bell from '../../assets/icons/bell-line.svg?react';
 import BellNoti from '../../assets/icons/bell-noti.svg?react';
 import Letter from '../../assets/icons/letter.svg?react';
@@ -70,7 +70,7 @@ const IconStyle = styled.div`
 `;
 
 const leftIconMap = {
-  'chevron-left': <ChevronLeft />,
+  'back': <Back />,
   'close': <Close />,
 };
 
@@ -79,7 +79,9 @@ export default function Header({ title, leftIcon, onLeft, icons = [], onIconClic
     <Container>
       <LeftGroup>
         {leftIcon && (
-          <span onClick={onLeft} style={{ cursor: 'pointer' }}>
+          <span 
+            onClick={onLeft} 
+            style={{ cursor: 'pointer', marginTop: leftIcon === 'back' ? '7px' : '0px' }}>
             {leftIconMap[leftIcon]}
           </span>
         )}

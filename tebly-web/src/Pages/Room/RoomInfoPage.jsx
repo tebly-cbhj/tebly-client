@@ -86,7 +86,7 @@ export default function RoomInfoPage() {
     <PageWrapper>
       <Header 
         title={room?.title}
-        leftIcon="chevron-left"
+        leftIcon="back"
         onLeft={() => navigate(-1)}
         icons={['bubble', 'more']}
         onIconClick={(icon) => {
