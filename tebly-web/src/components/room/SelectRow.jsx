@@ -33,12 +33,6 @@ const Text = styled.span`
   letter-spacing: -0.025rem;
 `;
 
-const Cursor = styled.div`
-  width: 0.0625rem;
-  height: 1rem;
-  background: var(--grayscale-gray-800, #525252);
-`;
-
 const Input = styled.input`
   flex: 1;
   min-width: 0;
