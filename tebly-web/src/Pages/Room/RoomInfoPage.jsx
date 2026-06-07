@@ -90,6 +90,7 @@ export default function RoomInfoPage() {
         onLeft={() => navigate(-1)}
         icons={['bubble', 'more']}
         onIconClick={(icon) => {
+          if (icon === 'bubble') navigate(`/room/${roomId}/chat`);
           if (icon === 'more') setIsSheetOpen(true);
         }}
       />

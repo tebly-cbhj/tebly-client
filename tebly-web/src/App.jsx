@@ -9,6 +9,7 @@ import RoomInfoPage from './Pages/Room/RoomInfoPage';
 import TimeRecommendPage from './Pages/Room/TimeRecommendPage';
 import TestPage from './TestPage';
 import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
+import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/create-room" element={<CreateRoomPage />} />
           <Route path="/select-friend" element={<SelectFriendPage />} />
           <Route path="/room/:roomId" element={<RoomInfoPage />} />
+          <Route path="/room/:roomId/chat" element={<ChatPage />} />
           <Route path="/time-recommend" element={<TimeRecommendPage />} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/my-appointments" element={<MyAppointMentPage />} />
