@@ -33,21 +33,44 @@ const categoryImageMap = {
   '팀 프로젝트': TeamProject,
   기타: Others,
 };
+const ScrollContent = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 90px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 const CardList = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+
+  & > * {
+    flex-shrink: 0;
+  }
 `;
 
 const SummaryWrapper = styled.div`
-    width: 390px;
+  width: 390px;
+  max-width: 100%;
+  flex-shrink: 0;
 `;
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px; 
+  bottom: 20px;
   right: 20px;
-  z-index: 100; 
+  z-index: 100;
 `;
 
 export default function RoomInfoPage() {
@@ -63,7 +86,7 @@ export default function RoomInfoPage() {
     <PageWrapper>
       <Header 
         title={room?.title}
-        leftIcon="chevron-left"
+        leftIcon="back"
         onLeft={() => navigate(-1)}
         icons={['bubble', 'more']}
         onIconClick={(icon) => {
@@ -71,10 +94,14 @@ export default function RoomInfoPage() {
           if (icon === 'more') setIsSheetOpen(true);
         }}
       />
+
+      <ScrollContent>
         <SummaryWrapper>
-            <RoomSummarySection roomId={Number(roomId)} />    
+          <RoomSummarySection roomId={Number(roomId)} />    
         </SummaryWrapper>
+
         <TabBtn activeTab={currentTab} onTabClick={setCurrentTab} />
+
         <CardList>
           {schedules.map((schedule) => (
             <ScheduleCard
@@ -96,17 +123,19 @@ export default function RoomInfoPage() {
             />
           ))}
         </CardList>
+      </ScrollContent>
 
-        <FloatingWrapper>
-            <AddBtn onClick={() => navigate('/my-appointments')} />
+      <FloatingWrapper>
+        <AddBtn onClick={() => navigate('/create-appointment')} />
       </FloatingWrapper>
+
       {isSheetOpen && (
         <ActionSheet
           visible={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
           option1Text="방 수정하기"
           option2Text="방 나가기"
-          option2Color= "#E31818"
+          option2Color="#E31818"
           onOption1={() => { setIsSheetOpen(false); }}
           onOption2={() => { setIsSheetOpen(false); }}
         />
