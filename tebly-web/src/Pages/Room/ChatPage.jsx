@@ -157,7 +157,7 @@ export default function ChatPage() {
       <HeaderWrapper>
         <Header
           title={room?.title ?? '채팅'}
-          leftIcon="chevron-left"
+          leftIcon="back"
           onLeft={() => navigate(-1)}
         />
       </HeaderWrapper>

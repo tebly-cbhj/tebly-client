@@ -48,7 +48,7 @@ const CreateRoom = () => {
     <PageWrapper style={{ alignItems: 'center' }}>
       <Header 
         title="방 만들기"
-        leftIcon="chevron-left"
+        leftIcon="back"
         onLeft={() => navigate(-1)}
         icons={[]}
       />
