@@ -26,6 +26,18 @@ export const useScheduleStore = create((set) => ({
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2, 3, 4],
     },
+    {
+      id: 3,
+      roomId: 2,
+      title: '한강 자전거',
+      date: '2026.06.16 (화)',
+      time: '14:00 - 16:00',
+      location: '이촌 한강공원',
+      category: '약속',
+      alarmTime: '1시간 전',
+      memberIds: [1, 2, 3, 4, 5],
+      acceptedIds: [1, 2, 3, 4],
+    },
   ],
 
   categories: [

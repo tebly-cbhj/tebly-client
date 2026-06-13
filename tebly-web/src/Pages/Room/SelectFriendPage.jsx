@@ -148,7 +148,7 @@ const SelectFriendPage = () => {
                   // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행
                   const { roomName, description } = location.state || {};
                   addRoom(roomName, description, selected); 
-                  navigate('/');
+                  navigate('/room-list');
                 }
             }}
           />
