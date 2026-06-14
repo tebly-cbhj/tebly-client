@@ -62,7 +62,7 @@ export const usePersonalScheduleStore = create((set) => ({
       title: '치과 정기검진',
       startDate: '2026.06.08 (월)',
       endDate: '2026.06.08 (월)',
-      time: '17:00 - 18:00',
+      time: '17:00 - 19:00',
       location: '',
       category: 'Other',
       alarmTime: '30분 전',

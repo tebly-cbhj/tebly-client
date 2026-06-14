@@ -13,6 +13,7 @@ export const useScheduleStore = create((set) => ({
       alarmTime: '30분 전',
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2],
+      confirmed: true,
     },
     {
       id: 2,
@@ -25,6 +26,7 @@ export const useScheduleStore = create((set) => ({
       alarmTime: '1시간 전',
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2, 3, 4],
+      confirmed: true,
     },
     {
       id: 3,
@@ -37,6 +39,7 @@ export const useScheduleStore = create((set) => ({
       alarmTime: '1시간 전',
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2, 3, 4],
+      confirmed: true,
     },
   ],
 
@@ -71,4 +74,11 @@ export const useScheduleStore = create((set) => ({
     set((state) => ({
       schedules: state.schedules.filter((s) => s.id !== scheduleId),
     })),
+
+  confirmSchedule: (scheduleId) =>
+  set((state) => ({
+    schedules: state.schedules.map((s) =>
+      s.id === scheduleId ? { ...s, confirmed: true } : s
+    ),
+  })),
 }));

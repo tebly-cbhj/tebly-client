@@ -4,6 +4,7 @@ import { GlobalStyle } from './GlobalStyle';
 import DateCell from './components/calendar/month/DateCell';
 import { useState } from 'react';
 import CalendarHeader from './components/calendar/CalendarHeader';
+import WeekDateCell from './components/calendar/week/WeekDateCell';
 
 const mockSchedules = [
   { id: 1, category: 'Appointment', label: '약속' },
@@ -35,6 +36,7 @@ export default function DateTestpage() {
               <DateCell date={5} schedules={mockSchedules} />
               <DateCell date={6} schedules={mockSchedules.slice(0, 3)} variant="selected" />
               <DateCell date={30} schedules={mockSchedules.slice(0, 2)} variant="muted" />
+              <WeekDateCell></WeekDateCell>
             </div>
           </div>
         </div>
