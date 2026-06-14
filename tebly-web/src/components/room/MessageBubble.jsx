@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: ${({ $type }) => $type === 'sent' ? 'flex-end' : 'flex-start'};
+  ${({ $type }) => $type === 'sent' ? 'justify-content: center;' : ''}
+  gap: 0.25rem;
+  width: 100%;
   padding-left: ${({ $type }) => $type === 'received-hidden' ? '2.875rem' : '0'};
 `;
 
