@@ -2,8 +2,8 @@ import styled from 'styled-components';
 
 const Block = styled.div`
   display: flex;
-  width: 40px;
-  height: 58px;
+  width: 100%;
+  height: 100%;
   padding: 4px;
   align-items: flex-start;
   gap: 10px;

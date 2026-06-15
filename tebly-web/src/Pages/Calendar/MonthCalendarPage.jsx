@@ -151,7 +151,7 @@ function expandScheduleDates(schedule) {
   return dates;
 }
 
-export default function MonthCalendarPage() {
+export default function MonthCalendarPage({ viewMode, onViewModeChange }) {
   const navigate = useNavigate();
   const confirmedSchedules = useScheduleStore((state) => state.schedules);
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
@@ -159,8 +159,6 @@ export default function MonthCalendarPage() {
   const today = useMemo(() => new Date(), []);
   const [currentMonthDate] = useState(today);
   const [selectedDate, setSelectedDate] = useState(today);
-  const [viewMode, setViewMode] = useState('month');
-
   const monthDates = useMemo(
     () => createMonthDates(currentMonthDate),
     [currentMonthDate]
@@ -215,7 +213,7 @@ export default function MonthCalendarPage() {
         <CalendarHeader
           monthLabel={formatMonthLabel(currentMonthDate)}
           viewMode={viewMode}
-          onViewModeChange={setViewMode}
+          onViewModeChange={onViewModeChange}  // setViewMode → onViewModeChange
           hasUnreadNotification={false}
           onMonthClick={() => console.log('월 선택 클릭')}
           onNotificationClick={() => console.log('알림 클릭')}
