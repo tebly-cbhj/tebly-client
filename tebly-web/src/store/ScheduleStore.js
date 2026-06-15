@@ -13,6 +13,7 @@ export const useScheduleStore = create((set) => ({
       alarmTime: '30분 전',
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2],
+      confirmed: true,
     },
     {
       id: 2,
@@ -25,6 +26,20 @@ export const useScheduleStore = create((set) => ({
       alarmTime: '1시간 전',
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2, 3, 4],
+      confirmed: true,
+    },
+    {
+      id: 3,
+      roomId: 2,
+      title: '한강 자전거',
+      date: '2026.06.16 (화)',
+      time: '14:00 - 16:00',
+      location: '이촌 한강공원',
+      category: '약속',
+      alarmTime: '1시간 전',
+      memberIds: [1, 2, 3, 4, 5],
+      acceptedIds: [1, 2, 3, 4],
+      confirmed: true,
     },
   ],
 
@@ -59,4 +74,11 @@ export const useScheduleStore = create((set) => ({
     set((state) => ({
       schedules: state.schedules.filter((s) => s.id !== scheduleId),
     })),
+
+  confirmSchedule: (scheduleId) =>
+  set((state) => ({
+    schedules: state.schedules.map((s) =>
+      s.id === scheduleId ? { ...s, confirmed: true } : s
+    ),
+  })),
 }));

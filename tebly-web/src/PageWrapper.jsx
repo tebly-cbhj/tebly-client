@@ -15,6 +15,8 @@ export const PageWrapper = styled.div`
 
   // 좌우 기본 여백
   padding: 0 20px; 
+  // 네비게이션 바 자리
+  padding-bottom: 88px;
   box-sizing: border-box;
 
   // 내부 요소 배치 방향

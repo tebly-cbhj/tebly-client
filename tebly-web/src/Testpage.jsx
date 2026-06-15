@@ -25,6 +25,8 @@ import OptionItem from './components/room/OptionItem';
 import MessageBubble from './components/room/MessageBubble';
 import ProfileItem from './components/room/ProfileItem';
 import MessageInput from './components/room/MessageInput';
+import WeekDayRow from './components/calendar/month/WeekDayRow';
+import ScheduleChip from './components/calendar/month/ScheduleChip';
 
 export default function Testpage() {
   const [isToggleOn, setIsToggleOn] = useState(false);
@@ -319,6 +321,25 @@ export default function Testpage() {
                     }}
                 />
             </div>
+        </div>
+        <div>
+            <div>
+                <h3>위클리 데이 로우</h3>
+                <WeekDayRow />
+            </div>
+            <div>
+                <h3>스케줄 칩</h3>
+                <ScheduleChip category="Appointment" label="약속" />
+                <ScheduleChip category="Class" label="수업" />
+                <ScheduleChip category="Club" label="동아리" />
+                <ScheduleChip category="Family" label="가족" />
+                <ScheduleChip category="SelfDevelopment" label="자기개발" />
+                <ScheduleChip category="Work" label="알바" />
+                <ScheduleChip category="Leisure" label="여가" />
+                <ScheduleChip category="TeamProject" label="팀 프로젝트" />
+                <ScheduleChip category="Other" label="기타" />
+            </div>
+            
         </div>
     </ThemeProvider>
 

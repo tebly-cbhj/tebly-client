@@ -11,6 +11,9 @@ import TestPage from './TestPage';
 import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
 import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
+import CalendarTestpage from './CalendarTestpage';
+import BottomNavBar from './components/common/BottomNavBar';
+import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
 
 export default function App() {
   return (
@@ -18,7 +21,7 @@ export default function App() {
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<RoomListPage />} />
+          <Route path="/room-list" element={<RoomListPage />} />
           <Route path="/create-room" element={<CreateRoomPage />} />
           <Route path="/select-friend" element={<SelectFriendPage />} />
           <Route path="/room/:roomId" element={<RoomInfoPage />} />
@@ -27,7 +30,10 @@ export default function App() {
           <Route path="/test" element={<TestPage />} />
           <Route path="/my-appointments" element={<MyAppointMentPage />} />
           <Route path="/create-appointment" element={<CreateAppointmentPage />} />
+          <Route path="/calendar-test" element={<CalendarTestpage />} />
+          <Route path="/" element={<MonthCalendarPage />} />
         </Routes>
+        <BottomNavBar /> 
       </BrowserRouter>
     </ThemeProvider>
   );
