@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { useMemo, Fragment } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
-import { parseDate, parseTime, getWeekRange, expandRepeatingSchedules } from '../../utils/dateUtils';
+import { parseDate, parseTime, expandRepeatingSchedules } from '../../utils/dateUtils';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
@@ -77,13 +77,25 @@ const categoryIconMap = {
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px; 
+  bottom: 20px;
   right: 20px;
-  z-index: 100; 
+  z-index: 100;
 `;
 
-export default function WeekCalendarPage({ viewMode, onViewModeChange }) {
+// 선택된 날짜 기준으로 해당 주의 일~토 범위 계산
+function getWeekRangeFromDate(date) {
+  const sunday = new Date(date);
+  sunday.setDate(date.getDate() - date.getDay());
+  sunday.setHours(0, 0, 0, 0);
+  const saturday = new Date(sunday);
+  saturday.setDate(sunday.getDate() + 6);
+  saturday.setHours(23, 59, 59, 999);
+  return { sunday, saturday };
+}
+
+export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedDate, onDateChange }) {
   const navigate = useNavigate();
+
   const personalSchedules = usePersonalScheduleStore(
     useShallow((state) => state.schedules)
   );
@@ -91,34 +103,47 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange }) {
     useShallow((state) => state.schedules.filter((s) => s.confirmed))
   );
 
-  const { sunday, saturday } = getWeekRange();
+  const { sunday, saturday } = useMemo(() => {
+    const base = selectedDate
+      ? new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day)
+      : new Date();
+    return getWeekRangeFromDate(base);
+  }, [selectedDate]);
 
   const weekPersonal = useMemo(() =>
     expandRepeatingSchedules(personalSchedules, sunday, saturday),
-    [personalSchedules]
+    [personalSchedules, sunday, saturday]
   );
 
   const weekGroup = useMemo(() =>
     groupSchedules.filter((s) => {
       const date = parseDate(s.date);
       return date >= sunday && date <= saturday;
-    }), [groupSchedules]
+    }), [groupSchedules, sunday, saturday]
   );
 
   const getDayIndex = (schedule) => schedule._occurrenceDate.getDay();
 
+  const monthLabel = selectedDate
+    ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
+    : null;
+
   return (
     <PageWrapper>
       <CalendarHeader
+        monthLabel={monthLabel}
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
-        hasUnreadNotification={false}
-        onMonthClick={() => console.log('월 선택 클릭')}
-        onNotificationClick={() => console.log('알림 클릭')}
+        hasUnreadNotification={false} // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
+        onNotificationClick={() => console.log('알림 클릭')} // TODO: 알림 페이지 navigate 연동
+        onDateChange={(date) => {
+          onDateChange?.(date);
+          // TODO: 선택된 날짜 기준으로 해당 주 일정 API 호출 연동
+        }}
       />
 
       <WeekHeader>
-        <WeekDateCell />
+        <WeekDateCell sunday={sunday} />
       </WeekHeader>
 
       <ScrollArea>
@@ -150,7 +175,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange }) {
             const spanRows = Math.floor(durationMinutes / 5);
             return (
               <GridBlock
-                key={`${schedule.id}-${schedule._occurrenceDate.toISOString()}`} // key도 occurrenceDate 포함
+                key={`${schedule.id}-${schedule._occurrenceDate.toISOString()}`}
                 $startRow={startRow}
                 $spanRows={spanRows}
                 $dayIndex={getDayIndex(schedule)}
@@ -180,11 +205,11 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange }) {
             );
           })}
 
-
         </TimeTableWrapper>
       </ScrollArea>
+
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/create-room')} />
+        <AddBtn onClick={() => navigate('/create-room')} /> {/* TODO: 개인 일정 추가 페이지 navigate 연동 */}
       </FloatingWrapper>
     </PageWrapper>
   );

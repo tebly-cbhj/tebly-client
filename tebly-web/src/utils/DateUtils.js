@@ -18,7 +18,7 @@ export const parseTime = (timeStr) => {
 // 이번 주 일~토의 날짜 숫자 배열 반환 (WeekDateCell에서 사용)
 export const getWeekDates = (baseDate = new Date()) => {
   const sunday = new Date(baseDate);
-  sunday.setDate(baseDate.getDate() - baseDate.getDay());
+  sunday.setDate(baseDate.getDate() - baseDate.getDay()); // 일요일로 이동
 
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(sunday);
