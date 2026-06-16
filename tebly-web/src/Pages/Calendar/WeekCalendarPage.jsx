@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useMemo, Fragment } from 'react';
+import { useMemo, Fragment, useState, useRef, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -39,7 +39,7 @@ const ScrollArea = styled.div`
 const TimeTableWrapper = styled.div`
   display: grid;
   grid-template-columns: 32px repeat(7, 44px);
-  grid-template-rows: repeat(288, 5px);
+  grid-template-rows: repeat(288, ${({ $cellHeight }) => $cellHeight / 12}px);
   margin: 0 auto;
 `;
 
@@ -82,7 +82,6 @@ const FloatingWrapper = styled.div`
   z-index: 100;
 `;
 
-// 선택된 날짜 기준으로 해당 주의 일~토 범위 계산
 function getWeekRangeFromDate(date) {
   const sunday = new Date(date);
   sunday.setDate(date.getDate() - date.getDay());
@@ -95,6 +94,9 @@ function getWeekRangeFromDate(date) {
 
 export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedDate, onDateChange }) {
   const navigate = useNavigate();
+  const scrollRef = useRef(null);
+  const lastDistanceRef = useRef(null);
+  const [cellHeight, setCellHeight] = useState(60);
 
   const personalSchedules = usePersonalScheduleStore(
     useShallow((state) => state.schedules)
@@ -128,6 +130,48 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
     : null;
 
+  const getDistance = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e) => {
+      if (e.touches.length === 2) {
+        lastDistanceRef.current = getDistance(e.touches);
+      }
+    };
+
+    const onTouchMove = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault(); // ✅ 두 손가락일 때만 스크롤 막고 줌 처리
+        const currentDistance = getDistance(e.touches);
+        const diff = currentDistance - lastDistanceRef.current;
+        setCellHeight(prev => Math.min(60, Math.max(30, prev + diff * 0.1)));
+        lastDistanceRef.current = currentDistance;
+      }
+      // 한 손가락이면 아무것도 안 함 → 스크롤 정상 동작
+    };
+
+    const onTouchEnd = () => {
+      lastDistanceRef.current = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart);
+    el.addEventListener('touchmove', onTouchMove, { passive: false }); // ✅ passive: false 필수
+    el.addEventListener('touchend', onTouchEnd);
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, []);
+
   return (
     <PageWrapper>
       <CalendarHeader
@@ -146,8 +190,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
         <WeekDateCell sunday={sunday} />
       </WeekHeader>
 
-      <ScrollArea>
-        <TimeTableWrapper>
+      <ScrollArea ref={scrollRef}> {/* ✅ ref 추가, 터치 이벤트 제거 */}
+        <TimeTableWrapper $cellHeight={cellHeight}>
 
           {/* 시간 레이블 + 셀 */}
           {Array.from({ length: 24 }, (_, i) => {
@@ -161,6 +205,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                 {Array.from({ length: 7 }, (_, j) => (
                   <TimeSlotCell
                     key={`cell-${hour}-${j}`}
+                    $cellHeight={cellHeight}
                     style={{ gridRow: `${(hour - 1) * 12 + 1} / span 12`, gridColumn: j + 2 }}
                   />
                 ))}
