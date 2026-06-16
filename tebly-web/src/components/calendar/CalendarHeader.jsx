@@ -46,20 +46,27 @@ function getCurrentMonthLabel() {
 export default function CalendarHeader({
   viewMode = 'month',
   onViewModeChange,
-  hasUnreadNotification = false, // TODO: 알림 존재 여부 상태(State) 바인딩 및 알림 API 연동
+  hasUnreadNotification = false, // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
   onNotificationClick,
-  onMonthConfirm, // 부모에서 선택된 연월 받을 때 사용
+  onDateChange,
+  monthLabel: externalMonthLabel,
 }) {
-  const [monthLabel, setMonthLabel] = useState(getCurrentMonthLabel());
+  const monthLabel = externalMonthLabel ?? getCurrentMonthLabel();
   const [showPicker, setShowPicker] = useState(false);
+  const [lastSelectedDate, setLastSelectedDate] = useState(null);
+  const [pickerKey, setPickerKey] = useState(0); // ✅ 추가
 
   const NotificationIcon = hasUnreadNotification ? BellNoti : BellLine;
 
-  function handleConfirm({ year, month }) {
-    const label = `${year}.${String(month).padStart(2, '0')}`;
-    setMonthLabel(label);
-    // TODO: 선택된 연월 기준으로 해당 월 일정 API 호출 연동
-    onMonthConfirm?.({ year, month });
+  function handleOpen() {
+    setPickerKey(prev => prev + 1); // ✅ 열 때마다 key 증가
+    setShowPicker(true);
+  }
+
+  function handleConfirm({ year, month, day }) {
+    setLastSelectedDate({ year, month, day });
+    // TODO: 선택된 연월 기준으로 해당 월/주 일정 API 호출 연동
+    onDateChange?.({ year, month, day });
   }
 
   return (
@@ -67,7 +74,7 @@ export default function CalendarHeader({
       <Container>
         <MonthSelect
           label={monthLabel}
-          onClick={() => setShowPicker(true)}
+          onClick={handleOpen} // ✅ setShowPicker(true) → handleOpen
         />
 
         <RightArea>
@@ -90,6 +97,8 @@ export default function CalendarHeader({
         <DatePickerPopup
           onClose={() => setShowPicker(false)}
           onConfirm={handleConfirm}
+          initialDate={lastSelectedDate}
+          key={pickerKey} // ✅ 열 때마다 새로 마운트
         />
       )}
     </>
