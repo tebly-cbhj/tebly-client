@@ -14,6 +14,8 @@ import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
 import BottomNavBar from './components/common/BottomNavBar';
 import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
+import EventDetailPage from './Pages/Calendar/EventDetailPage';
+import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 
 export default function App() {
   return (
@@ -32,6 +34,8 @@ export default function App() {
           <Route path="/create-appointment" element={<CreateAppointmentPage />} />
           <Route path="/calendar-test" element={<CalendarTestpage />} />
           <Route path="/" element={<MonthCalendarPage />} />
+          <Route path="/calendar/event-detail" element={<EventDetailPage />} />
+          <Route path="/calendar/create" element={<CreateSchedulePage />} />
         </Routes>
         <BottomNavBar /> 
       </BrowserRouter>

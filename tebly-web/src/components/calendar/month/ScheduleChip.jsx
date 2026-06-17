@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 
-const Chip = styled.div`
+const Chip = styled.button`
   width: 44px;
   height: 13px;
+  border: none;
   border-radius: 4px;
   overflow: hidden;
   display: flex;
   align-items: center;
   padding: 0 4px;
+  cursor: pointer;
   background-color: ${({ $category, theme }) => {
     const colorMap = {
       Appointment: theme.colors.secondaryred,
@@ -40,7 +42,7 @@ const Text = styled.span`
 
 export default function ScheduleChip({ category, label, onClick }) {
   return (
-    <Chip $category={category} onClilck={onClick}>
+    <Chip type="button" $category={category} onClick={onClick}>
       <Text>{label}</Text>
     </Chip>
   );

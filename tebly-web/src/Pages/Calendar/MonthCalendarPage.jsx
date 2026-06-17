@@ -7,7 +7,7 @@ import { PageWrapper } from '../../PageWrapper';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
 import DateCell from '../../components/calendar/month/DateCell';
-import AddBtn from '../../components/common/AddBtn';
+import CalendarFab from '../../components/calendar/CalendarFab';
 
 const Container = styled.div`
   width: 390px;
@@ -24,9 +24,9 @@ const DateGrid = styled.div`
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px; 
-  right: 20px;
-  z-index: 100; 
+  bottom: 5rem;
+  right: 1.25rem;
+  z-index: 100;
 `;
 
 const CATEGORY_MAP = {
@@ -157,15 +157,45 @@ export default function MonthCalendarPage() {
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
 
   const today = useMemo(() => new Date(), []);
-  const [currentMonthDate] = useState(today);
+  const [currentMonthDate, setCurrentMonthDate] = useState(today);
   const [selectedDate, setSelectedDate] = useState(today);
   const [viewMode, setViewMode] = useState('month');
+
+  // TODO: DB 연동 시 schedule ID로 상세 데이터를 API에서 fetch하도록 교체
+  function handleScheduleClick(schedule) {
+    const [startTime, endTime] = schedule.time ? schedule.time.split(' - ') : ['', ''];
+    navigate('/calendar/event-detail', {
+      state: {
+        schedule: {
+          title: schedule.label,
+          memo: schedule.memo,
+          startDate: schedule.date,
+          startTime: startTime || '',
+          endDate: schedule.date,
+          endTime: endTime || '',
+          place: schedule.place,
+          category: schedule.category,
+          alarmTime: schedule.alarmTime,
+          repeat: schedule.repeat,
+        },
+      },
+    });
+  }
+
+  function handlePrevMonth() {
+    setCurrentMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  }
+
+  function handleNextMonth() {
+    setCurrentMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  }
 
   const monthDates = useMemo(
     () => createMonthDates(currentMonthDate),
     [currentMonthDate]
   );
 
+  // TODO: OCR 파싱으로 들어오는 불안정한 데이터 포맷에 대한 방어 예외 처리 추가
   const allSchedules = useMemo(() => {
     return [...confirmedSchedules, ...personalSchedules].flatMap((schedule) => {
       const scheduleDates = expandScheduleDates(schedule);
@@ -174,8 +204,14 @@ export default function MonthCalendarPage() {
         id: `${schedule.id}-${date}`,
         date,
         category: normalizeCategory(schedule.category),
+        originalCategory: schedule.category,
         label: schedule.title,
         time: schedule.time,
+        // TODO: DB 연동 시 아래 필드를 실제 데이터로 교체
+        memo: schedule.memo || '',
+        place: schedule.place || '',
+        alarmTime: schedule.alarmTime || '',
+        repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
       }));
     });
   }, [confirmedSchedules, personalSchedules]);
@@ -217,7 +253,8 @@ export default function MonthCalendarPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           hasUnreadNotification={false}
-          onMonthClick={() => console.log('월 선택 클릭')}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
           onNotificationClick={() => console.log('알림 클릭')}
         />
 
@@ -247,6 +284,7 @@ export default function MonthCalendarPage() {
                 schedules={schedulesByDate[dateKey] || []}
                 variant={variant}
                 onClick={() => setSelectedDate(date)}
+                onScheduleClick={handleScheduleClick}
               />
             );
           })}
@@ -254,7 +292,10 @@ export default function MonthCalendarPage() {
       </Container>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/create-room')} />
+        <CalendarFab
+          onDirectInput={() => navigate('/calendar/create')}
+          onAiRecognition={() => console.log('AI 이미지 인식')}
+        />
       </FloatingWrapper>
     </PageWrapper>
   );

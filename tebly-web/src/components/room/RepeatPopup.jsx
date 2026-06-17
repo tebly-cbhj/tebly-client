@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 import Btn from '../common/Btn';
 
 import DragHandleIcon from '../../assets/icons/drag-handle.svg?react';
-import CheckIcon from '../../assets/icons/check.svg?react';
 
-const OPTIONS = ['5분 전', '10분 전', '30분 전', '1시간 전', '12시간 전', '1일 전'];
+const REPEAT_OPTIONS = ['없음', '매일', '매주', '매월', '매년'];
 
 const Overlay = styled.div`
   position: fixed;
@@ -23,10 +21,10 @@ const Overlay = styled.div`
 
 const Sheet = styled.div`
   width: 390px;
-  height: 477px;
   border-radius: 32px 32px 0 0;
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0 -4px 12px 0 rgba(68, 68, 68, 0.08);
+  padding-bottom: 2rem;
 `;
 
 const DragHandleWrapper = styled.div`
@@ -41,16 +39,15 @@ const DragHandleWrapper = styled.div`
 
 const OptionList = styled.div`
   margin-top: 24px;
-  padding: 0 20px;
+  padding: 0 1.25rem;
 `;
 
-const OptionItem = styled.button`
+const OptionRow = styled.button`
   display: flex;
   height: 3.5rem;
   padding: 1rem 0;
   align-items: center;
   justify-content: space-between;
-  align-self: stretch;
   width: 100%;
   border: none;
   background: transparent;
@@ -65,31 +62,25 @@ const OptionItem = styled.button`
 const OptionText = styled.span`
   ${({ $selected, theme }) =>
     $selected ? theme.typography.s2 : theme.typography.body2};
-
   color: ${({ $selected, theme }) =>
     $selected ? theme.colors.gray900 : theme.colors.gray500};
+  text-align: center;
 `;
+
+const CheckSvg = () => (
+  <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M1 5L7 11L19 1" stroke="#34BAA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const ButtonWrapper = styled.div`
   width: 350px;
-  margin: 18.5px;
+  margin: 18.5px auto 0;
 `;
 
-export default function AlarmPopup({ onClose, onSelect }) {
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
-  function toggleOption(option) {
-    setSelectedOptions((prev) => {
-      if (prev.includes(option)) {
-        return prev.filter((item) => item !== option);
-      }
-
-      return [...prev, option];
-    });
-  }
-
-  function handleConfirm() {
-    onSelect?.(selectedOptions);
+export default function RepeatPopup({ selected = '없음', onClose, onSelect }) {
+  function handleSelect(option) {
+    onSelect?.(option);
   }
 
   return (
@@ -100,28 +91,19 @@ export default function AlarmPopup({ onClose, onSelect }) {
         </DragHandleWrapper>
 
         <OptionList>
-          {OPTIONS.map((option) => {
-            const selected = selectedOptions.includes(option);
-
+          {REPEAT_OPTIONS.map((option) => {
+            const isSelected = option === selected;
             return (
-              <OptionItem
-                key={option}
-                type="button"
-                onClick={() => toggleOption(option)}
-              >
-                <OptionText $selected={selected}>{option}</OptionText>
-                {selected && <CheckIcon width={24} height={24} />}
-              </OptionItem>
+              <OptionRow key={option} type="button" onClick={() => handleSelect(option)}>
+                <OptionText $selected={isSelected}>{option}</OptionText>
+                {isSelected && <CheckSvg />}
+              </OptionRow>
             );
           })}
         </OptionList>
 
         <ButtonWrapper>
-          <Btn
-            text="선택 완료"
-            size="large"
-            onClick={handleConfirm}
-          />
+          <Btn text="선택 완료" size="large" onClick={onClose} />
         </ButtonWrapper>
       </Sheet>
     </Overlay>
