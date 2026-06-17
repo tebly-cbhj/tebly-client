@@ -74,6 +74,9 @@ const BottomBtnWrapper = styled.div`
 
 export default function OCRResultPage() {
   const navigate = useNavigate();
+  // TODO: 페이지 진입 시(useEffect) 이전 페이지에서 넘겨받은 이미지 데이터를 
+  // 백엔드 OCR API로 전송하고, 반환된 데이터를 setSchedules로 업데이트하는 로직 추가 필요.
+  // 로딩 상태 관리 필요: isLoading 사용
   const [schedules, setSchedules] = useState([
     { id: 1, title: '시스템 프로그래밍 보강', time: '14:00~16:00', category: 'Class' },
     { id: 2, title: 'tave 회의', time: '15:00~17:00', category: 'TeamProject' },
@@ -98,7 +101,10 @@ export default function OCRResultPage() {
 
   const handleAddCalendar = () => {
     console.log('선택된 일정 IDs:', selectedIds);
-    // TODO: 백엔드와 연결할 API가 있을 경우 (선택된 selectedIds 배열을 서버로 전송하여 캘린더에 등록)
+    // TODO 1: schedules 배열에서 selectedIds에 포함된 일정 객체들만 필터링하기 (finalSchedules)
+    // TODO 2: 필터링된 일정들을 백엔드 '일정 등록 API'로 전송하여 DB에 저장
+    // TODO 3: API 호출 성공 시, usePersonalScheduleStore의 addSchedule을 호출하여 전역 상태 업데이트
+    // TODO 4: 모든 작업 완료 후 홈('/') 또는 캘린더 화면으로 navigate 이동
   };
 
   return (
@@ -147,7 +153,7 @@ export default function OCRResultPage() {
           text="캘린더에 추가하기" 
           onClick={() => navigate('/')}
           disabled={selectedIds.length === 0} 
-        />
+        /> {/* TODO: PersonalScheduleStore의 일정 추가 함수 이용해 일정 추가 */}
       </BottomBtnWrapper>
     </PageWrapper>
   );
