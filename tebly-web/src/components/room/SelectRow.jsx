@@ -3,7 +3,7 @@ import ChevronRightIcon from '../../assets/icons/chevron-right.svg?react';
 
 const Row = styled.div`
   display: flex;
-  width: 21.875rem;
+  width: 100%;
   padding: 1.25rem 0;
   align-items: center;
   gap: 0.5rem;

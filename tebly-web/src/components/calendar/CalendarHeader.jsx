@@ -36,6 +36,12 @@ const BellButton = styled.button`
   cursor: pointer;
 `;
 
+const LeftArea = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
 function getCurrentMonthLabel() {
   const today = new Date();
   const year = today.getFullYear();
@@ -46,7 +52,7 @@ function getCurrentMonthLabel() {
 export default function CalendarHeader({
   viewMode = 'month',
   onViewModeChange,
-  hasUnreadNotification = false, // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
+  hasUnreadNotification = false,
   onNotificationClick,
   onDateChange,
   monthLabel: externalMonthLabel,
@@ -72,17 +78,18 @@ export default function CalendarHeader({
   return (
     <>
       <Container>
-        <MonthSelect
-          label={monthLabel}
-          onClick={handleOpen} // ✅ setShowPicker(true) → handleOpen
-        />
-
+        <LeftArea>
+          <MonthSelect
+            label={monthLabel}
+            onClick={handleOpen}
+          />
+        </LeftArea>
         <RightArea>
           <MonthWeekToggle
             value={viewMode}
             onChange={onViewModeChange}
           />
-
+          {/* TODO: 알림 존재 여부 상태(State) 바인딩 및 알림 API 연동 */}
           <BellButton
             type="button"
             onClick={onNotificationClick}
@@ -92,13 +99,12 @@ export default function CalendarHeader({
           </BellButton>
         </RightArea>
       </Container>
-
       {showPicker && (
         <DatePickerPopup
           onClose={() => setShowPicker(false)}
           onConfirm={handleConfirm}
           initialDate={lastSelectedDate}
-          key={pickerKey} // ✅ 열 때마다 새로 마운트
+          key={pickerKey}
         />
       )}
     </>

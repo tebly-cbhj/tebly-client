@@ -39,7 +39,7 @@ const ChipList = styled.div`
   gap: 2px;
 `;
 
-export default function DateCell({ date, schedules = [], variant = 'default', onClick }) {
+export default function DateCell({ date, schedules = [], variant = 'default', onClick, onScheduleClick }) {
   const visible = schedules.slice(0, 3);
   const remaining = schedules.length - 3;
 
@@ -55,6 +55,10 @@ export default function DateCell({ date, schedules = [], variant = 'default', on
             key={schedule.id}
             category={schedule.category}
             label={schedule.label}
+            onClick={(e) => {
+              e.stopPropagation();
+              onScheduleClick?.(schedule);
+            }}
           />
         ))}
 

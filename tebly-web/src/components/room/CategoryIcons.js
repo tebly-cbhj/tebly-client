@@ -30,6 +30,18 @@ export const CATEGORY_ICON_MAP = {
   Other: { Icon: Others, SelectedIcon: OthersSelected },
 };
 
+export const CATEGORY_KO = {
+  Appointment: '약속',
+  Club: '동아리',
+  Family: '가족',
+  SelfDevelopment: '자기계발',
+  Work: '업무',
+  Class: '수업',
+  Leisure: '여가',
+  TeamProject: '팀 프로젝트',
+  Other: '기타',
+};
+
 // CreateCategoryPopup에서 사용
 export const CATEGORY_ICONS = [
   { id: 'Appointment', Icon: AppointmentSelected },

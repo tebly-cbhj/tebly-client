@@ -1,5 +1,7 @@
 import styled from 'styled-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+
+const HIDDEN_PATHS = ['/calendar/create', '/calendar/event-detail'];
 
 import CalendarLine from '../../assets/icons/calendar-line.svg?react';
 import CalendarFill from '../../assets/icons/calendar-fill.svg?react';
@@ -55,6 +57,9 @@ const NavLabel = styled.span`
 `;
 
 export default function BottomNavBar() {
+  const { pathname } = useLocation();
+  if (HIDDEN_PATHS.includes(pathname)) return null;
+
   return (
     <NavContainer>
       {NAV_ITEMS.map(({ id, label, to, Line, Fill }) => (

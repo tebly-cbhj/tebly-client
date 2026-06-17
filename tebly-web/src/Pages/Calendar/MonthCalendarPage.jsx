@@ -7,7 +7,7 @@ import { PageWrapper } from '../../PageWrapper';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
 import DateCell from '../../components/calendar/month/DateCell';
-import AddBtn from '../../components/common/AddBtn';
+import CalendarFab from '../../components/calendar/CalendarFab';
 
 const Container = styled.div`
   width: 390px;
@@ -24,9 +24,9 @@ const DateGrid = styled.div`
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px; 
-  right: 20px;
-  z-index: 100; 
+  bottom: 5rem;
+  right: 1.25rem;
+  z-index: 100;
 `;
 
 const CATEGORY_MAP = {
@@ -153,7 +153,9 @@ function expandScheduleDates(schedule) {
 
 export default function MonthCalendarPage({ viewMode, onViewModeChange, selectedDate: initialSelectedDate, onDateChange }) {
   const navigate = useNavigate();
+  // TODO: GET /api/schedules (방 확정 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const confirmedSchedules = useScheduleStore((state) => state.schedules);
+  // TODO: GET /api/personal-schedules (개인 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
 
   const today = useMemo(() => new Date(), []);
@@ -166,11 +168,33 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
 
   const [selectedDate, setSelectedDate] = useState(today);
 
+  // TODO: DB 연동 시 schedule ID로 상세 데이터를 API에서 fetch하도록 교체
+  function handleScheduleClick(schedule) {
+    const [startTime, endTime] = schedule.time ? schedule.time.split(' - ') : ['', ''];
+    navigate('/calendar/event-detail', {
+      state: {
+        schedule: {
+          title: schedule.label,
+          memo: schedule.memo,
+          startDate: schedule.date,
+          startTime: startTime || '',
+          endDate: schedule.date,
+          endTime: endTime || '',
+          place: schedule.place,
+          category: schedule.category,
+          alarmTime: schedule.alarmTime,
+          repeat: schedule.repeat,
+        },
+      },
+    });
+  }
+
   const monthDates = useMemo(
     () => createMonthDates(currentMonthDate),
     [currentMonthDate]
   );
 
+  // TODO: OCR 파싱으로 들어오는 불안정한 데이터 포맷에 대한 방어 예외 처리 추가
   const allSchedules = useMemo(() => {
     return [...confirmedSchedules, ...personalSchedules].flatMap((schedule) => {
       const scheduleDates = expandScheduleDates(schedule);
@@ -179,8 +203,14 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         id: `${schedule.id}-${date}`,
         date,
         category: normalizeCategory(schedule.category),
+        originalCategory: schedule.category,
         label: schedule.title,
         time: schedule.time,
+        // TODO: DB 연동 시 아래 필드를 실제 데이터로 교체
+        memo: schedule.memo || '',
+        place: schedule.place || '',
+        alarmTime: schedule.alarmTime || '',
+        repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
       }));
     });
   }, [confirmedSchedules, personalSchedules]);
@@ -256,6 +286,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
                 schedules={schedulesByDate[dateKey] || []}
                 variant={variant}
                 onClick={() => setSelectedDate(date)}
+                onScheduleClick={handleScheduleClick}
               />
             );
           })}
@@ -263,7 +294,10 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
       </Container>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/ocr-loading')} />
+        <CalendarFab
+          onDirectInput={() => navigate('/ocr-loading)}
+          onAiRecognition={() => console.log('AI 이미지 인식')}
+        />
       </FloatingWrapper>
     </PageWrapper>
   );

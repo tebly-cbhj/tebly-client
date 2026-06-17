@@ -13,6 +13,9 @@ import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
 import BottomNavBar from './components/common/BottomNavBar';
+import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
+import EventDetailPage from './Pages/Calendar/EventDetailPage';
+import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage'
@@ -36,6 +39,8 @@ export default function App() {
           <Route path="/" element={<CalendarPage />} />
           <Route path="/ocr-loading" element={<OCRLoadingPage />} />
           <Route path="/ocr-result" element={<OCRResultPage />} />
+          <Route path="/calendar/event-detail" element={<EventDetailPage />} />
+          <Route path="/calendar/create" element={<CreateSchedulePage />} />
         </Routes>
         <BottomNavBar /> 
       </BrowserRouter>
