@@ -153,7 +153,9 @@ function expandScheduleDates(schedule) {
 
 export default function MonthCalendarPage() {
   const navigate = useNavigate();
+  // TODO: GET /api/schedules (방 확정 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const confirmedSchedules = useScheduleStore((state) => state.schedules);
+  // TODO: GET /api/personal-schedules (개인 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
 
   const today = useMemo(() => new Date(), []);

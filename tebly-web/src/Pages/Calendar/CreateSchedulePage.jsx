@@ -342,6 +342,7 @@ export default function CreateSchedulePage() {
     setTimePickerTarget(null);
   }
 
+  // TODO: POST /api/schedules 로 교체 — 현재는 로컬 스토어에만 저장됨
   function handleSave() {
     if (!title.trim()) return;
     addSchedule({
@@ -349,10 +350,14 @@ export default function CreateSchedulePage() {
       memo,
       startDate: toStoreDate(startDate),
       endDate: toStoreDate(endDate || startDate),
+      // TODO: 종일 여부(allDay)를 API 요청 바디에 포함
       time: allDay ? '' : `${startTime} - ${endTime}`,
       location: place,
+      // TODO: category 영문 키를 API 스펙에 맞게 변환하여 전송
       category,
+      // TODO: alarmTime을 API 스펙 포맷(분 단위 등)으로 변환하여 전송
       alarmTime,
+      // TODO: repeat(반복 주기)·repeatEnd(종료 조건)·repeatEndDate를 API 바디에 포함
       repeat: null,
     });
     navigate(-1);
