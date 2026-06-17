@@ -151,7 +151,7 @@ function expandScheduleDates(schedule) {
   return dates;
 }
 
-export default function MonthCalendarPage() {
+export default function MonthCalendarPage({ viewMode, onViewModeChange, selectedDate: initialSelectedDate, onDateChange }) {
   const navigate = useNavigate();
   // TODO: GET /api/schedules (방 확정 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const confirmedSchedules = useScheduleStore((state) => state.schedules);
@@ -159,9 +159,14 @@ export default function MonthCalendarPage() {
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
 
   const today = useMemo(() => new Date(), []);
-  const currentMonthDate = today;
+
+  const [currentMonthDate, setCurrentMonthDate] = useState(
+    initialSelectedDate
+      ? new Date(initialSelectedDate.year, initialSelectedDate.month - 1, initialSelectedDate.day)
+      : today
+  );
+
   const [selectedDate, setSelectedDate] = useState(today);
-  const [viewMode, setViewMode] = useState('month');
 
   // TODO: DB 연동 시 schedule ID로 상세 데이터를 API에서 fetch하도록 교체
   function handleScheduleClick(schedule) {
@@ -220,24 +225,24 @@ export default function MonthCalendarPage() {
   }
 
   const schedulesByDate = useMemo(() => {
-  const grouped = allSchedules.reduce((acc, schedule) => {
-    if (!acc[schedule.date]) {
-      acc[schedule.date] = [];
-    }
+    const grouped = allSchedules.reduce((acc, schedule) => {
+      if (!acc[schedule.date]) {
+        acc[schedule.date] = [];
+      }
 
-    acc[schedule.date].push(schedule);
+      acc[schedule.date].push(schedule);
 
-    return acc;
-  }, {});
+      return acc;
+    }, {});
 
     Object.keys(grouped).forEach((date) => {
-        grouped[date].sort(
-            (a, b) => getScheduleStartMinutes(a.time) - getScheduleStartMinutes(b.time)
-        );
+      grouped[date].sort(
+        (a, b) => getScheduleStartMinutes(a.time) - getScheduleStartMinutes(b.time)
+      );
     });
 
     return grouped;
-    }, [allSchedules]);
+  }, [allSchedules]);
 
   return (
     <PageWrapper>
@@ -245,9 +250,14 @@ export default function MonthCalendarPage() {
         <CalendarHeader
           monthLabel={formatMonthLabel(currentMonthDate)}
           viewMode={viewMode}
-          onViewModeChange={setViewMode}
+          onViewModeChange={onViewModeChange}
           hasUnreadNotification={false}
           onNotificationClick={() => console.log('알림 클릭')}
+          onDateChange={(date) => {
+            setCurrentMonthDate(new Date(date.year, date.month - 1, date.day));
+            setSelectedDate(new Date(date.year, date.month - 1, date.day));
+            onDateChange?.(date);
+          }}
         />
 
         <WeekDayRow />

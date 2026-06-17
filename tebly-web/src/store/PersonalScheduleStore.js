@@ -107,6 +107,7 @@ export const usePersonalScheduleStore = create((set) => ({
         {
           id: Date.now(),
           repeat: null,
+          // TODO: OCR 파싱으로 들어오는 불안정한 데이터 포맷에 대한 방어 예외 처리 추가
           ...newSchedule,
         },
       ],

@@ -16,6 +16,7 @@ import BottomNavBar from './components/common/BottomNavBar';
 import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
 import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
+import CalendarPage from './Pages/Calendar/CalendarPage';
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/" element={<MonthCalendarPage />} />
           <Route path="/calendar/event-detail" element={<EventDetailPage />} />
           <Route path="/calendar/create" element={<CreateSchedulePage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
         </Routes>
         <BottomNavBar /> 
       </BrowserRouter>
