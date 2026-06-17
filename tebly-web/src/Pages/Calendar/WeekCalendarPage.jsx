@@ -190,7 +190,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
         <WeekDateCell sunday={sunday} />
       </WeekHeader>
 
-      <ScrollArea ref={scrollRef}> {/* ✅ ref 추가, 터치 이벤트 제거 */}
+      <ScrollArea ref={scrollRef}>
         <TimeTableWrapper $cellHeight={cellHeight}>
 
           {/* 시간 레이블 + 셀 */}
@@ -254,7 +254,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
       </ScrollArea>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/create-room')} /> {/* TODO: 개인 일정 추가 페이지 navigate 연동 */}
+        <AddBtn onClick={() => navigate('/ocr-loading')} />
       </FloatingWrapper>
     </PageWrapper>
   );
