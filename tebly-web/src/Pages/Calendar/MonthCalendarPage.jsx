@@ -263,7 +263,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
       </Container>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/create-room')} />
+        <AddBtn onClick={() => navigate('/ocr-loading')} />
       </FloatingWrapper>
     </PageWrapper>
   );

@@ -54,12 +54,12 @@ export default function CalendarHeader({
   const monthLabel = externalMonthLabel ?? getCurrentMonthLabel();
   const [showPicker, setShowPicker] = useState(false);
   const [lastSelectedDate, setLastSelectedDate] = useState(null);
-  const [pickerKey, setPickerKey] = useState(0); // ✅ 추가
+  const [pickerKey, setPickerKey] = useState(0);
 
   const NotificationIcon = hasUnreadNotification ? BellNoti : BellLine;
 
   function handleOpen() {
-    setPickerKey(prev => prev + 1); // ✅ 열 때마다 key 증가
+    setPickerKey(prev => prev + 1);
     setShowPicker(true);
   }
 

@@ -14,6 +14,8 @@ import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
 import BottomNavBar from './components/common/BottomNavBar';
 import CalendarPage from './Pages/Calendar/CalendarPage';
+import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
+import OCRResultPage from './Pages/Calendar/OCRResultPage'
 
 export default function App() {
   return (
@@ -32,6 +34,8 @@ export default function App() {
           <Route path="/create-appointment" element={<CreateAppointmentPage />} />
           <Route path="/calendar-test" element={<CalendarTestpage />} />
           <Route path="/" element={<CalendarPage />} />
+          <Route path="/ocr-loading" element={<OCRLoadingPage />} />
+          <Route path="/ocr-result" element={<OCRResultPage />} />
         </Routes>
         <BottomNavBar /> 
       </BrowserRouter>
