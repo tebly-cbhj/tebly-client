@@ -157,7 +157,7 @@ export default function MonthCalendarPage() {
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
 
   const today = useMemo(() => new Date(), []);
-  const [currentMonthDate, setCurrentMonthDate] = useState(today);
+  const currentMonthDate = today;
   const [selectedDate, setSelectedDate] = useState(today);
   const [viewMode, setViewMode] = useState('month');
 
@@ -180,14 +180,6 @@ export default function MonthCalendarPage() {
         },
       },
     });
-  }
-
-  function handlePrevMonth() {
-    setCurrentMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  }
-
-  function handleNextMonth() {
-    setCurrentMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   }
 
   const monthDates = useMemo(
@@ -253,8 +245,6 @@ export default function MonthCalendarPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           hasUnreadNotification={false}
-          onPrevMonth={handlePrevMonth}
-          onNextMonth={handleNextMonth}
           onNotificationClick={() => console.log('알림 클릭')}
         />
 

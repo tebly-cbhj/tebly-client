@@ -3,8 +3,6 @@ import MonthSelect from './month/MonthSelect';
 import MonthWeekToggle from './MonthWeekToggle';
 import BellLine from '../../assets/icons/bell-line.svg?react';
 import BellNoti from '../../assets/icons/bell-noti.svg?react';
-import ChevronLeft from '../../assets/icons/chevron-left.svg?react';
-import ChevronRight from '../../assets/icons/chevron-right.svg?react';
 
 const Container = styled.div`
   display: flex;
@@ -36,17 +34,6 @@ const BellButton = styled.button`
   cursor: pointer;
 `;
 
-const NavButton = styled.button`
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-`;
 
 const LeftArea = styled.div`
   display: flex;
@@ -57,8 +44,6 @@ const LeftArea = styled.div`
 export default function CalendarHeader({
   monthLabel = '2026.06',
   viewMode = 'month',
-  onPrevMonth,
-  onNextMonth,
   onViewModeChange,
   hasUnreadNotification = false,
   onNotificationClick,
@@ -68,13 +53,7 @@ export default function CalendarHeader({
   return (
     <Container>
       <LeftArea>
-        <NavButton type="button" onClick={onPrevMonth} aria-label="이전 달">
-          <ChevronLeft width={16} height={16} />
-        </NavButton>
         <MonthSelect label={monthLabel} />
-        <NavButton type="button" onClick={onNextMonth} aria-label="다음 달">
-          <ChevronRight width={16} height={16} />
-        </NavButton>
       </LeftArea>
 
       <RightArea>
