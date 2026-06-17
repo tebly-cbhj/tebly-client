@@ -34,7 +34,7 @@ export default function App() {
           <Route path="/my-appointments" element={<MyAppointMentPage />} />
           <Route path="/create-appointment" element={<CreateAppointmentPage />} />
           <Route path="/calendar-test" element={<CalendarTestpage />} />
-          <Route path="/" element={<MonthCalendarPage />} />
+          <Route path="/" element={<CalendarPage />} />
           <Route path="/calendar/event-detail" element={<EventDetailPage />} />
           <Route path="/calendar/create" element={<CreateSchedulePage />} />
           <Route path="/calendar" element={<CalendarPage />} />

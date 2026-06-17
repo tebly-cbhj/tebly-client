@@ -130,6 +130,38 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
     : null;
 
+  function handleScheduleClick(schedule, occurrenceDate) {
+    const [startTime, endTime] = schedule.time ? schedule.time.split(' - ') : ['', ''];
+
+    let dateStr;
+    if (occurrenceDate) {
+      const y = occurrenceDate.getFullYear();
+      const m = String(occurrenceDate.getMonth() + 1).padStart(2, '0');
+      const d = String(occurrenceDate.getDate()).padStart(2, '0');
+      dateStr = `${y}.${m}.${d}`;
+    } else {
+      dateStr = schedule.date ? schedule.date.split(' ')[0] : '';
+    }
+
+    navigate('/calendar/event-detail', {
+      state: {
+        scheduleId: schedule.id,
+        schedule: {
+          title: schedule.title,
+          memo: schedule.memo || '',
+          startDate: dateStr,
+          startTime: startTime || '',
+          endDate: dateStr,
+          endTime: endTime || '',
+          place: schedule.place || '',
+          category: categoryIconMap[schedule.category] || schedule.category || 'Other',
+          alarmTime: schedule.alarmTime || '',
+          repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
+        },
+      },
+    });
+  }
+
   const getDistance = (touches) => {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
@@ -225,7 +257,11 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                 $spanRows={spanRows}
                 $dayIndex={getDayIndex(schedule)}
               >
-                <ScheduleBlock category={schedule.category} text={schedule.title} />
+                <ScheduleBlock
+                  category={schedule.category}
+                  text={schedule.title}
+                  onClick={() => handleScheduleClick(schedule, schedule._occurrenceDate)}
+                />
               </GridBlock>
             );
           })}
@@ -245,6 +281,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                 <ScheduleBlock
                   category={categoryIconMap[schedule.category]}
                   text={schedule.title}
+                  onClick={() => handleScheduleClick(schedule, null)}
                 />
               </GridBlock>
             );

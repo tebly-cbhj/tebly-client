@@ -49,7 +49,8 @@ const ActionButton = styled.button`
 const ActionText = styled.span`
   ${({ theme }) => theme.typography.btn2};
   color: ${({ $color, $selected, theme }) =>
-    $selected ? theme.colors.primary100 : $color || theme.colors.gray900};
+    $selected ? theme.colors.primary100 : $color || theme.colors.gray800};
+  text-align: center;
 `;
 
 const CancelText = styled(ActionText)`
