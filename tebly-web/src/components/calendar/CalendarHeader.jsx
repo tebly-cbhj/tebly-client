@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import MonthSelect from './month/MonthSelect';
 import MonthWeekToggle from './MonthWeekToggle';
 import BellLine from '../../assets/icons/bell-line.svg?react';
 import BellNoti from '../../assets/icons/bell-noti.svg?react';
+import DatePickerPopup from './month/DatepickerPopup';
 
 const Container = styled.div`
   display: flex;
@@ -34,37 +36,71 @@ const BellButton = styled.button`
   cursor: pointer;
 `;
 
+function getCurrentMonthLabel() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  return `${year}.${month}`;
+}
+
 export default function CalendarHeader({
-  monthLabel = '2026.06',
   viewMode = 'month',
-  onMonthClick,
   onViewModeChange,
-  hasUnreadNotification = false,
+  hasUnreadNotification = false, // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
   onNotificationClick,
+  onDateChange,
+  monthLabel: externalMonthLabel,
 }) {
+  const monthLabel = externalMonthLabel ?? getCurrentMonthLabel();
+  const [showPicker, setShowPicker] = useState(false);
+  const [lastSelectedDate, setLastSelectedDate] = useState(null);
+  const [pickerKey, setPickerKey] = useState(0); // ✅ 추가
+
   const NotificationIcon = hasUnreadNotification ? BellNoti : BellLine;
 
-  return (
-    <Container>
-      <MonthSelect
-        label={monthLabel}
-        onClick={onMonthClick}
-      />
+  function handleOpen() {
+    setPickerKey(prev => prev + 1); // ✅ 열 때마다 key 증가
+    setShowPicker(true);
+  }
 
-      <RightArea>
-        <MonthWeekToggle
-          value={viewMode}
-          onChange={onViewModeChange}
+  function handleConfirm({ year, month, day }) {
+    setLastSelectedDate({ year, month, day });
+    // TODO: 선택된 연월 기준으로 해당 월/주 일정 API 호출 연동
+    onDateChange?.({ year, month, day });
+  }
+
+  return (
+    <>
+      <Container>
+        <MonthSelect
+          label={monthLabel}
+          onClick={handleOpen} // ✅ setShowPicker(true) → handleOpen
         />
 
-        <BellButton
-          type="button"
-          onClick={onNotificationClick}
-          aria-label="알림"
-        >
-          <NotificationIcon width={24} height={24} />
-        </BellButton>
-      </RightArea>
-    </Container>
+        <RightArea>
+          <MonthWeekToggle
+            value={viewMode}
+            onChange={onViewModeChange}
+          />
+
+          <BellButton
+            type="button"
+            onClick={onNotificationClick}
+            aria-label="알림"
+          >
+            <NotificationIcon width={24} height={24} />
+          </BellButton>
+        </RightArea>
+      </Container>
+
+      {showPicker && (
+        <DatePickerPopup
+          onClose={() => setShowPicker(false)}
+          onConfirm={handleConfirm}
+          initialDate={lastSelectedDate}
+          key={pickerKey} // ✅ 열 때마다 새로 마운트
+        />
+      )}
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { getWeekDates } from '../../../utils/dateUtils';  
-
+import { getWeekDates } from '../../../utils/dateUtils';
 
 const Row = styled.div`
   display: flex;
@@ -29,8 +28,9 @@ const DayCell = styled.div`
 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-export default function WeekDateCell() {
-  const weekDates = getWeekDates();
+export default function WeekDateCell({ sunday }) {
+  // sunday가 있으면 해당 주, 없으면 오늘 기준 이번 주
+  const weekDates = getWeekDates(sunday ?? new Date());
 
   return (
     <Row>
