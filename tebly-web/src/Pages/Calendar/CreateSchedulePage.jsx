@@ -11,6 +11,7 @@ import DatePopup from '../../components/room/DatePopup';
 import CategoryPopup from '../../components/room/CategoryPopup';
 import AlarmPopup from '../../components/room/AlarmPopup';
 import RepeatPopup from '../../components/room/RepeatPopup';
+import { CATEGORY_KO } from '../../components/room/CategoryIcons';
 import RepeatEndDatePopup from '../../components/room/RepeatEndDatePopup';
 import ExpandIcon from '../../components/common/ExpandIcon';
 import TimePicker from '../../components/common/TimePicker';
@@ -432,7 +433,7 @@ export default function CreateSchedulePage() {
           <SelectRow
             LeftIcon={CategoryIcon}
             text_empty="카테고리 선택"
-            text_selected={category}
+            text_selected={CATEGORY_KO[category] ?? category}
             state={category ? 'selected' : 'empty'}
             right_icon
             onClick={() => setPopupType('category')}

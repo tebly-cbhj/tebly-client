@@ -16,7 +16,7 @@ import FriendsGrayIcon from '../../assets/icons/friends-gray.svg?react';
 import RoomFillIcon from '../../assets/icons/room-fill.svg?react';
 import MoreLineIcon from '../../assets/icons/more-line.svg?react';
 
-import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
+import { CATEGORY_ICON_MAP, CATEGORY_KO } from '../../components/room/CategoryIcons';
 
 const CATEGORY_BG = {
   Appointment:     { bg: '#FFBEBE', outline: '#FF8989' },
@@ -262,7 +262,7 @@ export default function EventDetailPage() {
         <SelectRow
           LeftIcon={CategoryIcon}
           text_empty="카테고리"
-          text_selected={schedule.category}
+          text_selected={CATEGORY_KO[schedule.category] ?? schedule.category}
           state={schedule.category ? 'selected' : 'empty'}
           right_icon
         />
