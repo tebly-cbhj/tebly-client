@@ -36,9 +36,9 @@ const Text = styled.p`
   margin: 0;
 `;
 
-export default function ScheduleBlock({ category, text }) {
+export default function ScheduleBlock({ category, text, onClick }) {
   return (
-    <Block $category={category}>
+    <Block $category={category} onClick={onClick}>
       <Text>{text}</Text>
     </Block>
   );

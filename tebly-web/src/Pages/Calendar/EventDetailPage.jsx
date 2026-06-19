@@ -180,6 +180,7 @@ export default function EventDetailPage() {
 
   // TODO: location.state 대신 scheduleId(URL 파라미터)로 GET /api/schedules/:id 호출하여 데이터 fetch
   // TODO: allDay 초기값을 API 응답 데이터로 초기화
+  const scheduleId = location.state?.scheduleId;
   const schedule = location.state?.schedule || {
     title: '미문 과제 제출',
     memo: '1,000자 내외 작성, 제출형식 pdf',
@@ -215,8 +216,7 @@ export default function EventDetailPage() {
         option2Color="#FF4646"
         onOption1={() => {
           setShowActionSheet(false);
-          // TODO: 일정 수정 페이지로 이동 (navigate('/calendar/edit', { state: { schedule } }))
-          console.log('수정');
+          navigate('/calendar/create', { state: { scheduleId, schedule } });
         }}
         onOption2={() => {
           setShowActionSheet(false);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import TextField from '../../components/common/TextField';
@@ -304,21 +304,43 @@ function toStoreDate(dateObj) {
   return `${dateObj.year}.${String(dateObj.month).padStart(2, '0')}.${String(dateObj.day).padStart(2, '0')} (${day})`;
 }
 
+const REPEAT_TYPE_TO_KO = { daily: '매일', weekly: '매주', monthly: '매월', yearly: '매년' };
+
+function parseDateString(dateStr) {
+  if (!dateStr) return null;
+  const parts = dateStr.split(/[-.]/).map(Number);
+  if (parts.length >= 3 && parts[0] > 999) {
+    return { year: parts[0], month: parts[1], day: parts[2] };
+  }
+  return null;
+}
+
+function parseRepeatString(repeatStr) {
+  if (!repeatStr || repeatStr === '반복 없음') return '없음';
+  const match = repeatStr.match(/^(\w+) 반복$/);
+  return match ? (REPEAT_TYPE_TO_KO[match[1]] || '없음') : '없음';
+}
+
 export default function CreateSchedulePage() {
   const navigate = useNavigate();
-  const addSchedule = usePersonalScheduleStore((state) => state.addSchedule);
+  const location = useLocation();
+  const { scheduleId, schedule: initialSchedule } = location.state || {};
+  const isEditing = !!scheduleId;
 
-  const [title, setTitle] = useState('');
-  const [memo, setMemo] = useState('');
+  const addSchedule = usePersonalScheduleStore((state) => state.addSchedule);
+  const updateSchedule = usePersonalScheduleStore((state) => state.updateSchedule);
+
+  const [title, setTitle] = useState(initialSchedule?.title || '');
+  const [memo, setMemo] = useState(initialSchedule?.memo || '');
   const [allDay, setAllDay] = useState(false);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [startTime, setStartTime] = useState('09:00');
-  const [endTime, setEndTime] = useState('10:00');
-  const [place, setPlace] = useState('');
-  const [category, setCategory] = useState('');
-  const [alarmTime, setAlarmTime] = useState('');
-  const [repeat, setRepeat] = useState('없음');
+  const [startDate, setStartDate] = useState(() => parseDateString(initialSchedule?.startDate));
+  const [endDate, setEndDate] = useState(() => parseDateString(initialSchedule?.endDate));
+  const [startTime, setStartTime] = useState(initialSchedule?.startTime || '09:00');
+  const [endTime, setEndTime] = useState(initialSchedule?.endTime || '10:00');
+  const [place, setPlace] = useState(initialSchedule?.place || '');
+  const [category, setCategory] = useState(initialSchedule?.category || '');
+  const [alarmTime, setAlarmTime] = useState(initialSchedule?.alarmTime || '');
+  const [repeat, setRepeat] = useState(() => parseRepeatString(initialSchedule?.repeat));
   const [repeatEnd, setRepeatEnd] = useState('안 함');
   const [repeatEndDate, setRepeatEndDate] = useState(null);
   const [showRepeatEndMenu, setShowRepeatEndMenu] = useState(false);
@@ -342,30 +364,31 @@ export default function CreateSchedulePage() {
     setTimePickerTarget(null);
   }
 
-  // TODO: POST /api/schedules 로 교체 — 현재는 로컬 스토어에만 저장됨
+  // TODO: POST/PUT /api/schedules 로 교체 — 현재는 로컬 스토어에만 저장됨
   function handleSave() {
     if (!title.trim()) return;
-    addSchedule({
+    const payload = {
       title,
       memo,
       startDate: toStoreDate(startDate),
       endDate: toStoreDate(endDate || startDate),
-      // TODO: 종일 여부(allDay)를 API 요청 바디에 포함
       time: allDay ? '' : `${startTime} - ${endTime}`,
       location: place,
-      // TODO: category 영문 키를 API 스펙에 맞게 변환하여 전송
       category,
-      // TODO: alarmTime을 API 스펙 포맷(분 단위 등)으로 변환하여 전송
       alarmTime,
-      // TODO: repeat(반복 주기)·repeatEnd(종료 조건)·repeatEndDate를 API 바디에 포함
       repeat: null,
-    });
+    };
+    if (isEditing) {
+      updateSchedule(scheduleId, payload);
+    } else {
+      addSchedule(payload);
+    }
     navigate(-1);
   }
 
   return (
     <PageWrapper>
-      <Header title="일정 추가" leftIcon="back" onLeft={() => navigate(-1)} />
+      <Header title={isEditing ? '일정 수정' : '일정 추가'} leftIcon="back" onLeft={() => navigate(-1)} />
 
       <ScrollContent>
         <InputContainer>

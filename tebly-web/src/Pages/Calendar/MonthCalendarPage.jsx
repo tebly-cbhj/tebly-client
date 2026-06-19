@@ -173,6 +173,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
     const [startTime, endTime] = schedule.time ? schedule.time.split(' - ') : ['', ''];
     navigate('/calendar/event-detail', {
       state: {
+        scheduleId: schedule.scheduleId,
         schedule: {
           title: schedule.label,
           memo: schedule.memo,
@@ -201,6 +202,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
 
       return scheduleDates.map((date) => ({
         id: `${schedule.id}-${date}`,
+        scheduleId: schedule.id,
         date,
         category: normalizeCategory(schedule.category),
         originalCategory: schedule.category,
