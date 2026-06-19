@@ -297,7 +297,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
 
       <FloatingWrapper>
         <CalendarFab
-          onDirectInput={() => navigate('/calendar/create')}
+          onDirectInput={() => navigate('/ocr-loading')}
           onAiRecognition={() => console.log('AI 이미지 인식')}
         />
       </FloatingWrapper>
