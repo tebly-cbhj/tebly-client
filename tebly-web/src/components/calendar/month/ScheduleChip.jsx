@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Chip = styled.button`
+const Chip = styled.div`
   width: 44px;
   height: 13px;
   border: none;
