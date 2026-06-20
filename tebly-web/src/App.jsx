@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -19,29 +19,40 @@ import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage'
 
+function Layout() {
+  const location = useLocation();
+  const hideNavBar = location.pathname.includes('/chat'); // /chat 포함된 경로면 숨김
+
+  return (
+    <>
+      <Routes>
+        <Route path="/room-list" element={<RoomListPage />} />
+        <Route path="/create-room" element={<CreateRoomPage />} />
+        <Route path="/select-friend" element={<SelectFriendPage />} />
+        <Route path="/room/:roomId" element={<RoomInfoPage />} />
+        <Route path="/room/:roomId/chat" element={<ChatPage />} />
+        <Route path="/time-recommend" element={<TimeRecommendPage />} />
+        <Route path="/test" element={<TestPage />} />
+        <Route path="/my-appointments" element={<MyAppointMentPage />} />
+        <Route path="/create-appointment" element={<CreateAppointmentPage />} />
+        <Route path="/calendar-test" element={<CalendarTestpage />} />
+        <Route path="/" element={<CalendarPage />} />
+        <Route path="/ocr-loading" element={<OCRLoadingPage />} />
+        <Route path="/ocr-result" element={<OCRResultPage />} />
+        <Route path="/calendar/event-detail" element={<EventDetailPage />} />
+        <Route path="/calendar/create" element={<CreateSchedulePage />} />
+      </Routes>
+      {!hideNavBar && <BottomNavBar />}  {/* 채팅 페이지면 숨김 */}
+    </>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <BrowserRouter>
-        <Routes>
-          <Route path="/room-list" element={<RoomListPage />} />
-          <Route path="/create-room" element={<CreateRoomPage />} />
-          <Route path="/select-friend" element={<SelectFriendPage />} />
-          <Route path="/room/:roomId" element={<RoomInfoPage />} />
-          <Route path="/room/:roomId/chat" element={<ChatPage />} />
-          <Route path="/time-recommend" element={<TimeRecommendPage />} />
-          <Route path="/test" element={<TestPage />} />
-          <Route path="/my-appointments" element={<MyAppointMentPage />} />
-          <Route path="/create-appointment" element={<CreateAppointmentPage />} />
-          <Route path="/calendar-test" element={<CalendarTestpage />} />
-          <Route path="/" element={<CalendarPage />} />
-          <Route path="/ocr-loading" element={<OCRLoadingPage />} />
-          <Route path="/ocr-result" element={<OCRResultPage />} />
-          <Route path="/calendar/event-detail" element={<EventDetailPage />} />
-          <Route path="/calendar/create" element={<CreateSchedulePage />} />
-        </Routes>
-        <BottomNavBar /> 
+        <Layout />  {/* Routes랑 BottomNavBar를 Layout으로 감쌈 */}
       </BrowserRouter>
     </ThemeProvider>
   );

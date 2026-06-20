@@ -1,13 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import Header from '../../components/common/Header';
 import MessageBubble from '../../components/room/MessageBubble';
 import MessageInput from '../../components/room/MessageInput';
 import { useRoomStore } from '../../store/RoomStore';
-import { PageWrapper } from '../../PageWrapper';
+import { useChatStore } from '../../store/ChatStore'; // 추가!
 
 const ChatContainer = styled.div`
   width: 100%;
@@ -114,84 +112,29 @@ const CalendarIcon = () => (
 );
 
 export default function ChatPage() {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // 빠져있었음!
   const { roomId } = useParams();
-  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
+  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId))); // 빠져있었음!
+  const { connect, sendMessage, messagesByRoom } = useChatStore();
+  const messages = messagesByRoom[roomId] ?? [];
+  const accessToken = import.meta.env.VITE_ACCESS_TOKEN;
 
-  // STOMP 클라이언트를 ref로 관리 (리렌더링과 무관하게 연결 유지)
-  const stompClientRef = useRef(null);
-
-  const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isConnected, setIsConnected] = useState(false);
-
-  // TODO: API 연결 시 서버에서 받아온 약속 확정 여부(boolean)로 대체
+  const [inputValue, setInputValue] = useState(''); // 빠져있었음!
+  // TODO: API 연결 시 서버에서 받아온 약속 확정 여부로 대체
   const [appointmentConfirmed, setAppointmentConfirmed] = useState(false);
   const [cardExpanded, setCardExpanded] = useState(true);
 
   useEffect(() => {
-    const accessToken = import.meta.env.VITE_ACCESS_TOKEN;
-
-    const client = new Client({
-      webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL),
-      connectHeaders: {
-        Authorization: 'Bearer ' + accessToken,
-      },
-      onConnect: () => {
-        console.log('연결 성공');
-        const MY_SENDER_ID = 6; // TODO: 로그인 후 실제 userId로 교체
-
-        client.subscribe(`/topic/chat/room/${roomId}`, (message) => {
-          const body = JSON.parse(message.body);
-          const newMessages = Array.isArray(body) ? body : [body];
-
-          setMessages((prev) => [...prev, ...newMessages.map((msg) => ({
-            id: msg.id,
-            type: msg.senderId === MY_SENDER_ID ? 'sent' : 'received-shown',
-            senderName: msg.senderNickname,
-            profileImage: msg.senderProfileImageUrl,
-            text: msg.content,
-            sentAt: msg.sentAt,
-          }))]);
-        });
-      },                              // ← onConnect 닫기
-      onDisconnect: () => setIsConnected(false),
-      onStompError: (frame) => console.error('STOMP 에러', frame),
-    });                               // ← Client 생성자 닫기
-
-    client.activate();
-    stompClientRef.current = client;
-
-    return () => { client.deactivate(); };
+    connect(roomId, accessToken);
   }, [roomId]);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
-    if (!stompClientRef.current?.connected) {
-      console.warn('아직 연결 안 됨');
-      return;
-    }
-
-    stompClientRef.current.publish({
-      destination: '/app/chat/send',
-      body: JSON.stringify({
-        roomId: Number(roomId),
-        content: inputValue.trim(),
-      }),
-    });
-
-    // 이 부분 통째로 지우기!
-    // setMessages((prev) => [...prev, {
-    //   id: Date.now(),
-    //   type: 'sent',
-    //   text: inputValue.trim(),
-    // }]);
-
+    sendMessage(roomId, inputValue.trim());
     setInputValue('');
   };
 
   return (
-    <PageWrapper>
       <ChatContainer>
         <HeaderWrapper>
           <Header
@@ -236,6 +179,5 @@ export default function ChatPage() {
           />
         </InputBar>
       </ChatContainer>
-    </PageWrapper>
   );
 }
