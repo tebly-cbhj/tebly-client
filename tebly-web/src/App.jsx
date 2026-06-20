@@ -13,7 +13,6 @@ import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
 import BottomNavBar from './components/common/BottomNavBar';
-import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
 import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
