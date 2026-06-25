@@ -18,11 +18,13 @@ import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage'
-import MorePage from './Pages/More/MorePage'
+import MorePage from './Pages/More/MorePage';
+import EditProfilePage from './Pages/More/EditProfilePage';
 
 function Layout() {
   const location = useLocation();
-  const hideNavBar = location.pathname.includes('/chat'); // /chat 포함된 경로면 숨김
+  
+  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more'].includes(location.pathname);
 
   return (
     <>
@@ -43,8 +45,9 @@ function Layout() {
         <Route path="/calendar/event-detail" element={<EventDetailPage />} />
         <Route path="/calendar/create" element={<CreateSchedulePage />} />
         <Route path='/more' element={<MorePage />} />
+        <Route path='/edit-profile' element={<EditProfilePage />} />
       </Routes>
-      {!hideNavBar && <BottomNavBar />}  {/* 채팅 페이지면 숨김 */}
+      {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
   );
 }

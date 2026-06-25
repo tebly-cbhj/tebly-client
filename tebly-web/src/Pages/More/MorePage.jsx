@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { PageWrapper } from '../../PageWrapper';
 import Header2 from '../../components/common/Header2';
@@ -76,6 +77,7 @@ const Bio = styled.span`
 `;
 
 export default function MorePage() {
+  const navigate = useNavigate();
   // TODO: 유저 정보 API 연동 후 아래 하드코딩 데이터 대체
   const user = {
     name: '김뿡치',
@@ -104,7 +106,7 @@ export default function MorePage() {
           <ProfileInfo>
             <NameRow>
               <Name>{user.name}</Name>
-              <EditIcon onClick={() => console.log('프로필 편집')}> {/* TODO: 프로필 편집 페이지 navigate 연동 */}
+              <EditIcon onClick={() => navigate('/edit-profile')}> {/* TODO: 프로필 편집 페이지 navigate 연동 */}
                 <EditSmallIcon width={24} height={24} />
               </EditIcon>
             </NameRow>
