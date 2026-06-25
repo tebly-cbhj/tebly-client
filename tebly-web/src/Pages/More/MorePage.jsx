@@ -106,7 +106,7 @@ export default function MorePage() {
           <ProfileInfo>
             <NameRow>
               <Name>{user.name}</Name>
-              <EditIcon onClick={() => navigate('/edit-profile')}> {/* TODO: 프로필 편집 페이지 navigate 연동 */}
+              <EditIcon onClick={() => navigate('/edit-profile')}> 
                 <EditSmallIcon width={24} height={24} />
               </EditIcon>
             </NameRow>
@@ -121,14 +121,14 @@ export default function MorePage() {
             text_empty="알림 설정"
             state="empty"
             right_icon={true}
-            onClick={() => console.log('알림 설정')} // TODO: 알림 설정 페이지 navigate 연동
+            onClick={() => navigate('/alarm-setting')} 
           />
           <SelectRow
             LeftIcon={CategoryIcon}
             text_empty="카테고리 설정"
             state="empty"
             right_icon={true}
-            onClick={() => console.log('카테고리 설정')} // TODO: 카테고리 설정 페이지 navigate 연동
+            onClick={() => navigate('/category-setting')} // TODO: 카테고리 설정 페이지 navigate 연동
           />
         </SectionCard>
 

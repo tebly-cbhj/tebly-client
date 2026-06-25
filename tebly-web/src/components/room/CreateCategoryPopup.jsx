@@ -118,9 +118,9 @@ const ButtonWrapper = styled.div`
   width: 149px;
 `;
 
-export default function CreateCategoryPopup({ onClose, onSave }) {
-  const [categoryName, setCategoryName] = useState('');
-  const [selectedIconId, setSelectedIconId] = useState(null);
+export default function CreateCategoryPopup({ onClose, onSave, title = "카테고리 추가", initialName = '', initialIconId = null }) {
+  const [categoryName, setCategoryName] = useState(initialName);
+  const [selectedIconId, setSelectedIconId] = useState(initialIconId);
 
   const canSave = categoryName.trim() !== '' && selectedIconId !== null;
 
@@ -136,7 +136,7 @@ export default function CreateCategoryPopup({ onClose, onSave }) {
   return (
     <PopupBox>
       <Header>
-        <Title>카테고리 추가</Title>
+        <Title>{title}</Title>
 
         <CloseButton type="button" onClick={onClose}>
           <CloseIcon />

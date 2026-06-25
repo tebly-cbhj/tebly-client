@@ -20,6 +20,8 @@ import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage'
 import MorePage from './Pages/More/MorePage';
 import EditProfilePage from './Pages/More/EditProfilePage';
+import AlarmSettingPage from './Pages/More/AlarmSettingPage'
+import CategorySettingPage from './Pages/More/CategorySettingPage'
 
 function Layout() {
   const location = useLocation();
@@ -46,6 +48,8 @@ function Layout() {
         <Route path="/calendar/create" element={<CreateSchedulePage />} />
         <Route path='/more' element={<MorePage />} />
         <Route path='/edit-profile' element={<EditProfilePage />} />
+        <Route path='/alarm-setting' element={<AlarmSettingPage />} />
+        <Route path='/category-setting' element={<CategorySettingPage />} />
       </Routes>
       {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
