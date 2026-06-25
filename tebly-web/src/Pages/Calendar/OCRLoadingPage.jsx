@@ -83,7 +83,6 @@ function OCRLoadingPage() {
       </Description>
     </Container>
     </PageWrapper>
-    
   );
 }
 

@@ -18,6 +18,7 @@ import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage'
+import MorePage from './Pages/More/MorePage'
 
 function Layout() {
   const location = useLocation();
@@ -41,6 +42,7 @@ function Layout() {
         <Route path="/ocr-result" element={<OCRResultPage />} />
         <Route path="/calendar/event-detail" element={<EventDetailPage />} />
         <Route path="/calendar/create" element={<CreateSchedulePage />} />
+        <Route path='/more' element={<MorePage />} />
       </Routes>
       {!hideNavBar && <BottomNavBar />}  {/* 채팅 페이지면 숨김 */}
     </>
