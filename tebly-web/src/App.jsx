@@ -26,11 +26,13 @@ import CategorySettingPage from './Pages/More/CategorySettingPage'
 import FriendPage from './Pages/Friend/FriendPage';
 import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
+import InviteNotiPage from './Pages/Notification/InviteNotiPage';
+import AlarmPage from './Pages/Notification/AlarmPage';
 
 function Layout() {
   const location = useLocation();
   
-  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more'].includes(location.pathname);
+  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'].includes(location.pathname);
   return (
     <>
       <Routes>
@@ -57,6 +59,8 @@ function Layout() {
         <Route path="/friends" element={<FriendPage />} />
         <Route path="/friends/add" element={<AddFriendPage />} />
         <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
+        <Route path='/noti-invitaion' element={<InviteNotiPage />} />
+        <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
       {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>

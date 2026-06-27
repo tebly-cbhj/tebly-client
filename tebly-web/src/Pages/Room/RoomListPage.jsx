@@ -41,7 +41,14 @@ export default function RoomListPage() {
 
   return (
     <PageWrapper>
-      <Header2 title="방" icons={['letter', 'bell']} />
+      <Header2
+        title="방"
+        icons={['letter', 'bell']} // TODO: 알림/메시지 여부에 따라 'letter-noti', 'bell-noti'로 변경
+        onIconClick={(icon) => {
+          if (icon === 'letter' || icon === 'letter-noti') navigate('/noti-invitaion');
+          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm'); // TODO: 알림 페이지 navigate 연동
+        }}
+      />
       <RoomListContainer>
         {rooms.map((room) => (
           <RoomListCard
