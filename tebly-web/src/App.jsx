@@ -17,11 +17,15 @@ import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
-import OCRResultPage from './Pages/Calendar/OCRResultPage'
+import OCRResultPage from './Pages/Calendar/OCRResultPage';
+import OCREditPage from './Pages/Calendar/OCREditPage';
+import FriendPage from './Pages/Friend/FriendPage';
+import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
+import AddFriendPage from './Pages/Friend/AddFriendPage';
 
 function Layout() {
   const location = useLocation();
-  const hideNavBar = location.pathname.includes('/chat'); // /chat 포함된 경로면 숨김
+  const hideNavBar = location.pathname.includes('/chat');
 
   return (
     <>
@@ -39,10 +43,14 @@ function Layout() {
         <Route path="/" element={<CalendarPage />} />
         <Route path="/ocr-loading" element={<OCRLoadingPage />} />
         <Route path="/ocr-result" element={<OCRResultPage />} />
+        <Route path="/ocr-edit" element={<OCREditPage />} />
         <Route path="/calendar/event-detail" element={<EventDetailPage />} />
         <Route path="/calendar/create" element={<CreateSchedulePage />} />
+        <Route path="/friends" element={<FriendPage />} />
+        <Route path="/friends/add" element={<AddFriendPage />} />
+        <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
       </Routes>
-      {!hideNavBar && <BottomNavBar />}  {/* 채팅 페이지면 숨김 */}
+      {!hideNavBar && <BottomNavBar />}
     </>
   );
 }
@@ -52,7 +60,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <BrowserRouter>
-        <Layout />  {/* Routes랑 BottomNavBar를 Layout으로 감쌈 */}
+        <Layout />
       </BrowserRouter>
     </ThemeProvider>
   );
