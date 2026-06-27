@@ -19,14 +19,18 @@ import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
 import OCRResultPage from './Pages/Calendar/OCRResultPage';
 import OCREditPage from './Pages/Calendar/OCREditPage';
+import MorePage from './Pages/More/MorePage';
+import EditProfilePage from './Pages/More/EditProfilePage';
+import AlarmSettingPage from './Pages/More/AlarmSettingPage'
+import CategorySettingPage from './Pages/More/CategorySettingPage'
 import FriendPage from './Pages/Friend/FriendPage';
 import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
 
 function Layout() {
   const location = useLocation();
-  const hideNavBar = location.pathname.includes('/chat');
-
+  
+  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more'].includes(location.pathname);
   return (
     <>
       <Routes>
@@ -46,11 +50,15 @@ function Layout() {
         <Route path="/ocr-edit" element={<OCREditPage />} />
         <Route path="/calendar/event-detail" element={<EventDetailPage />} />
         <Route path="/calendar/create" element={<CreateSchedulePage />} />
+        <Route path='/more' element={<MorePage />} />
+        <Route path='/edit-profile' element={<EditProfilePage />} />
+        <Route path='/alarm-setting' element={<AlarmSettingPage />} />
+        <Route path='/category-setting' element={<CategorySettingPage />} />
         <Route path="/friends" element={<FriendPage />} />
         <Route path="/friends/add" element={<AddFriendPage />} />
         <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
       </Routes>
-      {!hideNavBar && <BottomNavBar />}
+      {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
   );
 }

@@ -44,15 +44,16 @@ export const useScheduleStore = create((set) => ({
   ],
 
   categories: [
-    { name: '약속', iconId: 'Appointment' },
-    { name: '동아리', iconId: 'Club' },
-    { name: '가족', iconId: 'Family' },
-    { name: '자기개발', iconId: 'SelfDevelopment' },
-    { name: '알바', iconId: 'Work' },
-    { name: '수업', iconId: 'Class' },
-    { name: '여가', iconId: 'Leisure' },
-    { name: '팀 프로젝트', iconId: 'TeamProject' },
-    { name: '기타', iconId: 'Other' },
+    { name: '약속', iconId: 'Appointment', isPrivate: false, isDefault: true },
+    { name: '동아리', iconId: 'Club', isPrivate: false, isDefault: true },
+    { name: '가족', iconId: 'Family', isPrivate: false, isDefault: true },
+    { name: '자기개발', iconId: 'SelfDevelopment', isPrivate: false, isDefault: true },
+    { name: '알바', iconId: 'Work', isPrivate: false, isDefault: true },
+    { name: '수업', iconId: 'Class', isPrivate: false, isDefault: true },
+    { name: '여가', iconId: 'Leisure', isPrivate: false, isDefault: true },
+    { name: '팀 프로젝트', iconId: 'TeamProject', isPrivate: false, isDefault: true },
+    { name: '기타', iconId: 'Other', isPrivate: false, isDefault: true },
+    { name: '테스트', iconId: 'Class', isPrivate: true, isDefault: false },
   ],
 
   alarmOptions: ['1일 전', '1시간 전', '30분 전', '15분 전'],
@@ -67,7 +68,25 @@ export const useScheduleStore = create((set) => ({
 
   addCategory: (newCategory) =>
     set((state) => ({
-      categories: [...state.categories, newCategory],
+      categories: [
+        ...state.categories,
+        { ...newCategory, isPrivate: false, isDefault: false }, // TODO: 카테고리 추가 API 연동
+      ],
+    })),
+
+  deleteCategory: (categoryName) =>
+    set((state) => ({
+      categories: state.categories.filter(
+        (c) => !(c.name === categoryName && !c.isDefault) // isDefault: false인 것만 삭제 가능
+      ),
+    })),
+
+  togglePrivate: (categoryName) =>
+    set((state) => ({
+      categories: state.categories.map((c) =>
+        c.name === categoryName ? { ...c, isPrivate: !c.isPrivate } : c
+        // TODO: 카테고리 공개/비공개 API 연동
+      ),
     })),
 
   deleteSchedule: (scheduleId) =>
@@ -76,9 +95,18 @@ export const useScheduleStore = create((set) => ({
     })),
 
   confirmSchedule: (scheduleId) =>
+    set((state) => ({
+      schedules: state.schedules.map((s) =>
+        s.id === scheduleId ? { ...s, confirmed: true } : s
+      ),
+    })),
+    
+  updateCategory: (originalName, updatedCategory) =>
   set((state) => ({
-    schedules: state.schedules.map((s) =>
-      s.id === scheduleId ? { ...s, confirmed: true } : s
+    categories: state.categories.map((c) =>
+      c.name === originalName
+        ? { ...c, name: updatedCategory.name, iconId: updatedCategory.iconId }
+        : c
     ),
   })),
 }));

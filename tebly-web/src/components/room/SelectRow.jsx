@@ -24,7 +24,8 @@ const Label = styled.div`
 `;
 
 const Text = styled.span`
-  color: ${({ $state, theme }) =>
+  color: ${({ $state, $color, theme }) =>
+    $color ? theme.colors[$color] :
     $state === 'empty' ? theme.colors.gray800 : theme.colors.gray900};
   font-family: Pretendard, sans-serif;
   font-size: 1rem;
@@ -60,6 +61,7 @@ export default function SelectRow({
   text_typing = '',
   state = 'empty',
   value = '',
+  color = null,  // ✅ 추가
   onClick,
   onChange,
   onBlur,
@@ -85,7 +87,7 @@ export default function SelectRow({
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
-          <Text $state={state}>{text}</Text>
+          <Text $state={state} $color={color}>{text}</Text>
         )}
       </Label>
       {right_icon && <IconWrapper><ChevronRightIcon /></IconWrapper>}
