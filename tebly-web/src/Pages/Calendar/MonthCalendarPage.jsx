@@ -22,6 +22,13 @@ const DateGrid = styled.div`
   justify-content: center;
 `;
 
+const WeekDivider = styled.div`
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0.0625rem;
+  background: var(--grayscale-gray-300, #DCDCDC);
+`;
+
 const FloatingWrapper = styled.div`
   position: fixed;
   bottom: 5rem;
@@ -265,7 +272,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         <WeekDayRow />
 
         <DateGrid>
-          {monthDates.map((date) => {
+          {monthDates.flatMap((date, index) => {
             const dateKey = formatDateKey(date);
             const isCurrentMonth =
               date.getMonth() === currentMonthDate.getMonth();
@@ -281,7 +288,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
               variant = 'selected';
             }
 
-            return (
+            const cell = (
               <DateCell
                 key={dateKey}
                 date={date.getDate()}
@@ -291,6 +298,12 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
                 onScheduleClick={handleScheduleClick}
               />
             );
+
+            if ((index + 1) % 7 === 0 && index < monthDates.length - 1) {
+              return [cell, <WeekDivider key={`divider-${index}`} />];
+            }
+
+            return [cell];
           })}
         </DateGrid>
       </Container>
@@ -298,7 +311,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
       <FloatingWrapper>
         <CalendarFab
           onDirectInput={() => navigate('/ocr-loading')}
-          onAiRecognition={() => console.log('AI 이미지 인식')}
+          onAiRecognition={() => navigate('/ocr-loading')}
         />
       </FloatingWrapper>
     </PageWrapper>

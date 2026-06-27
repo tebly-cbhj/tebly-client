@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import Header from '../../components/common/Header'; 
-import ScheduleCard from '../../components/calendar/addSchedule/ScheduleCard'; 
-import Btn from '../../components/common/Btn'; 
-import CheckIcon from '../../assets/icons/check.svg?react'; 
+import Header from '../../components/common/Header';
+import ScheduleCard from '../../components/calendar/addSchedule/ScheduleCard';
+import Btn from '../../components/common/Btn';
+import CheckIcon from '../../assets/icons/check.svg?react';
 import { PageWrapper } from '../../PageWrapper';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
+import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
+import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import OCREditSheet from '../../components/calendar/OCREditSheet';
 
 const ResultHeaderContainer = styled.div`
   display: flex;
@@ -21,9 +24,9 @@ const LeftTextContainer = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 3px;
-  flex: 1 0 0; 
-  min-width: 0; 
-  white-space: nowrap; 
+  flex: 1 0 0;
+  min-width: 0;
+  white-space: nowrap;
   flex-shrink: 0;
 `;
 
@@ -32,7 +35,7 @@ const LabelText = styled.span`
   color: ${({ theme }) => theme.colors.gray800};
 
   position: relative;
-  top: 2.8px; 
+  top: 2.8px;
 `;
 
 const CountText = styled.span`
@@ -43,7 +46,7 @@ const CountText = styled.span`
 const SelectAllBtn = styled.div`
   display: flex;
   align-items: center;
-  gap: 3px; 
+  gap: 3px;
   cursor: pointer;
 `;
 
@@ -53,14 +56,14 @@ const SelectAllText = styled.span`
 `;
 
 const CardListContainer = styled.div`
-  flex: 1; 
+  flex: 1;
   width: 100%;
-  overflow-y: auto; 
+  overflow-y: auto;
   padding: 0 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px; 
-  
+  gap: 12px;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -74,16 +77,10 @@ const BottomBtnWrapper = styled.div`
 
 export default function OCRResultPage() {
   const navigate = useNavigate();
-  // TODO: 페이지 진입 시(useEffect) 이전 페이지에서 넘겨받은 이미지 데이터를 
-  // 백엔드 OCR API로 전송하고, 반환된 데이터를 setSchedules로 업데이트하는 로직 추가 필요.
-  // 로딩 상태 관리 필요: isLoading 사용
-  const [schedules, setSchedules] = useState([
-    { id: 1, title: '시스템 프로그래밍 보강', time: '14:00~16:00', category: 'Class' },
-    { id: 2, title: 'tave 회의', time: '15:00~17:00', category: 'TeamProject' },
-    { id: 3, title: '치과 정기검진', time: '17:00~19:00', category: 'Other' },
-  ]);
-
+  const { schedules } = useOCRScheduleStore();
+  const addSchedule = usePersonalScheduleStore((state) => state.addSchedule);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [editScheduleId, setEditScheduleId] = useState(null);
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) =>
@@ -93,23 +90,59 @@ export default function OCRResultPage() {
 
   const handleSelectAll = () => {
     if (selectedIds.length === schedules.length) {
-      setSelectedIds([]); 
+      setSelectedIds([]);
     } else {
-      setSelectedIds(schedules.map((schedule) => schedule.id)); 
+      setSelectedIds(schedules.map((s) => s.id));
     }
   };
 
+  const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+  const DAY_MAP = { 일: 0, 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6 };
+
+  function toDateStr(dateObj) {
+    const d = new Date(dateObj.year, dateObj.month - 1, dateObj.day);
+    return `${dateObj.year}.${String(dateObj.month).padStart(2, '0')}.${String(dateObj.day).padStart(2, '0')} (${DAY_KO[d.getDay()]})`;
+  }
+
+  function nearestDateFromTimeStr(timeStr) {
+    const dayChar = timeStr?.split(' ')[0]?.charAt(0);
+    const targetDay = DAY_MAP[dayChar];
+    const base = new Date();
+    if (targetDay === undefined) return base;
+    const diff = (targetDay - base.getDay() + 7) % 7;
+    base.setDate(base.getDate() + diff);
+    return base;
+  }
+
+  function resolveDateStr(dateObj, timeStr) {
+    if (dateObj) return toDateStr(dateObj);
+    const d = nearestDateFromTimeStr(timeStr);
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${DAY_KO[d.getDay()]})`;
+  }
+
   const handleAddCalendar = () => {
-    console.log('선택된 일정 IDs:', selectedIds);
-    // TODO 1: schedules 배열에서 selectedIds에 포함된 일정 객체들만 필터링하기 (finalSchedules)
-    // TODO 2: 필터링된 일정들을 백엔드 '일정 등록 API'로 전송하여 DB에 저장
-    // TODO 3: API 호출 성공 시, usePersonalScheduleStore의 addSchedule을 호출하여 전역 상태 업데이트
-    // TODO 4: 모든 작업 완료 후 홈('/') 또는 캘린더 화면으로 navigate 이동
+    const selected = schedules.filter((s) => selectedIds.includes(s.id));
+    selected.forEach((s) => {
+      const startDateStr = resolveDateStr(s.startDate, s.time);
+      const endDateStr = resolveDateStr(s.endDate ?? s.startDate, s.time);
+      addSchedule({
+        title: s.title,
+        memo: s.memo || '',
+        startDate: startDateStr,
+        endDate: endDateStr,
+        time: s.allDay ? '' : `${s.startTime} - ${s.endTime}`,
+        location: s.place || '',
+        category: s.category,
+        alarmTime: s.alarmTime || '',
+        repeat: null,
+      });
+    });
+    navigate('/');
   };
 
   return (
     <PageWrapper>
-      <Header 
+      <Header
         title="일정 추가"
         leftIcon="back"
         onLeft={() => navigate(-1)}
@@ -123,8 +156,8 @@ export default function OCRResultPage() {
         </LeftTextContainer>
 
         <SelectAllBtn onClick={handleSelectAll}>
-          <CheckIcon 
-            color={selectedIds.length === schedules.length ? '#B92D2D' : '#1A1A1A'} 
+          <CheckIcon
+            color={selectedIds.length === schedules.length ? '#B92D2D' : '#1A1A1A'}
           />
           <SelectAllText>전체 선택</SelectAllText>
         </SelectAllBtn>
@@ -133,28 +166,36 @@ export default function OCRResultPage() {
       <CardListContainer>
         {schedules.map((schedule) => {
           const iconData = CATEGORY_ICON_MAP[schedule.category] || CATEGORY_ICON_MAP.Other;
-          const CategoryIcon = iconData.SelectedIcon; // SelectedIcon만 추출
+          const CategoryIcon = iconData.SelectedIcon;
 
           return (
             <ScheduleCard
               key={schedule.id}
               title={schedule.title}
               time={schedule.time}
-              categoryIcon={<CategoryIcon />} 
+              categoryIcon={<CategoryIcon />}
               isSelected={selectedIds.includes(schedule.id)}
-              onClick={() => toggleSelect(schedule.id)}
+              onBodyClick={() => setEditScheduleId(schedule.id)}
+              onRadioClick={() => toggleSelect(schedule.id)}
             />
           );
         })}
       </CardListContainer>
 
       <BottomBtnWrapper>
-        <Btn 
-          text="캘린더에 추가하기" 
-          onClick={() => navigate('/')}
-          disabled={selectedIds.length === 0} 
-        /> {/* TODO: PersonalScheduleStore의 일정 추가 함수 이용해 일정 추가 */}
+        <Btn
+          text="캘린더에 추가하기"
+          onClick={handleAddCalendar}
+          disabled={selectedIds.length === 0}
+        />
       </BottomBtnWrapper>
+
+      {editScheduleId !== null && (
+        <OCREditSheet
+          scheduleId={editScheduleId}
+          onClose={() => setEditScheduleId(null)}
+        />
+      )}
     </PageWrapper>
   );
 }
