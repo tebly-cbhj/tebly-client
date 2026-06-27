@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -13,7 +13,6 @@ import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
 import BottomNavBar from './components/common/BottomNavBar';
-import MonthCalendarPage from './Pages/Calendar/MonthCalendarPage';
 import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
@@ -24,33 +23,44 @@ import FriendPage from './Pages/Friend/FriendPage';
 import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
 
+function Layout() {
+  const location = useLocation();
+  const hideNavBar = location.pathname.includes('/chat');
+
+  return (
+    <>
+      <Routes>
+        <Route path="/room-list" element={<RoomListPage />} />
+        <Route path="/create-room" element={<CreateRoomPage />} />
+        <Route path="/select-friend" element={<SelectFriendPage />} />
+        <Route path="/room/:roomId" element={<RoomInfoPage />} />
+        <Route path="/room/:roomId/chat" element={<ChatPage />} />
+        <Route path="/time-recommend" element={<TimeRecommendPage />} />
+        <Route path="/test" element={<TestPage />} />
+        <Route path="/my-appointments" element={<MyAppointMentPage />} />
+        <Route path="/create-appointment" element={<CreateAppointmentPage />} />
+        <Route path="/calendar-test" element={<CalendarTestpage />} />
+        <Route path="/" element={<CalendarPage />} />
+        <Route path="/ocr-loading" element={<OCRLoadingPage />} />
+        <Route path="/ocr-result" element={<OCRResultPage />} />
+        <Route path="/ocr-edit" element={<OCREditPage />} />
+        <Route path="/calendar/event-detail" element={<EventDetailPage />} />
+        <Route path="/calendar/create" element={<CreateSchedulePage />} />
+        <Route path="/friends" element={<FriendPage />} />
+        <Route path="/friends/add" element={<AddFriendPage />} />
+        <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
+      </Routes>
+      {!hideNavBar && <BottomNavBar />}
+    </>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <BrowserRouter>
-        <Routes>
-          <Route path="/room-list" element={<RoomListPage />} />
-          <Route path="/create-room" element={<CreateRoomPage />} />
-          <Route path="/select-friend" element={<SelectFriendPage />} />
-          <Route path="/room/:roomId" element={<RoomInfoPage />} />
-          <Route path="/room/:roomId/chat" element={<ChatPage />} />
-          <Route path="/time-recommend" element={<TimeRecommendPage />} />
-          <Route path="/test" element={<TestPage />} />
-          <Route path="/my-appointments" element={<MyAppointMentPage />} />
-          <Route path="/create-appointment" element={<CreateAppointmentPage />} />
-          <Route path="/calendar-test" element={<CalendarTestpage />} />
-          <Route path="/" element={<CalendarPage />} />
-          <Route path="/ocr-loading" element={<OCRLoadingPage />} />
-          <Route path="/ocr-result" element={<OCRResultPage />} />
-          <Route path="/ocr-edit" element={<OCREditPage />} />
-          <Route path="/calendar/event-detail" element={<EventDetailPage />} />
-          <Route path="/calendar/create" element={<CreateSchedulePage />} />
-          <Route path="/friends" element={<FriendPage />} />
-          <Route path="/friends/add" element={<AddFriendPage />} />
-          <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
-        </Routes>
-        <BottomNavBar /> 
+        <Layout />
       </BrowserRouter>
     </ThemeProvider>
   );
