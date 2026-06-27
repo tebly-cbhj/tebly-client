@@ -18,7 +18,11 @@ import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
 import OCRLoadingPage from './Pages/Calendar/OCRLoadingPage';
-import OCRResultPage from './Pages/Calendar/OCRResultPage'
+import OCRResultPage from './Pages/Calendar/OCRResultPage';
+import OCREditPage from './Pages/Calendar/OCREditPage';
+import FriendPage from './Pages/Friend/FriendPage';
+import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
+import AddFriendPage from './Pages/Friend/AddFriendPage';
 
 export default function App() {
   return (
@@ -39,8 +43,12 @@ export default function App() {
           <Route path="/" element={<CalendarPage />} />
           <Route path="/ocr-loading" element={<OCRLoadingPage />} />
           <Route path="/ocr-result" element={<OCRResultPage />} />
+          <Route path="/ocr-edit" element={<OCREditPage />} />
           <Route path="/calendar/event-detail" element={<EventDetailPage />} />
           <Route path="/calendar/create" element={<CreateSchedulePage />} />
+          <Route path="/friends" element={<FriendPage />} />
+          <Route path="/friends/add" element={<AddFriendPage />} />
+          <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
         </Routes>
         <BottomNavBar /> 
       </BrowserRouter>

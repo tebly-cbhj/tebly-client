@@ -52,26 +52,28 @@ const TimeText = styled.span`
   color: ${({ theme }) => theme.colors.gray800};
 `;
 
-export default function ScheduleCard({ 
-  title, 
-  time, 
-  categoryIcon, 
-  isSelected, 
-  onClick 
+export default function ScheduleCard({
+  title,
+  time,
+  categoryIcon,
+  isSelected,
+  onBodyClick,
+  onRadioClick,
 }) {
   return (
-    <CardContainer $isSelected={isSelected} onClick={onClick}>
+    <CardContainer $isSelected={isSelected} onClick={onBodyClick}>
       <IconWrapper>
-        {/* 부모로부터 _selected 버전의 아이콘 컴포넌트를 주입받습니다 */}
         {categoryIcon}
       </IconWrapper>
-      
+
       <TextContainer>
         <Title $isSelected={isSelected}>{title}</Title>
         <TimeText>{time}</TimeText>
       </TextContainer>
-      
-      <RadioBtn selected={isSelected} />
+
+      <div onClick={(e) => { e.stopPropagation(); onRadioClick?.(); }}>
+        <RadioBtn selected={isSelected} />
+      </div>
     </CardContainer>
   );
 }
