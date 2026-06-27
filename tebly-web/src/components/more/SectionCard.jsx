@@ -13,7 +13,7 @@ const Card = styled.div`
 `;
 
 const Title = styled.span`
-  ${({ theme }) => theme.typography.S2};
+  ${({ theme }) => theme.typography.s2};
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
