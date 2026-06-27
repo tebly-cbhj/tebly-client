@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 
 export const useFriendStore = create((set) => ({
+  // TODO: GET /api/user/me — 내 프로필 API 연동 후 교체
   myProfile: {
     name: '김뽕치',
     intro: '주말 한정 백수입니다~',
     profileImage: null,
   },
 
+  // TODO: GET /api/friends — 친구 목록 API 연동 후 교체 (fetchFriends 호출로 초기화)
   friends: [
     { id: 1, name: '조정묵', intro: '엽덕 개땡기네', profileImage: null, isFavorite: true },
     { id: 2, name: '정지윤', intro: '점심 뭐 먹지', profileImage: null, isFavorite: true },
@@ -20,6 +22,7 @@ export const useFriendStore = create((set) => ({
     { id: 10, name: '한지원', intro: '', profileImage: null, isFavorite: false },
   ],
 
+  // TODO: PATCH /api/friends/:id/favorite — 즐겨찾기 토글 API 연동 후 교체
   toggleFavorite: (id) =>
     set((state) => ({
       friends: state.friends.map((f) =>
@@ -27,6 +30,7 @@ export const useFriendStore = create((set) => ({
       ),
     })),
 
+  // TODO: DELETE /api/friends/:id — 친구 삭제 API 연동 후 교체
   deleteFriend: (id) =>
     set((state) => ({
       friends: state.friends.filter((f) => f.id !== id),

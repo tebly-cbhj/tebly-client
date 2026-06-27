@@ -264,6 +264,7 @@ export default function FriendCalendarPage() {
               if (!isCurrentMonth) variant = 'muted';
               if (isSelected) variant = 'selected';
               return (
+                // TODO: GET /api/friends/:id/schedules — 친구 일정 조회 API 연동 후 schedules 교체
                 <DateCell
                   key={dateKey}
                   date={date.getDate()}

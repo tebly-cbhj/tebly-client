@@ -323,6 +323,7 @@ export default function AddFriendPage() {
     }
   }
 
+  // TODO: POST /api/friends — 친구 추가 API 연동 후 교체
   function handleAddFriend() {
     if (!foundFriend) return;
     addFriend(foundFriend);
