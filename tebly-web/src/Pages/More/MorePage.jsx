@@ -145,7 +145,7 @@ export default function MorePage() {
             state="empty"
             right_icon={true}
             color="alert"  
-            onClick={() => console.log('로그아웃')} // TODO: 로그아웃 API 연동
+            onClick={() => navigate('/onboarding')} // TODO: 로그아웃 API 연동
           />
         </SectionCard>
       </ContentWrapper>

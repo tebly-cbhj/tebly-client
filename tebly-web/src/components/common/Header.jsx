@@ -12,7 +12,7 @@ import Close from '../../assets/icons/close-m.svg?react';
 const Container = styled.div`
   display: flex;
   width: 100%;
-  padding: 12px 20px 12px 20px;
+  padding: 12px 0;
   justify-content: space-between;
   align-items: center;
   background: transparent;
