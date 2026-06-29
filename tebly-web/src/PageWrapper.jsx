@@ -13,10 +13,6 @@ export const PageWrapper = styled.div`
   // 배경 색
   background-color: ${(props) => props.theme.colors.bg};
 
-  // 좌우 기본 여백
-  padding: 0 20px; 
-  // 네비게이션 바 자리
-  padding-bottom: ${(props) => props.noNav ? '0px' : '88px'};
   box-sizing: border-box;
 
   // 내부 요소 배치 방향
