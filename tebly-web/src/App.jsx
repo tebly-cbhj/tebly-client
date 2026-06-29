@@ -26,6 +26,12 @@ import CategorySettingPage from './Pages/More/CategorySettingPage'
 import FriendPage from './Pages/Friend/FriendPage';
 import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
+import OnboardingPage from './Pages/Onboarding/OnboardingPage';
+import LoginPage from './Pages/Onboarding/LoginPage';
+import TermsAgreementPage from './Pages/Onboarding/TermsAgreementPage';
+import ProfileSetupPage from './Pages/Onboarding/ProfileSetupPage';
+import LocationConsentPage from './Pages/Onboarding/LocationConsentPage';
+import ScheduleRegisterPage from './Pages/Onboarding/ScheduleRegisterPage';
 import InviteNotiPage from './Pages/Notification/InviteNotiPage';
 import AlarmPage from './Pages/Notification/AlarmPage';
 
@@ -59,6 +65,12 @@ function Layout() {
         <Route path="/friends" element={<FriendPage />} />
         <Route path="/friends/add" element={<AddFriendPage />} />
         <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
+        <Route path='/onboarding' element={<OnboardingPage />} />
+        <Route path='/login' element={<LoginPage />} />
+        <Route path='/signup/terms' element={<TermsAgreementPage />} />
+        <Route path='/signup/profile' element={<ProfileSetupPage />} />
+        <Route path='/signup/location' element={<LocationConsentPage />} />
+        <Route path='/signup/schedule' element={<ScheduleRegisterPage />} />
         <Route path='/noti-invitaion' element={<InviteNotiPage />} />
         <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
