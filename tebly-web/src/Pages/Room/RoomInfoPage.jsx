@@ -11,28 +11,8 @@ import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
 import ActionSheet from '../../components/common/ActionSheet';
+import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 
-import Appointment from '../../assets/category/appointment_selected.svg?react';
-import Class from '../../assets/category/class_selected.svg?react';
-import Club from '../../assets/category/club_selected.svg?react';
-import Family from '../../assets/category/famliy_selected.svg?react';
-import Free from '../../assets/category/free_selected.svg?react';
-import Others from '../../assets/category/others_selected.svg?react';
-import SelfStudy from '../../assets/category/selfstudy_selected.svg?react';
-import TeamProject from '../../assets/category/teamproject_selected.svg?react';
-import Work from '../../assets/category/work_selected.svg?react';
-
-const categoryImageMap = {
-  약속: Appointment,
-  동아리: Club,
-  가족: Family,
-  자기개발: SelfStudy,
-  알바: Work,
-  수업: Class,
-  여가: Free,
-  '팀 프로젝트': TeamProject,
-  기타: Others,
-};
 const ScrollContent = styled.div`
   flex: 1;
   min-height: 0;
@@ -111,7 +91,7 @@ export default function RoomInfoPage() {
               location={schedule.location}
               acceptedCount={schedule.acceptedIds.length}
               totalCount={schedule.memberIds.length}
-              CategoryImage={categoryImageMap[schedule.category]}
+              CategoryImage={CATEGORY_ICON_MAP[schedule.category]?.SelectedIcon}
               onClick={() =>
                 navigate('/my-appointments', {
                   state: {

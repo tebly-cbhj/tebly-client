@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { PageWrapper } from '../../PageWrapper';
 import Header2 from '../../components/common/Header2';
 import SectionCard from '../../components/more/SectionCard';
@@ -90,7 +89,10 @@ export default function MorePage() {
       <Header2
         title="더보기"
         icons={['letter', 'bell']} // TODO: 알림/메시지 여부에 따라 'letter-noti', 'bell-noti'로 변경
-        onIconClick={(icon) => console.log(icon)} // TODO: 각 아이콘 클릭 시 navigate 연동
+        onIconClick={(icon) => {
+          if (icon === 'letter' || icon === 'letter-noti') navigate('/noti-invitaion');
+          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm'); // TODO: 알림 페이지 navigate 연동
+        }} 
       />
 
       <ContentWrapper>

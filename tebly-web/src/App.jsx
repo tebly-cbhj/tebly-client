@@ -32,11 +32,13 @@ import TermsAgreementPage from './Pages/Onboarding/TermsAgreementPage';
 import ProfileSetupPage from './Pages/Onboarding/ProfileSetupPage';
 import LocationConsentPage from './Pages/Onboarding/LocationConsentPage';
 import ScheduleRegisterPage from './Pages/Onboarding/ScheduleRegisterPage';
+import InviteNotiPage from './Pages/Notification/InviteNotiPage';
+import AlarmPage from './Pages/Notification/AlarmPage';
 
 function Layout() {
   const location = useLocation();
   
-  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more'].includes(location.pathname);
+  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'].includes(location.pathname);
   return (
     <>
       <Routes>
@@ -69,6 +71,8 @@ function Layout() {
         <Route path='/signup/profile' element={<ProfileSetupPage />} />
         <Route path='/signup/location' element={<LocationConsentPage />} />
         <Route path='/signup/schedule' element={<ScheduleRegisterPage />} />
+        <Route path='/noti-invitaion' element={<InviteNotiPage />} />
+        <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
       {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
