@@ -13,6 +13,7 @@ export const PageWrapper = styled.div`
   // 배경 색
   background-color: ${(props) => props.theme.colors.bg};
 
+  padding: 0 20px;
   box-sizing: border-box;
 
   // 내부 요소 배치 방향
