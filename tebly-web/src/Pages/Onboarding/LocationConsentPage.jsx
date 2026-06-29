@@ -69,7 +69,7 @@ export default function LocationConsentPage() {
 
   function handleAgree() {
     // TODO: 위치 정보 동의 API 연동
-    navigate('/');
+    navigate('/signup/schedule');
   }
 
   return (

@@ -59,7 +59,7 @@ const BtnWrapper = styled.div`
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 440px;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
