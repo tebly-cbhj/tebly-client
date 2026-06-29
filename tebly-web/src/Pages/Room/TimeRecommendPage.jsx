@@ -354,7 +354,7 @@ export default function TimeRecommendPage() {
   const cells = buildCalendarDays(viewYear, viewMonth);
 
   return (
-    <PageWrapper>
+    <PageWrapper noNav>
       <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
 
       <FilterBar>

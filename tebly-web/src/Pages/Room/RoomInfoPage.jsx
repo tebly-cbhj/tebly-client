@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom'; 
+import { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import {useRoomStore} from '../../store/RoomStore';
@@ -53,31 +53,48 @@ const FloatingWrapper = styled.div`
   z-index: 100;
 `;
 
+
 export default function RoomInfoPage() {
   const { roomId } = useParams();  
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('tab1');
   const allSchedules = useScheduleStore((state) => state.schedules);
-  const schedules = allSchedules.filter((s) => s.roomId === Number(roomId));
+  const roomSchedules = allSchedules.filter((s) => s.roomId === Number(roomId));
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
-  const [isSheetOpen, setIsSheetOpen] = useState(false);  
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // TODO: GET /api/rooms/:id/unread — 안 읽은 채팅 여부 API 연동 후 교체
+  const hasUnreadChat = false;
+
+  const mySchedules = useMemo(
+    () => roomSchedules.filter((s) => s.createdByMe),
+    [roomSchedules]
+  );
+
+  const invitedSchedules = useMemo(
+    () => roomSchedules.filter((s) => !s.createdByMe),
+    [roomSchedules]
+  );
+
+  const schedules = currentTab === 'tab1' ? mySchedules : invitedSchedules;
+
+  const MY_STATUS_LABEL = { accepted: '참석', rejected: '불참', pending: '미응답' };
 
   return (
-    <PageWrapper>
-      <Header 
+    <PageWrapper noNav>
+      <Header
         title={room?.title}
         leftIcon="back"
         onLeft={() => navigate(-1)}
-        icons={['bubble', 'more']}
+        icons={[hasUnreadChat ? 'bubble-noti' : 'bubble', 'more']}
         onIconClick={(icon) => {
-          if (icon === 'bubble') navigate(`/room/${roomId}/chat`);
+          if (icon === 'bubble' || icon === 'bubble-noti') navigate(`/room/${roomId}/chat`);
           if (icon === 'more') setIsSheetOpen(true);
         }}
       />
 
       <ScrollContent>
         <SummaryWrapper>
-          <RoomSummarySection roomId={Number(roomId)} />    
+          <RoomSummarySection roomId={Number(roomId)} />
         </SummaryWrapper>
 
         <TabBtn activeTab={currentTab} onTabClick={setCurrentTab} />
@@ -92,11 +109,17 @@ export default function RoomInfoPage() {
               acceptedCount={schedule.acceptedIds.length}
               totalCount={schedule.memberIds.length}
               CategoryImage={CATEGORY_ICON_MAP[schedule.category]?.SelectedIcon}
+              chipLabel={
+                currentTab === 'tab1'
+                  ? (schedule.confirmed ? '확정' : '진행 중')
+                  : MY_STATUS_LABEL[schedule.myStatus]
+              }
               onClick={() =>
                 navigate('/my-appointments', {
                   state: {
                     scheduleId: schedule.id,
                     roomId: schedule.roomId,
+                    isInvited: currentTab === 'tab2',
                   },
                 })
               }
@@ -106,7 +129,7 @@ export default function RoomInfoPage() {
       </ScrollContent>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/create-appointment')} />
+        <AddBtn onClick={() => navigate('/create-appointment', { state: { roomId: Number(roomId) } })} />
       </FloatingWrapper>
 
       {isSheetOpen && (

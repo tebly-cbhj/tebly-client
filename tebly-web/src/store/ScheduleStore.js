@@ -14,6 +14,9 @@ export const useScheduleStore = create((set) => ({
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2],
       confirmed: true,
+      // TODO: API 연동 시 서버에서 내려오는 createdByMe, myStatus로 교체
+      createdByMe: true,
+      myStatus: null,
     },
     {
       id: 2,
@@ -27,6 +30,8 @@ export const useScheduleStore = create((set) => ({
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2, 3, 4],
       confirmed: true,
+      createdByMe: false,
+      myStatus: 'accepted', // 'accepted' | 'rejected' | 'pending'
     },
     {
       id: 3,
@@ -40,6 +45,8 @@ export const useScheduleStore = create((set) => ({
       memberIds: [2],
       acceptedIds: [2],
       confirmed: true,
+      createdByMe: false,
+      myStatus: 'pending',
     },
   ],
 

@@ -17,7 +17,6 @@ export const PageWrapper = styled.div`
   padding: 0 20px; 
   // 네비게이션 바 자리
   padding-bottom: ${(props) => props.noNav ? '0px' : '88px'};
-  padding-bottom: 88px;
   box-sizing: border-box;
 
   // 내부 요소 배치 방향
