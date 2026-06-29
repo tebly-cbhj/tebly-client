@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import MemberIcon from '../../assets/icons/member.svg?react';
+import ChipFilter from './ChipFilter';
 
 const Card = styled.div`
   display: flex;
@@ -9,6 +10,9 @@ const Card = styled.div`
   gap: 20px;
   cursor: pointer;
   box-sizing: border-box;
+  position: relative;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
+  opacity: 0.8;
 `;
 
 const Thumbnail = styled.div`
@@ -32,7 +36,6 @@ const RightSection = styled.div`
   flex-direction: column;
   flex: 1;
   gap: 8px;
-  padding-top: 20px;
   align-self: stretch;
 `;
 
@@ -81,6 +84,12 @@ const SliderFill = styled.div`
   transition: width 0.3s ease;
 `;
 
+const ChipWrapper = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+`;
+
 export default function ScheduleCard({
   title,
   date,
@@ -88,6 +97,7 @@ export default function ScheduleCard({
   acceptedCount,
   totalCount,
   CategoryImage,
+  chipLabel,
   onClick,
 }) {
   const ratio = totalCount > 0 ? acceptedCount / totalCount : 0;
@@ -116,6 +126,12 @@ export default function ScheduleCard({
           </SliderTrack>
         </ParticipantContainer>
       </RightSection>
+
+      {chipLabel && (
+        <ChipWrapper>
+          <ChipFilter text={chipLabel} />
+        </ChipWrapper>
+      )}
     </Card>
   );
 }

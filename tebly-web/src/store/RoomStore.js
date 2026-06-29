@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 
 export const useRoomStore = create((set) => ({
+  // TODO: GET /api/rooms — 방 목록 API 연동 후 교체
+  // 멤버 이름이 FriendStore 더미와 다르지만 API 연동 시 실제 유저 데이터로 대체되므로 수정 불필요
   rooms: [
     { 
       id: 1, 

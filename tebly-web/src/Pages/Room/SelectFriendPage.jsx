@@ -71,17 +71,23 @@ const SelectFriendPage = () => {
   const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
   const [searchText, setSearchText] = useState("");
 
-  const friendsList = useFriendStore((state) => state.friends);  
-  const filteredFriends = friendsList.filter((friend) =>         
-    friend.name.includes(searchText)
-  );
-
+  const appointmentMode = location.state?.appointmentMode ?? false;
   const currentRoomId = location.state?.roomId;
-  const existingRoom = useRoomStore((state) => 
+
+  const friendsList = useFriendStore((state) => state.friends);
+  const existingRoom = useRoomStore((state) =>
     state.rooms.find((r) => r.id === currentRoomId)
   );
 
-  const [selected, setSelected] = useState(existingRoom ? existingRoom.members : []); 
+  const displayList = appointmentMode
+    ? (existingRoom?.members ?? [])
+    : friendsList;
+
+  const filteredList = displayList.filter((f) => f.name.includes(searchText));
+
+  const [selected, setSelected] = useState(
+    appointmentMode ? (existingRoom?.members ?? []) : (existingRoom ? existingRoom.members : [])
+  ); 
   const isActive = selected.length > 0;
 
   // 체크박스 토글 함수
@@ -99,8 +105,8 @@ const SelectFriendPage = () => {
   };
 
   return (
-    <PageWrapper>
-      <Header 
+    <PageWrapper noNav>
+      <Header
               title="친구 선택"
               leftIcon="back"
               onLeft={() => navigate(-1)}
@@ -113,7 +119,7 @@ const SelectFriendPage = () => {
           onChange={(e) => setSearchText(e.target.value)}
         />
         <FriendsWrapper>
-            {filteredFriends.map((friend) => (
+            {filteredList.map((friend) => (
                 <FriendsSelect
                   key={friend.id}
                   friend={friend}
@@ -140,14 +146,17 @@ const SelectFriendPage = () => {
             text="완료"
             disabled={!isActive}
             onClick={() => {
-                if (currentRoomId) {
-                  // 기존 방 번호가 있다면 업데이트 함수 실행
+                if (appointmentMode) {
+                  // 약속 만들기 흐름: 선택된 멤버를 CreateAppointmentPage로 전달
+                  navigate('/create-appointment', {
+                    state: { roomId: currentRoomId, selectedMembers: selected },
+                  });
+                } else if (currentRoomId) {
                   updateRoomMembers(currentRoomId, selected);
                   navigate(-1);
                 } else {
-                  // 방 번호가 없다면 (방 생성 과정) 새 방 만들기 함수 실행
                   const { roomName, description } = location.state || {};
-                  addRoom(roomName, description, selected); 
+                  addRoom(roomName, description, selected);
                   navigate('/room-list');
                 }
             }}

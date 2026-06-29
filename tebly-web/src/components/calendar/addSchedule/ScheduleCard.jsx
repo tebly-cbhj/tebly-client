@@ -36,7 +36,14 @@ const TextContainer = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
-  flex: 1 0 0; /* 남은 공간을 모두 차지하도록 설정 */
+  flex: 1 0 0;
+`;
+
+const Divider = styled.div`
+  width: 2px;
+  height: 44px;
+  background: #efefef;
+  flex-shrink: 0;
 `;
 
 const Title = styled.span`
@@ -70,6 +77,8 @@ export default function ScheduleCard({
         <Title $isSelected={isSelected}>{title}</Title>
         <TimeText>{time}</TimeText>
       </TextContainer>
+
+      <Divider />
 
       <div onClick={(e) => { e.stopPropagation(); onRadioClick?.(); }}>
         <RadioBtn selected={isSelected} />
