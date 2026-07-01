@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { FieldWrapper, FieldInput } from './TextFieldBase';
+import { FieldWrapper, FieldInput } from './TextfieldBase';
 import SearchIconSvg from '../../assets/icons/search.svg?react'; // SVG 컬러 변경용
 
 const SearchIcon = styled(SearchIconSvg)`
