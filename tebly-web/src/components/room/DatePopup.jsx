@@ -62,7 +62,16 @@ function toMs(d) {
   return new Date(d.year, d.month - 1, d.day).getTime();
 }
 
-export default function DatePopup({ onClose, onReset, onConfirm }) {
+export default function DatePopup({
+  onClose,
+  onReset,
+  onConfirm,
+  leftBtnText = '초기화',
+  rightBtnText = '선택 완료',
+  onLeftBtn,
+  onRightBtn,
+  singleSelect = false,
+}) {
   const today = new Date();
 
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -116,6 +125,12 @@ export default function DatePopup({ onClose, onReset, onConfirm }) {
   function handleSelect(day, type) {
     const clicked = resolveDate(day, type);
 
+    if (singleSelect) {
+      setStartDate(clicked);
+      setEndDate(null);
+      return;
+    }
+
     if (phase === 'start') {
       setStartDate(clicked);
       setEndDate(null);
@@ -149,6 +164,10 @@ export default function DatePopup({ onClose, onReset, onConfirm }) {
     const effectiveEndMs = endMs ?? hoverMs;
 
     if (startMs === null) return 'default';
+
+    if (singleSelect) {
+      return cellMs === startMs ? 'single' : 'default';
+    }
 
     if (effectiveEndMs === null) {
       return cellMs === startMs ? 'start' : 'default';
@@ -215,18 +234,18 @@ export default function DatePopup({ onClose, onReset, onConfirm }) {
         <ButtonRow>
           <ResetButtonWrapper>
             <Btn
-              text="초기화"
+              text={leftBtnText}
               size="medium"
               variant="gray"
-              onClick={handleReset}
+              onClick={onLeftBtn ? () => onLeftBtn({ start: startDate, end: endDate }) : handleReset}
             />
           </ResetButtonWrapper>
 
           <ConfirmButtonWrapper>
             <Btn
-              text="선택 완료"
+              text={rightBtnText}
               size="medium"
-              onClick={handleConfirm}
+              onClick={onRightBtn ?? handleConfirm}
             />
           </ConfirmButtonWrapper>
         </ButtonRow>

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 
 const Container = styled.div`
   display: flex;
@@ -40,7 +41,13 @@ const DateText = styled.p`
   color: ${({ theme }) => theme.colors.gray800};
 `;
 
-export default function ScheduleInfo({ title, date, time, CategoryImage }) {
+const TimeRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+export default function ScheduleInfo({ title, date, time, CategoryImage, isEditing, onEditTime }) {
   return (
     <Container>
       <ImageBox>
@@ -49,7 +56,12 @@ export default function ScheduleInfo({ title, date, time, CategoryImage }) {
 
       <TextBox>
         <Title>{title}</Title>
-        <DateText>{date} {time}</DateText>
+        <TimeRow>
+          <DateText>{date} {time}</DateText>
+          {isEditing && (
+            <EditSmallIcon style={{ cursor: 'pointer' }} onClick={onEditTime} />
+          )}
+        </TimeRow>
       </TextBox>
     </Container>
   );

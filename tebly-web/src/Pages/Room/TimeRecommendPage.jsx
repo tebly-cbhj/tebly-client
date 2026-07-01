@@ -253,6 +253,7 @@ function resolveDate(day, type, year, month) {
 
 // TODO: API에서 추천 시간 목록 받아오기
 // 예상 응답 형태: [{ id, date, dayOfWeek, timeRange, memberCount, totalCount }]
+// totalCount가 RoomStore 더미 멤버 수와 다르지만 API 연동 시 실제 값으로 대체되므로 수정 불필요
 const dummyOptions = [
   { id: 1, date: 22, dayOfWeek: '금요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
   { id: 2, date: 22, dayOfWeek: '금요일', timeRange: '18:00~19:00', memberCount: 5, totalCount: 6 },
@@ -353,7 +354,7 @@ export default function TimeRecommendPage() {
   const cells = buildCalendarDays(viewYear, viewMonth);
 
   return (
-    <PageWrapper>
+    <PageWrapper noNav>
       <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
 
       <FilterBar>

@@ -93,8 +93,8 @@ const TopCard = styled.div`
 `;
 
 const CategoryCircle = styled.div`
-  width: 52px;
-  height: 52px;
+  width: 80px;
+  height: 80px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -116,7 +116,7 @@ const InlineField = styled.input`
   width: 100%;
   padding: 0;
   font-family: Pretendard;
-  font-size: ${({ $isTitle }) => ($isTitle ? '1rem' : '0.875rem')};
+  font-size: ${({ $isTitle }) => ($isTitle ? '1.5rem' : '1rem')};
   font-weight: ${({ $isTitle }) => ($isTitle ? '600' : '400')};
   line-height: 140%;
   color: ${({ $isEmpty, theme }) => ($isEmpty ? theme.colors.gray400 : theme.colors.gray900)};

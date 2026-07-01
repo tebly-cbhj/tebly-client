@@ -12,7 +12,7 @@ const CODE_LENGTH = 6;
 // TODO: POST /api/friends/search — 친구 코드 검색 API 연동 후 교체
 const MOCK_USERS = {
   '123456': { id: 100, name: '오뚜기', intro: '아이고 허리 아프다 내일 뭐 먹지', profileImage: null },
-  '111111': { id: 101, name: '조정묵', intro: '엽덕 개땡기네', profileImage: null },
+  '111111': { id: 1, name: '조정묵', intro: '엽덕 개땡기네', profileImage: null },
 };
 
 const Wrapper = styled.div`

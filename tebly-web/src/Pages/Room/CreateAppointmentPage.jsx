@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import TextField from '../../components/common/TextField';
@@ -10,11 +10,14 @@ import Btn from '../../components/common/Btn';
 import DatePopup from '../../components/room/DatePopup';
 import CategoryPopup from '../../components/room/CategoryPopup';
 import AlarmPopup from '../../components/room/AlarmPopup';
+import MinTimePickerPopup from '../../components/room/MinTimePickerPopup';
 
 import PlaceIcon from '../../assets/icons/place.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
 import DateIcon from '../../assets/icons/calendar-fill.svg?react';
+import FriendsIcon from '../../assets/icons/friends.svg?react';
+import ClockIcon from '../../assets/icons/clock.svg?react';
 
 const ContentArea = styled.div`
   display: flex;
@@ -79,17 +82,22 @@ export default function CreateAppointmentPage() {
   const [appointmentName, setAppointmentName] = useState('');
   const [memo, setMemo] = useState('');
   const navigate = useNavigate();
+  const routerLocation = useLocation();
+
+  const roomId = routerLocation.state?.roomId;
+  const selectedMembers = routerLocation.state?.selectedMembers ?? [];
 
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState('');
   const [alarmTime, setAlarmTime] = useState('');
   const [date, setDate] = useState('');
+  const [minTime, setMinTime] = useState('');
 
   const [editingField, setEditingField] = useState(null);
   const [popupType, setPopupType] = useState(null);
 
   return (
-    <PageWrapper>
+    <PageWrapper noNav>
       <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
       <ScrollContent>
         <ContentArea>
@@ -141,6 +149,14 @@ export default function CreateAppointmentPage() {
             />
 
             <SelectRow
+              LeftIcon={ClockIcon}
+              text_empty="최소 시간 설정"
+              text_selected={minTime}
+              state={minTime ? 'selected' : 'empty'}
+              onClick={() => setPopupType('minTime')}
+            />
+
+            <SelectRow
               LeftIcon={CategoryIcon}
               text_empty="카테고리"
               text_selected={category}
@@ -150,10 +166,18 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={BellIcon}
-              text_empty="알림 받을 시간"
+              text_empty="알림 설정"
               text_selected={alarmTime}
               state={alarmTime ? 'selected' : 'empty'}
               onClick={() => setPopupType('alarm')}
+            />
+
+            <SelectRow
+              LeftIcon={FriendsIcon}
+              text_empty="친구 선택"
+              text_selected={selectedMembers.length > 0 ? `${selectedMembers.length}명 선택됨` : ''}
+              state={selectedMembers.length > 0 ? 'selected' : 'empty'}
+              onClick={() => navigate('/select-friend', { state: { appointmentMode: true, roomId } })}
             />
 
           </SelectRowContainer>
@@ -166,6 +190,19 @@ export default function CreateAppointmentPage() {
           onClick={() => navigate('/time-recommend')}
         />
       </BtnWrapper>
+
+      {popupType === 'minTime' && (
+        <MinTimePickerPopup
+          onClose={() => setPopupType(null)}
+          onConfirm={({ hour, minute }) => {
+            const h = parseInt(hour);
+            const m = parseInt(minute);
+            const label = `${h}시간${m > 0 ? ` ${m}분` : ''}`;
+            setMinTime(label);
+            setPopupType(null);
+          }}
+        />
+      )}
 
       {popupType === 'category' && (
         <CategoryPopup
