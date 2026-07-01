@@ -7,7 +7,7 @@ import CreateRoomPage from './Pages/Room/CreateRoomPage';
 import SelectFriendPage from './Pages/Room/SelectFriendPage';
 import RoomInfoPage from './Pages/Room/RoomInfoPage';
 import TimeRecommendPage from './Pages/Room/TimeRecommendPage';
-import TestPage from './TestPage';
+import Testpage from './Testpage';
 import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
 import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
@@ -48,7 +48,7 @@ function Layout() {
         <Route path="/room/:roomId" element={<RoomInfoPage />} />
         <Route path="/room/:roomId/chat" element={<ChatPage />} />
         <Route path="/time-recommend" element={<TimeRecommendPage />} />
-        <Route path="/test" element={<TestPage />} />
+        <Route path="/test" element={<Testpage />} />
         <Route path="/my-appointments" element={<MyAppointMentPage />} />
         <Route path="/create-appointment" element={<CreateAppointmentPage />} />
         <Route path="/calendar-test" element={<CalendarTestpage />} />
