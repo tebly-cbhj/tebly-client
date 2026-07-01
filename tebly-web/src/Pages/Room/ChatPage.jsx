@@ -5,7 +5,7 @@ import Header from '../../components/common/Header';
 import MessageBubble from '../../components/room/MessageBubble';
 import MessageInput from '../../components/room/MessageInput';
 import { useRoomStore } from '../../store/RoomStore';
-import { useChatStore } from '../../store/ChatStore'; // 추가!
+import { useChatStore } from '../../store/ChatStore';
 
 const ChatContainer = styled.div`
   width: 100%;
@@ -112,19 +112,21 @@ const CalendarIcon = () => (
 );
 
 export default function ChatPage() {
-  const navigate = useNavigate(); // 빠져있었음!
+  const navigate = useNavigate();
   const { roomId } = useParams();
-  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId))); // 빠져있었음!
+  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
   const { connect, sendMessage, messagesByRoom } = useChatStore();
   const messages = messagesByRoom[roomId] ?? [];
   const accessToken = import.meta.env.VITE_ACCESS_TOKEN;
 
-  const [inputValue, setInputValue] = useState(''); // 빠져있었음!
+  const [inputValue, setInputValue] = useState('');
   // TODO: API 연결 시 서버에서 받아온 약속 확정 여부로 대체
   const [appointmentConfirmed, setAppointmentConfirmed] = useState(false);
   const [cardExpanded, setCardExpanded] = useState(true);
 
   useEffect(() => {
+    // ✅ accessToken 없으면 연결 시도 안 함
+    if (!accessToken) return;
     connect(roomId, accessToken);
   }, [roomId]);
 
@@ -135,49 +137,49 @@ export default function ChatPage() {
   };
 
   return (
-      <ChatContainer>
-        <HeaderWrapper>
-          <Header
-            title={room?.title ?? '채팅'}
-            leftIcon="back"
-            onLeft={() => navigate(-1)}
-          />
-        </HeaderWrapper>
+    <ChatContainer>
+      <HeaderWrapper>
+        <Header
+          title={room?.title ?? '채팅'}
+          leftIcon="back"
+          onLeft={() => navigate(-1)}
+        />
+      </HeaderWrapper>
 
-        {appointmentConfirmed ? (
-          <AppointmentCard onClick={() => setCardExpanded((prev) => !prev)}>
-            <AppointmentCardLeft>
-              <CalendarIcon />
-              <AppointmentCardTitle>캘박하조 1차 스터디</AppointmentCardTitle>
-            </AppointmentCardLeft>
-            <ChevronIcon up={cardExpanded} />
-          </AppointmentCard>
-        ) : (
-          <AppointmentBanner>
+      {appointmentConfirmed ? (
+        <AppointmentCard onClick={() => setCardExpanded((prev) => !prev)}>
+          <AppointmentCardLeft>
             <CalendarIcon />
-            <BannerText>2차_스터디 약속이 확정됐어요 !</BannerText>
-          </AppointmentBanner>
-        )}
+            <AppointmentCardTitle>캘박하조 1차 스터디</AppointmentCardTitle>
+          </AppointmentCardLeft>
+          <ChevronIcon up={cardExpanded} />
+        </AppointmentCard>
+      ) : (
+        <AppointmentBanner>
+          <CalendarIcon />
+          <BannerText>2차_스터디 약속이 확정됐어요 !</BannerText>
+        </AppointmentBanner>
+      )}
 
-        <MessageList>
-          {messages.map((msg) => (
-            <MessageBubble
-              key={msg.id}
-              type={msg.type}
-              senderName={msg.senderName}
-              text={msg.text}
-              profileImage={msg.profileImage}
-            />
-          ))}
-        </MessageList>
-
-        <InputBar>
-          <MessageInput
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onSend={handleSend}
+      <MessageList>
+        {messages.map((msg) => (
+          <MessageBubble
+            key={msg.id}
+            type={msg.type}
+            senderName={msg.senderName}
+            text={msg.text}
+            profileImage={msg.profileImage}
           />
-        </InputBar>
-      </ChatContainer>
+        ))}
+      </MessageList>
+
+      <InputBar>
+        <MessageInput
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onSend={handleSend}
+        />
+      </InputBar>
+    </ChatContainer>
   );
 }

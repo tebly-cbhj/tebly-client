@@ -8,9 +8,15 @@ export const useChatStore = create((set, get) => ({
   messagesByRoom: {},
 
   // 연결 시작
-  connect: (roomId, accessToken) => {   // ← 이 줄 빠진 거야!
+  connect: (roomId, accessToken) => {
     const existingClient = get().client;
     if (existingClient?.connected || existingClient?.active) return;
+
+    // ✅ 환경변수 없으면 연결 시도 안 함
+    if (!import.meta.env.VITE_WS_URL || !accessToken) {
+      console.warn('웹소켓 URL 또는 토큰이 없어요. 연결을 건너뜁니다.');
+      return;
+    }
 
     const client = new Client({
       webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL),
@@ -46,10 +52,15 @@ export const useChatStore = create((set, get) => ({
       },
       onDisconnect: () => set({ isConnected: false }),
       onStompError: (frame) => console.error('STOMP 에러', frame),
+      reconnectDelay: 0, // ✅ 재연결 시도 안 함
     });
 
-    client.activate();
-    set({ client });
+    try {
+      client.activate();
+      set({ client });
+    } catch (e) {
+      console.error('웹소켓 연결 실패', e);
+    }
   },
 
   // 메시지 보내기
