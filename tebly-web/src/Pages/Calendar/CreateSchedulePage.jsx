@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
-import TextField from '../../components/common/TextField';
+import Textfield from '../../components/common/Textfield';
 import Toggle from '../../components/common/Toggle';
 import SelectRow from '../../components/room/SelectRow';
 import Btn from '../../components/common/Btn';
@@ -393,7 +393,7 @@ export default function CreateSchedulePage() {
       <ScrollContent>
         <InputContainer>
           <Label>일정 이름</Label>
-          <TextField
+          <Textfield
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="이름을 적어주세요."
@@ -402,7 +402,7 @@ export default function CreateSchedulePage() {
 
         <InputContainer>
           <Label>메모</Label>
-          <TextField
+          <Textfield
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
             placeholder="참고할 내용을 적어주세요."

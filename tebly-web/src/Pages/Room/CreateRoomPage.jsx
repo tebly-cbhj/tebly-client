@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import RoomCover from "../../components/room/RoomCover";
-import TextField from "../../components/common/TextField";
+import Textfield from "../../components/common/Textfield";
 import { PageWrapper } from '../../PageWrapper';
 import Btn from "../../components/common/Btn";
 import ActionSheet from "../../components/common/ActionSheet";
@@ -57,7 +57,7 @@ const CreateRoom = () => {
 
         <FieldContainer>
           <FieldLabel>방 이름</FieldLabel>
-          <TextField
+          <Textfield
             value={roomName}
             onChange={(e) => setRoomName(e.target.value)}
             placeholder="방 이름을 입력해 주세요."
@@ -66,7 +66,7 @@ const CreateRoom = () => {
 
         <FieldContainer>
           <FieldLabel>한 줄 소개</FieldLabel>
-          <TextField
+          <Textfield
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="한 줄 소개를 입력해 주세요."

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
-import TextFieldBase from '../../components/common/TextField';
+import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
 // TODO: 유저 프로필 정보 API 연동

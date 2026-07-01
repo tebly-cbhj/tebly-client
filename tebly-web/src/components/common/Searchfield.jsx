@@ -10,7 +10,7 @@ const SearchIcon = styled(SearchIconSvg)`
   color: ${(props) => props.theme.colors.gray800};
 `;
 
-export default function SearchField({ placeholder = '검색', value = '', onChange = () => {} }) {
+export default function Searchfield({ placeholder = '검색', value = '', onChange = () => {} }) {
   const [focused, setFocused] = useState(false);
 
   return (
