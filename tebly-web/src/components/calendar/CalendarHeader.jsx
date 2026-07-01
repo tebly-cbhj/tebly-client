@@ -4,7 +4,7 @@ import MonthSelect from './month/MonthSelect';
 import MonthWeekToggle from './MonthWeekToggle';
 import BellLine from '../../assets/icons/bell-line.svg?react';
 import BellNoti from '../../assets/icons/bell-noti.svg?react';
-import DatePickerPopup from './month/DatepickerPopup';
+import DatePickerPopup from './month/DatePickerPopup';
 
 const Container = styled.div`
   display: flex;
