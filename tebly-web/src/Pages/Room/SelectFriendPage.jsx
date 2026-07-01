@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
 import { PageWrapper } from '../../PageWrapper';
-import SearchField from "../../components/common/SearchField";
+import Searchfield from "../../components/common/Searchfield";
 import FriendsSelect from "../../components/room/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
@@ -113,7 +113,7 @@ const SelectFriendPage = () => {
               icons={[]}
             />
       <ContentArea>
-        <SearchField
+        <Searchfield
           placeholder="초대 할 친구 검색"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}

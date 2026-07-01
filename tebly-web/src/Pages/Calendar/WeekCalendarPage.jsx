@@ -3,7 +3,7 @@ import { useMemo, Fragment, useState, useRef, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
-import { parseDate, parseTime, expandRepeatingSchedules } from '../../utils/dateUtils';
+import { parseDate, parseTime, expandRepeatingSchedules } from '../../utils/DateUtils';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';

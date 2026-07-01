@@ -5,7 +5,7 @@ import { useFriendStore } from '../../store/FriendStore';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
 import DateCell from '../../components/calendar/month/DateCell';
 import MonthSelect from '../../components/calendar/month/MonthSelect';
-import DatePickerPopup from '../../components/calendar/month/DatepickerPopup';
+import DatePickerPopup from '../../components/calendar/month/DatePickerPopup';
 import MonthWeekToggle from '../../components/calendar/MonthWeekToggle';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';

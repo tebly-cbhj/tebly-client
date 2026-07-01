@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { FieldWrapper, FieldInput } from './TextFieldBase';
+import { FieldWrapper, FieldInput } from './TextfieldBase';
 import SearchIconSvg from '../../assets/icons/search.svg?react'; // SVG 컬러 변경용
 
 const SearchIcon = styled(SearchIconSvg)`
@@ -10,7 +10,7 @@ const SearchIcon = styled(SearchIconSvg)`
   color: ${(props) => props.theme.colors.gray800};
 `;
 
-export default function SearchField({ placeholder = '검색', value = '', onChange = () => {} }) {
+export default function Searchfield({ placeholder = '검색', value = '', onChange = () => {} }) {
   const [focused, setFocused] = useState(false);
 
   return (

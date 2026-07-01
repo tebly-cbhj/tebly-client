@@ -6,7 +6,7 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 
 import DragHandleIcon from '../../assets/icons/drag-handle.svg?react';
 
-import { CATEGORY_ICON_MAP } from './categoryIcons';
+import { CATEGORY_ICON_MAP } from './CategoryIcons';
 
 const Overlay = styled.div`
   position: fixed;
