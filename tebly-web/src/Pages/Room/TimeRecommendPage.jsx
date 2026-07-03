@@ -10,6 +10,7 @@ import SortButton from '../../components/common/SortButton';
 import OptionItem from '../../components/room/OptionItem';
 import DateCell from '../../components/room/DateCell';
 import Header from '../../components/common/Header';
+import AttendeePopup from '../../components/room/AttendeePopup';
 
 // ─── 페이지 레이아웃 ────────────────────────────────────────────
 
@@ -252,14 +253,74 @@ function resolveDate(day, type, year, month) {
 // ─── 목업 데이터 ────────────────────────────────────────────────
 
 // TODO: API에서 추천 시간 목록 받아오기
-// 예상 응답 형태: [{ id, date, dayOfWeek, timeRange, memberCount, totalCount }]
+// 예상 응답 형태: [{ id, date, dayOfWeek, timeRange, memberCount, totalCount, availableAttendees, unavailableAttendees }]
 // totalCount가 RoomStore 더미 멤버 수와 다르지만 API 연동 시 실제 값으로 대체되므로 수정 불필요
 const dummyOptions = [
-  { id: 1, date: 22, dayOfWeek: '금요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 2, date: 22, dayOfWeek: '금요일', timeRange: '18:00~19:00', memberCount: 5, totalCount: 6 },
-  { id: 3, date: 23, dayOfWeek: '토요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 4, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 5, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
+  {
+    id: 1, date: 22, dayOfWeek: '금요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6,
+    availableAttendees: [
+      { id: 1, name: '김철수' },
+      { id: 2, name: '이영희' },
+      { id: 3, name: '박민수' },
+      { id: 4, name: '최지우' },
+    ],
+    unavailableAttendees: [
+      { id: 5, name: '정하늘' },
+      { id: 6, name: '한소희' },
+    ],
+  },
+  {
+    id: 2, date: 22, dayOfWeek: '금요일', timeRange: '18:00~19:00', memberCount: 5, totalCount: 6,
+    availableAttendees: [
+      { id: 1, name: '김철수' },
+      { id: 2, name: '이영희' },
+      { id: 3, name: '박민수' },
+      { id: 4, name: '최지우' },
+      { id: 5, name: '정하늘' },
+    ],
+    unavailableAttendees: [
+      { id: 6, name: '한소희' },
+    ],
+  },
+  {
+    id: 3, date: 23, dayOfWeek: '토요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6,
+    availableAttendees: [
+      { id: 1, name: '김철수' },
+      { id: 2, name: '이영희' },
+      { id: 3, name: '박민수' },
+      { id: 4, name: '최지우' },
+    ],
+    unavailableAttendees: [
+      { id: 5, name: '정하늘' },
+      { id: 6, name: '한소희' },
+    ],
+  },
+  {
+    id: 4, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6,
+    availableAttendees: [
+      { id: 1, name: '김철수' },
+      { id: 2, name: '이영희' },
+      { id: 3, name: '박민수' },
+      { id: 4, name: '최지우' },
+    ],
+    unavailableAttendees: [
+      { id: 5, name: '정하늘' },
+      { id: 6, name: '한소희' },
+    ],
+  },
+  {
+    id: 5, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6,
+    availableAttendees: [
+      { id: 1, name: '김철수' },
+      { id: 2, name: '이영희' },
+      { id: 3, name: '박민수' },
+      { id: 4, name: '최지우' },
+    ],
+    unavailableAttendees: [
+      { id: 5, name: '정하늘' },
+      { id: 6, name: '한소희' },
+    ],
+  },
 ];
 
 // ─── 페이지 컴포넌트 ────────────────────────────────────────────
@@ -271,6 +332,9 @@ export default function TimeRecommendPage() {
   // TODO: useParams 등으로 roomId 받아오기
   const [selectedId, setSelectedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // 참석자 팝업
+  const [attendeePopupOption, setAttendeePopupOption] = useState(null);
 
   // 정렬 시트
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -381,7 +445,10 @@ export default function TimeRecommendPage() {
             memberCount={option.memberCount}
             totalCount={option.totalCount}
             selected={selectedId === option.id}
-            onClick={() => setSelectedId(option.id)}
+            onClick={() => {
+              setSelectedId(option.id);
+              setAttendeePopupOption(option);
+            }}
           />
         ))}
       </CardList>
@@ -391,6 +458,15 @@ export default function TimeRecommendPage() {
       </BottomArea>
 
       <LoadingOverlay isLoading={isLoading} />
+
+      {/* 참석자 팝업 */}
+      {attendeePopupOption && (
+        <AttendeePopup
+          availableAttendees={attendeePopupOption.availableAttendees}
+          unavailableAttendees={attendeePopupOption.unavailableAttendees}
+          onClose={() => setAttendeePopupOption(null)}
+        />
+      )}
 
       {/* 날짜 선택 시트 */}
       {isDateSheetOpen && (

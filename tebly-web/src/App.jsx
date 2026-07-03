@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -12,7 +13,6 @@ import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
 import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
-import BottomNavBar from './components/common/BottomNavBar';
 import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
@@ -36,9 +36,26 @@ import InviteNotiPage from './Pages/Notification/InviteNotiPage';
 import AlarmPage from './Pages/Notification/AlarmPage';
 
 function Layout() {
-  const location = useLocation();
-  
-  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'].includes(location.pathname);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'NAVIGATE') {
+          navigate(data.path);
+        }
+      } catch (e) {
+        // RN이 보낸 게 아닌 다른 메시지는 무시
+      }
+    }
+    document.addEventListener('message', handleMessage);
+    window.addEventListener('message', handleMessage);
+    return () => {
+      document.removeEventListener('message', handleMessage);
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [navigate]);
   return (
     <>
       <Routes>
@@ -74,7 +91,6 @@ function Layout() {
         <Route path='/noti-invitaion' element={<InviteNotiPage />} />
         <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
-      {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
   );
 }
