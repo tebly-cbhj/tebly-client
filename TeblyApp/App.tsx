@@ -7,7 +7,7 @@ import BottomNavBar from './src/components/BottomNavBar';
 import { ThemeProvider } from 'styled-components/native';
 
 const WEB_URL = __DEV__
-  ? 'http://172.30.1.95:5173/'
+  ? 'http://10.15.51.173:5173/'
   : 'https://tebly-client.vercel.app';
 
 const NAVBAR_VISIBLE_PATHS = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'];
