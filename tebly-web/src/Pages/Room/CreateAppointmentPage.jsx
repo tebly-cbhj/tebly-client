@@ -71,13 +71,6 @@ const BtnWrapper = styled.div`
   width: 350px;
 `;
 
-/* 
-const BtnWrapper = styled.div`
-  width: 350px;
-  margin: 186px auto 0;
-`; */
-
-
 export default function CreateAppointmentPage() {
   const [appointmentName, setAppointmentName] = useState('');
   const [memo, setMemo] = useState('');
@@ -88,10 +81,12 @@ export default function CreateAppointmentPage() {
   const selectedMembers = routerLocation.state?.selectedMembers ?? [];
 
   const [location, setLocation] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(null); // { categoryId, categoryName, categoryIcon, isPrivate }
   const [alarmTime, setAlarmTime] = useState('');
   const [date, setDate] = useState('');
+  const [dateRange, setDateRange] = useState(null);
   const [minTime, setMinTime] = useState('');
+  const [minDurationMinutes, setMinDurationMinutes] = useState(0);
 
   const [editingField, setEditingField] = useState(null);
   const [popupType, setPopupType] = useState(null);
@@ -159,7 +154,7 @@ export default function CreateAppointmentPage() {
             <SelectRow
               LeftIcon={CategoryIcon}
               text_empty="카테고리"
-              text_selected={category}
+              text_selected={category?.categoryName}
               state={category ? 'selected' : 'empty'}
               onClick={() => setPopupType('category')}
             />
@@ -187,7 +182,19 @@ export default function CreateAppointmentPage() {
       <BtnWrapper>
         <Btn
           text="다음"
-          onClick={() => navigate('/time-recommend')}
+          onClick={() => navigate('/time-recommend', {
+            state: {
+              roomId,
+              title: appointmentName,
+              comment: memo,
+              categoryId: category?.categoryId,
+              location,
+              proposeStartDate: dateRange?.start,
+              proposeEndDate: dateRange?.end,
+              minDuration: minDurationMinutes,
+              selectedMemberIds: selectedMembers.map((m) => m.id),
+            }
+          })}
         />
       </BtnWrapper>
 
@@ -199,6 +206,7 @@ export default function CreateAppointmentPage() {
             const m = parseInt(minute);
             const label = `${h}시간${m > 0 ? ` ${m}분` : ''}`;
             setMinTime(label);
+            setMinDurationMinutes(h * 60 + m);
             setPopupType(null);
           }}
         />
@@ -206,7 +214,7 @@ export default function CreateAppointmentPage() {
 
       {popupType === 'category' && (
         <CategoryPopup
-          selectedCategory={category}
+          selectedCategoryId={category?.categoryId}
           onClose={() => setPopupType(null)}
           onSelect={(value) => {
             setCategory(value);
@@ -230,6 +238,7 @@ export default function CreateAppointmentPage() {
           onClose={() => setPopupType(null)}
           onReset={() => {
             setDate('');
+            setDateRange(null);
             setPopupType(null);
           }}
           onConfirm={(value) => {
@@ -250,6 +259,7 @@ export default function CreateAppointmentPage() {
               setDate(start);
             }
 
+            setDateRange(value);
             setPopupType(null);
           }}
         />

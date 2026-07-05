@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -6,7 +6,7 @@ import Header from '../../components/common/Header';
 import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
-// TODO: 유저 프로필 정보 API 연동
+import { useFriendStore } from '../../store/FriendStore';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -78,14 +78,28 @@ const SaveButtonWrapper = styled.div`
 `;
 
 export default function EditProfilePage() {
-  // TODO: API에서 유저 정보 받아와서 초기값으로 설정
-  const [name, setName] = useState('김뿡치'); // TODO: 로그인된 유저 이름으로 대체
-  const [bio, setBio] = useState(''); // TODO: 저장된 자기소개로 대체
+  const myProfile = useFriendStore((state) => state.myProfile);
+  const updateMyProfile = useFriendStore((state) => state.updateMyProfile);
   const navigate = useNavigate();
 
-  function handleSave() {
-    console.log('저장:', { name, bio });
-    // TODO: 프로필 수정 API 연동
+  const [name, setName] = useState(myProfile?.nickname ?? '');
+  const [bio, setBio] = useState(''); // TODO: 백엔드에 자기소개 필드 추가되면 연동
+
+  const [profileImagePreview, setProfileImagePreview] = useState(myProfile?.profileImageUrl ?? null);
+  const [profileImageFile, setProfileImageFile] = useState(null); // TODO: 이미지 업로드 API 확인 후 연동
+  const fileInputRef = useRef(null);
+
+  function handleImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setProfileImageFile(file);
+    setProfileImagePreview(URL.createObjectURL(file));
+  }
+
+  async function handleSave() {
+    // TODO: 이미지 업로드 API 나오면 profileImageFile 업로드 후 받은 URL을 여기 전달
+    await updateMyProfile({ nickname: name, profileImageUrl: myProfile?.profileImageUrl });
+    navigate(-1);
   }
 
   return (
@@ -93,18 +107,25 @@ export default function EditProfilePage() {
       <Header
         title="프로필 수정"
         leftIcon="back"
-        onLeft={() => navigate(-1)} // TODO: navigate(-1) 연동
+        onLeft={() => navigate(-1)}
       />
 
       <ContentWrapper>
         {/* 프로필 이미지 */}
         <ProfileImageWrapper>
           <ProfileImage>
-            {/* TODO: 유저 프로필 이미지 API 연동 */}
+            {profileImagePreview && <img src={profileImagePreview} alt="프로필 미리보기" />}
           </ProfileImage>
-          <EditIconWrapper onClick={() => console.log('이미지 수정')}> {/* TODO: 이미지 선택 기능 연동 */}
+          <EditIconWrapper onClick={() => fileInputRef.current.click()}>
             <EditProfileImageIcon width={56} height={56} />
           </EditIconWrapper>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImageSelect}
+          />
         </ProfileImageWrapper>
 
         {/* 이름 입력 */}

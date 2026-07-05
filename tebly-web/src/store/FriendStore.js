@@ -1,11 +1,17 @@
 import { create } from 'zustand';
+import apiClient from '../api/client';
 
 export const useFriendStore = create((set) => ({
-  // TODO: GET /api/user/me — 내 프로필 API 연동 후 교체
-  myProfile: {
-    name: '김뽕치',
-    intro: '주말 한정 백수입니다~',
-    profileImage: null,
+  myProfile: null,
+
+  fetchMyProfile: async () => {
+    const res = await apiClient.get('/users/me');
+    set({ myProfile: res.data });
+  },
+
+  updateMyProfile: async ({ nickname, profileImageUrl }) => {
+    const res = await apiClient.patch('/users/me', { nickname, profileImageUrl });
+    set({ myProfile: res.data });
   },
 
   // TODO: GET /api/friends — 친구 목록 API 연동 후 교체 (fetchFriends 호출로 초기화)
@@ -22,7 +28,6 @@ export const useFriendStore = create((set) => ({
     { id: 10, name: '한지원', intro: '', profileImage: null, isFavorite: false },
   ],
 
-  // TODO: PATCH /api/friends/:id/favorite — 즐겨찾기 토글 API 연동 후 교체
   toggleFavorite: (id) =>
     set((state) => ({
       friends: state.friends.map((f) =>
@@ -30,7 +35,6 @@ export const useFriendStore = create((set) => ({
       ),
     })),
 
-  // TODO: DELETE /api/friends/:id — 친구 삭제 API 연동 후 교체
   deleteFriend: (id) =>
     set((state) => ({
       friends: state.friends.filter((f) => f.id !== id),

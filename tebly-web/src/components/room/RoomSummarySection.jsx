@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Btn from '../common/Btn';
-import { useRoomStore } from '../../store/RoomStore';
 
 const Container = styled.div`
   display: flex;
@@ -65,7 +64,10 @@ const Avatar = styled.div`
   height: 33px;
   border-radius: 33px;
   background: ${(props) => props.theme.colors.gray300}; 
-  
+  background-image: ${(props) => (props.$imgUrl ? `url(${props.$imgUrl})` : 'none')};
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
   position: relative;
   margin-left: ${(props) => (props.$isFirst ? '0' : '-12px')}; 
 `;
@@ -85,55 +87,40 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomSummarySection({ roomId, avatars }) {
-  const MAX_VISIBLE = 3; 
-    const navigate = useNavigate();
-  
-  // store에서 방 정보를 찾아옵니다
-  const room = useRoomStore((state) => 
-    state.rooms.find((r) => String(r.id) === String(roomId))
-  );
+export default function RoomSummarySection({ roomId, name, description, profileImages = [], totalMemberCount = 0 }) {
+  const MAX_VISIBLE = 3;
+  const navigate = useNavigate();
 
-  const avatarList = avatars || (room?.members ? room.members.map(m => m.profileImage) : []);
-  const visibleAvatars = avatarList.slice(0, MAX_VISIBLE);
-  const extraCount = avatarList.length - MAX_VISIBLE;
-
-  if (!room) {
-    return <Container><p>방 정보를 찾을 수 없습니다.</p></Container>;
-  }
+  const visibleAvatars = profileImages.slice(0, MAX_VISIBLE);
+  const extraCount = totalMemberCount - visibleAvatars.length;
 
   return (
     <Container>
       <PhotoArea />
       <InfoArea>
         <TextGroup>
-          <Title>{room.title}</Title>
-          <Description>{room.description}</Description>
+          <Title>{name}</Title>
+          <Description>{description}</Description>
         </TextGroup>
 
         <ActionRow>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar 
-                key={index} 
-                $imgUrl={imgUrl} 
-                $isFirst={index === 0} 
-              >
+              <Avatar key={index} $imgUrl={imgUrl} $isFirst={index === 0}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}
               </Avatar>
             ))}
           </AvatarGroup>
-          
+
           <ButtonWrapper>
             <Btn 
               size="small" 
-              onClick={() => navigate('/select-friend', { state: { roomId: roomId } })}
+              onClick={() => navigate('/select-friend', { state: { roomId } })}
               text="친구 초대"
             />
           </ButtonWrapper>
-
         </ActionRow>
       </InfoArea>
     </Container>

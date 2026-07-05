@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useFriendStore } from '../../store/FriendStore';
@@ -201,9 +201,14 @@ export default function FriendPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const myProfile = useFriendStore((s) => s.myProfile);
+  const fetchMyProfile = useFriendStore((s) => s.fetchMyProfile);
   const friends = useFriendStore((s) => s.friends);
   const toggleFavorite = useFriendStore((s) => s.toggleFavorite);
   const deleteFriend = useFriendStore((s) => s.deleteFriend);
+
+  useEffect(() => {
+    fetchMyProfile();
+  }, [fetchMyProfile]);
 
   const sorted = useMemo(
     () =>
@@ -256,11 +261,11 @@ export default function FriendPage() {
 
       <MyProfileContainer>
         <ProfileImage>
-          {myProfile.profileImage && <img src={myProfile.profileImage} alt={myProfile.name} />}
+          {myProfile?.profileImageUrl && <img src={myProfile.profileImageUrl} alt={myProfile.nickname} />}
         </ProfileImage>
         <TextArea>
-          <Name>{myProfile.name}</Name>
-          {myProfile.intro && <Intro>{myProfile.intro}</Intro>}
+          <Name>{myProfile?.nickname}</Name>
+          {/* TODO: 백엔드에 자기소개 필드 추가되면 여기 복구 */}
         </TextArea>
       </MyProfileContainer>
 

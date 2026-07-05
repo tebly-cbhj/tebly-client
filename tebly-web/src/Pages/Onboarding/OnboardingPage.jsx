@@ -180,7 +180,7 @@ export default function OnboardingPage() {
 
           {/* 4페이지 */}
           <Slide $count={STEP_COUNT}>
-            <Title>{`약속, 까먹을 걱정 없어요\n테블리가 먼저 알려드릴게요`}</Title>
+            <Title>{`약속, 잊어버릴 걱정 없어요\n테블리가 먼저 알려드릴게요`}</Title>
             <ImageArea>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Notification width={256} height={377} />

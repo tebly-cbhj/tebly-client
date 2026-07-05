@@ -2,6 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
+import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
 import Searchfield from "../../components/common/Searchfield";
 import FriendsSelect from "../../components/room/FriendsSelect";
@@ -18,7 +19,6 @@ const ContentArea = styled.div`
   flex: 1;
 `;
 
-// SearchField ~ FriendsSelect 간격
 const FriendsWrapper = styled.div`
   margin-top: 12px;
   &::-webkit-scrollbar {
@@ -26,7 +26,6 @@ const FriendsWrapper = styled.div`
   }
 `;
 
-// 하단 고정 컨테이너
 const SelectListContainer = styled.div`
   position: fixed;
   bottom: 0;
@@ -37,12 +36,11 @@ const SelectListContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.bg};
   display: flex;
   flex-direction: column;
-  padding: 12px 20px 34px 20px;  /* 하단 34px */
+  padding: 12px 20px 34px 20px;
   box-sizing: border-box;
   max-width: 480px;
 `;
 
-// 뱃지 가로 스크롤
 const BadgeScrollArea = styled.div`
   display: flex;
   flex-direction: row;
@@ -67,7 +65,6 @@ const BtnWrapper = styled.div`
 const SelectFriendPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const addRoom = useRoomStore((state) => state.addRoom);
   const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
   const [searchText, setSearchText] = useState("");
 
@@ -76,33 +73,51 @@ const SelectFriendPage = () => {
 
   const friendsList = useFriendStore((state) => state.friends);
   const existingRoom = useRoomStore((state) =>
-    state.rooms.find((r) => r.id === currentRoomId)
+    currentRoomId ? state.rooms.find((r) => r.roomId === currentRoomId) : undefined
   );
 
   const displayList = appointmentMode
     ? (existingRoom?.members ?? [])
     : friendsList;
 
+  const [selected, setSelected] = useState(
+    appointmentMode ? (existingRoom?.members ?? []) : (existingRoom?.members ?? [])
+  );
+
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
 
-  const [selected, setSelected] = useState(
-    appointmentMode ? (existingRoom?.members ?? []) : (existingRoom ? existingRoom.members : [])
-  ); 
   const isActive = selected.length > 0;
 
-  // 체크박스 토글 함수
   const handleToggle = (friend) => {
     setSelected((prev) =>
       prev.find((f) => f.id === friend.id)
-        ? prev.filter((f) => f.id !== friend.id) // 이미 선택됐으면 제거
-        : [...prev, friend]                      // 없으면 추가
+        ? prev.filter((f) => f.id !== friend.id)
+        : [...prev, friend]
     );
   };
 
-  // 뱃지 X 버튼 삭제 함수
   const handleRemove = (friendId) => {
     setSelected((prev) => prev.filter((f) => f.id !== friendId));
   };
+
+  async function handleComplete() {
+    if (appointmentMode) {
+      navigate('/create-appointment', {
+        state: { roomId: currentRoomId, selectedMembers: selected },
+      });
+    } else if (currentRoomId) {
+      updateRoomMembers(currentRoomId, selected);
+      navigate(-1);
+    } else {
+      const { roomName, description } = location.state || {};
+      await apiClient.post('/rooms', {
+        name: roomName,
+        description,
+        member_ids: selected.map((f) => f.id),
+      });
+      navigate('/room-list');
+    }
+  }
 
   return (
     <PageWrapper noNav>
@@ -145,21 +160,7 @@ const SelectFriendPage = () => {
           <Btn
             text="완료"
             disabled={!isActive}
-            onClick={() => {
-                if (appointmentMode) {
-                  // 약속 만들기 흐름: 선택된 멤버를 CreateAppointmentPage로 전달
-                  navigate('/create-appointment', {
-                    state: { roomId: currentRoomId, selectedMembers: selected },
-                  });
-                } else if (currentRoomId) {
-                  updateRoomMembers(currentRoomId, selected);
-                  navigate(-1);
-                } else {
-                  const { roomName, description } = location.state || {};
-                  addRoom(roomName, description, selected);
-                  navigate('/room-list');
-                }
-            }}
+            onClick={handleComplete}
           />
         </BtnWrapper>
       </SelectListContainer>

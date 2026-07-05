@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
-import { useRoomStore } from '../../store/RoomStore';
+import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import SelectRow from '../../components/room/SelectRow';
@@ -97,7 +97,6 @@ const AttendanceWrapper = styled.div`
   }
 `;
 
-// styled 컴포넌트 추가
 const BtnWrapper = styled.div`
   position: fixed;
   bottom: 0;
@@ -109,32 +108,56 @@ const BtnWrapper = styled.div`
   box-sizing: border-box;
 `;
 
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+const STATUS_LABEL_TO_ENUM = { '참석': 'ACCEPTED', '불참': 'REJECTED', '미응답': 'PENDING' };
+const pad = (n) => String(n).padStart(2, '0');
+
+function formatDateLabel(isoDateTime) {
+  const d = new Date(isoDateTime);
+  const y = d.getFullYear();
+  const m = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  return `${y}.${m}.${day} (${WEEKDAY_KO[d.getDay()]})`;
+}
+
+function formatTimeLabel(startTimeIso, endTimeIso) {
+  const start = new Date(startTimeIso);
+  const end = new Date(endTimeIso);
+  return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())}`;
+}
+
+function buildIsoDateTime(dateObj, hour, minute) {
+  return `${dateObj.year}-${pad(dateObj.month)}-${pad(dateObj.day)}T${pad(Number(hour))}:${pad(Number(minute))}:00`;
+}
+
+function parseDateString(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return { year, month, day };
+}
 
 export default function MyAppointmentPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
 
-  const scheduleId = location.state?.scheduleId;
-  const roomId = location.state?.roomId;
+  const promiseId = location.state?.promiseId;
   const isInvited = location.state?.isInvited ?? false;
 
-  const schedule = useScheduleStore((state) =>
-    state.schedules.find((s) => s.id === scheduleId)
-  );
-  const deleteSchedule = useScheduleStore((state) => state.deleteSchedule);
+  const [promise, setPromise] = useState(null);
 
-  const room = useRoomStore((state) =>
-    state.rooms.find((r) => r.id === roomId)
-  );
+  const fetchDetail = useCallback(async () => {
+    const res = await apiClient.get(`/promises/${promiseId}`);
+    setPromise(res.data);
+  }, [promiseId]);
 
-  // RoomStore 멤버에서 schedule.memberIds에 해당하는 사람만 필터링
-  const scheduleMembers = room?.members.filter(m => schedule?.memberIds.includes(m.id)) ?? [];
-  const totalCount = schedule?.memberIds.length ?? 0;
+  useEffect(() => {
+    fetchCategories();
+    fetchDetail();
+  }, [fetchCategories, fetchDetail]);
 
   const [selectedChip, setSelectedChip] = useState(null);
-  // TODO: GET /api/appointments/:id/my-response — 초기 응답 상태 API 연동 후 교체
-  // TODO: PATCH /api/appointments/:id/my-response — 응답 변경 시 API 호출 연동
-  const [myResponse, setMyResponse] = useState(null); // 'participated' | 'absent'
+  const [myResponse, setMyResponse] = useState(null); // 'ACCEPTED' | 'REJECTED'
   const [isEditing, setIsEditing] = useState(isInvited);
   const [showDateSheet, setShowDateSheet] = useState(false);
   const [showMinTimePicker, setShowMinTimePicker] = useState(false);
@@ -142,9 +165,58 @@ export default function MyAppointmentPage() {
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [pendingDate, setPendingDate] = useState(null);
   const [pendingStart, setPendingStart] = useState(null);
-  const [displayTime, setDisplayTime] = useState(schedule?.time ?? '');
+  const [pendingStartTimeIso, setPendingStartTimeIso] = useState(null);
+  const [pendingEndTimeIso, setPendingEndTimeIso] = useState(null);
+  const [displayTime, setDisplayTime] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+
+  useEffect(() => {
+    if (promise) {
+      setMyResponse(promise.myStatus === 'PENDING' ? null : promise.myStatus);
+      setDisplayTime(formatTimeLabel(promise.startTime, promise.endTime));
+    }
+  }, [promise]);
+
+  if (!promise) return null; // TODO: 로딩 스피너로 교체
+
+  const categoryIcon = categories.find((c) => c.categoryId === promise.myCategoryId)?.categoryIcon;
+  const filteredMembers = selectedChip
+    ? promise.members.filter((m) => m.status === STATUS_LABEL_TO_ENUM[selectedChip])
+    : promise.members;
+
+  async function handlePrimaryAction() {
+    if (isEditing) {
+      if (pendingStartTimeIso && pendingEndTimeIso) {
+        await apiClient.patch(`/promises/${promiseId}`, {
+          title: promise.title,
+          comment: promise.comment,
+          categoryId: promise.myCategoryId,
+          proposeStartDate: promise.proposeStartDate,
+          proposeEndDate: promise.proposeEndDate,
+          startTime: pendingStartTimeIso,
+          endTime: pendingEndTimeIso,
+          location: promise.location,
+          notificationLeadMinutes: promise.notificationLeadMinutes,
+          minDuration: promise.minDuration,
+        });
+      }
+      setIsEditing(false);
+      fetchDetail();
+    } else if (isInvited) {
+      await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
+      navigate(-1);
+    } else {
+      await apiClient.patch(`/promises/${promiseId}/confirm`);
+      fetchDetail();
+    }
+  }
+
+  async function handleDelete() {
+    await apiClient.delete(`/promises/${promiseId}`);
+    setIsSheetOpen(false);
+    navigate(-1);
+  }
 
   return (
     <PageWrapper noNav>
@@ -160,36 +232,34 @@ export default function MyAppointmentPage() {
 
       <ContentArea>
         <CardWrapper>
-          {schedule && (
-            <ScheduleInfo
-              title={schedule.title}
-              date={schedule.date}
-              time={displayTime}
-              CategoryImage={CATEGORY_ICON_MAP[schedule.category]?.SelectedIcon}
-              isEditing={isEditing}
-              onEditTime={() => setShowDateSheet(true)}
-            />
-          )}
+          <ScheduleInfo
+            title={promise.title}
+            date={formatDateLabel(promise.startTime)}
+            time={displayTime}
+            CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
+            isEditing={isEditing}
+            onEditTime={() => setShowDateSheet(true)}
+          />
         </CardWrapper>
 
         <SelectRowWrapper>
           <SelectRow
             LeftIcon={PlaceIcon}
             text_empty="약속 장소"
-            text_selected={schedule?.location}
-            state={schedule?.location ? 'selected' : 'empty'}
+            text_selected={promise.location}
+            state={promise.location ? 'selected' : 'empty'}
           />
           <SelectRow
             LeftIcon={CategoryIcon}
             text_empty="카테고리"
-            text_selected={schedule?.category}
-            state={schedule?.category ? 'selected' : 'empty'}
+            text_selected={promise.categoryName}
+            state={promise.categoryName ? 'selected' : 'empty'}
           />
           <SelectRow
             LeftIcon={BellIcon}
             text_empty="알람을 줄 시간"
-            text_selected={schedule?.alarmTime}
-            state={schedule?.alarmTime ? 'selected' : 'empty'}
+            text_selected={promise.notificationLeadMinutes ? `${promise.notificationLeadMinutes}분 전` : ''}
+            state={promise.notificationLeadMinutes ? 'selected' : 'empty'}
           />
 
           <MyResponseRow>
@@ -198,7 +268,7 @@ export default function MyAppointmentPage() {
             </IconWrapper>
             <Text $state="selected">내 응답</Text>
             <ChipArea>
-              {[{ label: '참석', value: 'participated' }, { label: '불참', value: 'absent' }].map(({ label, value }) => (
+              {[{ label: '참석', value: 'ACCEPTED' }, { label: '불참', value: 'REJECTED' }].map(({ label, value }) => (
                 <ChipFilter
                   key={value}
                   text={label}
@@ -214,8 +284,8 @@ export default function MyAppointmentPage() {
               <IconWrapper>
                 <FriendsIcon />
               </IconWrapper>
-              <Text $state={totalCount > 0 ? 'selected' : 'empty'}>
-                {totalCount > 0 ? `초대 ${totalCount}명` : '초대한 인원'}
+              <Text $state={promise.totalMemberCount > 0 ? 'selected' : 'empty'}>
+                {promise.totalMemberCount > 0 ? `초대 ${promise.totalMemberCount}명` : '초대한 인원'}
               </Text>
             </LeftSection>
             <ChipArea>
@@ -232,11 +302,11 @@ export default function MyAppointmentPage() {
         </SelectRowWrapper>
 
         <AttendanceWrapper>
-          {scheduleMembers.map((member) => (
+          {filteredMembers.map((member) => (
             <ProfileItem
-              key={member.id}
-              name={member.name}
-              src={member.profileImage}
+              key={member.promiseMemberId}
+              name={member.nickname}
+              src={member.profileImageUrl}
               onClick={() => setSelectedMember(member)}
             />
           ))}
@@ -245,7 +315,7 @@ export default function MyAppointmentPage() {
         <BtnWrapper>
           <Btn
             text={isEditing ? '응답 저장' : isInvited ? '응답 완료' : '약속 확정'}
-            onClick={isEditing ? () => setIsEditing(false) : undefined}
+            onClick={handlePrimaryAction}
           />
         </BtnWrapper>
 
@@ -256,17 +326,16 @@ export default function MyAppointmentPage() {
           option2Text="일정 삭제"
           option2Color="#E31818"
           onOption1={() => { setIsSheetOpen(false); setIsEditing(true); }}
-          onOption2={() => {
-            deleteSchedule(scheduleId);
-            setIsSheetOpen(false);
-            navigate(-1);
-          }}
+          onOption2={handleDelete}
         />
 
         {selectedMember && (
           <PokePopup
             onClose={() => setSelectedMember(null)}
-            onPoke={() => setSelectedMember(null)}
+            onPoke={async () => {
+              await apiClient.post(`/promises/${promiseId}/poke`, { targetUserId: selectedMember.userId });
+              setSelectedMember(null);
+            }}
           />
         )}
 
@@ -274,9 +343,17 @@ export default function MyAppointmentPage() {
           <MinTimePickerPopup
             onClose={() => setShowMinTimePicker(false)}
             confirmText="추천 받기"
-            onConfirm={(time) => {
+            onConfirm={({ hour, minute }) => {
               setShowMinTimePicker(false);
-              navigate('/time-recommend', { state: { minTime: time } });
+              navigate('/time-recommend', {
+                state: {
+                  promiseId,
+                  title: promise.title,
+                  proposeStartDate: parseDateString(promise.proposeStartDate),
+                  proposeEndDate: parseDateString(promise.proposeEndDate),
+                  minDuration: Number(hour) * 60 + Number(minute),
+                },
+              });
             }}
           />
         )}
@@ -298,11 +375,11 @@ export default function MyAppointmentPage() {
             title="종료 시간"
             onClose={() => setShowEndPicker(false)}
             onConfirm={({ hour, minute }) => {
-              const fmt = (h, m) =>
-                `${String(Number(h)).padStart(2, '0')}:${String(Number(m)).padStart(2, '0')}`;
-              const newTime = `${fmt(pendingStart.hour, pendingStart.minute)} - ${fmt(hour, minute)}`;
-              // TODO: PATCH /api/appointments/:id — { date: pendingDate, startTime, endTime } 연동
-              setDisplayTime(newTime);
+              const startIso = buildIsoDateTime(pendingDate, pendingStart.hour, pendingStart.minute);
+              const endIso = buildIsoDateTime(pendingDate, hour, minute);
+              setPendingStartTimeIso(startIso);
+              setPendingEndTimeIso(endIso);
+              setDisplayTime(`${pad(Number(pendingStart.hour))}:${pad(Number(pendingStart.minute))} - ${pad(Number(hour))}:${pad(Number(minute))}`);
               setShowEndPicker(false);
             }}
           />

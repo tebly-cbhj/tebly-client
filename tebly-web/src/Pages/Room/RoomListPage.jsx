@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
@@ -37,26 +38,32 @@ const FloatingWrapper = styled.div`
 
 export default function RoomListPage() {
   const rooms = useRoomStore((state) => state.rooms);
+  const fetchRooms = useRoomStore((state) => state.fetchRooms);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   return (
     <PageWrapper>
       <Header2
         title="방"
-        icons={['letter', 'bell']} // TODO: 알림/메시지 여부에 따라 'letter-noti', 'bell-noti'로 변경
+        icons={['letter', 'bell']}
         onIconClick={(icon) => {
           if (icon === 'letter' || icon === 'letter-noti') navigate('/noti-invitaion');
-          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm'); // TODO: 알림 페이지 navigate 연동
+          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm');
         }}
       />
       <RoomListContainer>
         {rooms.map((room) => (
           <RoomListCard
-            key={room.id}
-            title={room.title}
+            key={room.roomId}
+            title={room.name}
             description={room.description}
-            members={room.members}
-            onClick={() => navigate(`/room/${room.id}`)}  
+            profileImages={room.memberProfileImages}
+            totalMemberCount={room.totalMemberCount}
+            onClick={() => navigate(`/room/${room.roomId}`)}  
           />
         ))}
       </RoomListContainer>
