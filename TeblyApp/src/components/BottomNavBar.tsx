@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { useTheme } from 'styled-components/native';
 
 import CalendarLine from '../assets/icons/calendar-line.svg';
@@ -10,7 +10,7 @@ import RoomFill from '../assets/icons/room-fill.svg';
 import MoreLine from '../assets/icons/more-line.svg';
 import MoreFill from '../assets/icons/more-fill.svg';
 
-// 전체 바 컨테이너 
+// 전체 바 컨테이너
 const NavBarContainer = styled.View`
   width: 100%;
   padding: 8px 24px 0px 24px;
@@ -36,48 +36,47 @@ const TabText = styled.Text<{ isActive: boolean }>`
   font-size: 12px;
   font-weight: 400;
   text-align: center;
-  line-height: 12px; 
+  line-height: 12px;
   align-self: stretch;
-  color: ${(props) => 
+  color: ${(props) =>
     props.isActive ? props.theme.colors.red100 : props.theme.colors.gray900};
 `;
 
-// 메뉴 아이콘 설정
+// 메뉴 아이콘 + 경로 설정
 const TABS = [
-  { id: 'calendar', label: '캘린더', LineIcon: CalendarLine, FillIcon: CalendarFill },
-  { id: 'friends', label: '친구', LineIcon: FriendsLine, FillIcon: FriendsFill },
-  { id: 'room', label: '방', LineIcon: RoomLine, FillIcon: RoomFill },
-  { id: 'more', label: '더보기', LineIcon: MoreLine, FillIcon: MoreFill },
+  { id: 'calendar', label: '캘린더', path: '/', LineIcon: CalendarLine, FillIcon: CalendarFill },
+  { id: 'friends', label: '친구', path: '/friends', LineIcon: FriendsLine, FillIcon: FriendsFill },
+  { id: 'room', label: '방', path: '/room-list', LineIcon: RoomLine, FillIcon: RoomFill },
+  { id: 'more', label: '더보기', path: '/more', LineIcon: MoreLine, FillIcon: MoreFill },
 ];
 
-export default function BottomNavBar() {
-  const [activeTab, setActiveTab] = useState('calendar'); // 기본값 캘린더
+export default function BottomNavBar({ onTabPress, currentPath }) {
   const theme = useTheme();
 
   return (
     <NavBarContainer>
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          const CurrentIcon = isActive ? tab.FillIcon : tab.LineIcon;
+      {TABS.map((tab) => {
+        const isActive = currentPath === tab.path;
+        const CurrentIcon = isActive ? tab.FillIcon : tab.LineIcon;
 
-          return (
-            <TabButton 
-              key={tab.id} 
-              onPress={() => setActiveTab(tab.id)}
-              activeOpacity={0.7}
-            >
-              <CurrentIcon 
-                width={24} 
-                height={24} 
-                color={isActive ? theme.colors.red100 : theme.colors.gray900} 
-              />
-              
-              <TabText isActive={isActive}>
-                {tab.label}
-              </TabText>
-            </TabButton>
-          );
-        })}
-      </NavBarContainer>
+        return (
+          <TabButton
+            key={tab.id}
+            onPress={() => onTabPress(tab.path)}
+            activeOpacity={0.7}
+          >
+            <CurrentIcon
+              width={24}
+              height={24}
+              color={isActive ? theme.colors.red100 : theme.colors.gray900}
+            />
+
+            <TabText isActive={isActive}>
+              {tab.label}
+            </TabText>
+          </TabButton>
+        );
+      })}
+    </NavBarContainer>
   );
 }
