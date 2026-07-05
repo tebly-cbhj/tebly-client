@@ -7,7 +7,6 @@ import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
 import ScheduleCard from '../../components/room/ScheduleCard';
 import styled from 'styled-components';
-import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
 import ActionSheet from '../../components/common/ActionSheet';
@@ -41,8 +40,7 @@ const CardList = styled.div`
 `;
 
 const SummaryWrapper = styled.div`
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
   flex-shrink: 0;
 `;
 
@@ -53,6 +51,11 @@ const FloatingWrapper = styled.div`
   z-index: 100;
 `;
 
+const HeaderWrapper = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
 
 export default function RoomInfoPage() {
   const { roomId } = useParams();  
@@ -80,17 +83,19 @@ export default function RoomInfoPage() {
   const MY_STATUS_LABEL = { accepted: '참석', rejected: '불참', pending: '미응답' };
 
   return (
-    <PageWrapper noNav>
-      <Header
-        title={room?.title}
-        leftIcon="back"
-        onLeft={() => navigate(-1)}
-        icons={[hasUnreadChat ? 'bubble-noti' : 'bubble', 'more']}
-        onIconClick={(icon) => {
-          if (icon === 'bubble' || icon === 'bubble-noti') navigate(`/room/${roomId}/chat`);
-          if (icon === 'more') setIsSheetOpen(true);
-        }}
-      />
+    <>
+      <HeaderWrapper>
+        <Header
+          title={room?.title}
+          leftIcon="back"
+          onLeft={() => navigate(-1)}
+          icons={[hasUnreadChat ? 'bubble-noti' : 'bubble', 'more']}
+          onIconClick={(icon) => {
+            if (icon === 'bubble' || icon === 'bubble-noti') navigate(`/room/${roomId}/chat`);
+            if (icon === 'more') setIsSheetOpen(true);
+          }}
+        />
+      </HeaderWrapper>
 
       <ScrollContent>
         <SummaryWrapper>
@@ -143,6 +148,6 @@ export default function RoomInfoPage() {
           onOption2={() => { setIsSheetOpen(false); }}
         />
       )}
-    </PageWrapper>
+    </>
   );
 }

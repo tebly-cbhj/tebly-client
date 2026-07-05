@@ -50,6 +50,12 @@ const SectionTitle = styled.span`
   padding: 12px 20px;
 `;
 
+const HeaderWrapper = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
+
 export default function AlarmPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('left'); // left: 일정/약속, right: 콕 찌르기
@@ -148,13 +154,14 @@ function markAsRead(id) {
   }
 
   return (
-    <PageWrapper>
-      <Header
-        title="알림"
-        leftIcon="back"
-        onLeft={() => navigate(-1)}
-      />
-
+    <>
+      <HeaderWrapper>
+        <Header
+          title="알림"
+          leftIcon="back"
+          onLeft={() => navigate(-1)}
+        />
+      </HeaderWrapper>
       <ContentWrapper>
         <ToggleBtnWrapper>
           <ToggleBtn
@@ -273,6 +280,6 @@ function markAsRead(id) {
           </SectionWrapper>
         )}
       </ScrollArea>
-    </PageWrapper>
+    </>
   );
 }

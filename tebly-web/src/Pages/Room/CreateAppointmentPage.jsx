@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import Textfield from '../../components/common/Textfield';
 import SelectRow from '../../components/room/SelectRow';
@@ -71,6 +70,12 @@ const BtnWrapper = styled.div`
   width: 350px;
 `;
 
+const HeaderWrapper = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
+
 /* 
 const BtnWrapper = styled.div`
   width: 350px;
@@ -97,8 +102,10 @@ export default function CreateAppointmentPage() {
   const [popupType, setPopupType] = useState(null);
 
   return (
-    <PageWrapper noNav>
-      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
+    <>
+      <HeaderWrapper>
+        <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
+      </HeaderWrapper>
       <ScrollContent>
         <ContentArea>
           <InputContainer>
@@ -254,6 +261,6 @@ export default function CreateAppointmentPage() {
           }}
         />
       )}
-    </PageWrapper>
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -83,9 +83,20 @@ export default function EditProfilePage() {
   const [bio, setBio] = useState(''); // TODO: 저장된 자기소개로 대체
   const navigate = useNavigate();
 
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [profileImageFile, setProfileImageFile] = useState(null); // TODO: 저장 시 이 File을 백엔드 업로드 API에 전달
+  const fileInputRef = useRef(null);
+
+  function handleImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setProfileImageFile(file);
+    setProfileImagePreview(URL.createObjectURL(file));
+  }
+
   function handleSave() {
-    console.log('저장:', { name, bio });
-    // TODO: 프로필 수정 API 연동
+    console.log('저장:', { name, bio, profileImageFile });
+    // TODO: 프로필 수정 API 연동 (profileImageFile은 FormData로 전송)
   }
 
   return (
@@ -101,10 +112,18 @@ export default function EditProfilePage() {
         <ProfileImageWrapper>
           <ProfileImage>
             {/* TODO: 유저 프로필 이미지 API 연동 */}
+            {profileImagePreview && <img src={profileImagePreview} alt="프로필 미리보기" />}
           </ProfileImage>
-          <EditIconWrapper onClick={() => console.log('이미지 수정')}> {/* TODO: 이미지 선택 기능 연동 */}
+          <EditIconWrapper onClick={() => fileInputRef.current.click()}>
             <EditProfileImageIcon width={56} height={56} />
           </EditIconWrapper>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImageSelect}
+          />
         </ProfileImageWrapper>
 
         {/* 이름 입력 */}

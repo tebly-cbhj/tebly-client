@@ -82,7 +82,8 @@ const InquiryText = styled.span`
   ${({ theme }) => theme.typography.body3};
   color: ${({ theme }) => theme.colors.gray500};
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 `;
 
 export default function LoginPage() {
