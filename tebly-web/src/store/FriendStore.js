@@ -3,10 +3,16 @@ import apiClient from '../api/client';
 
 export const useFriendStore = create((set) => ({
   myProfile: null,
+  inviteCode: null,
 
   fetchMyProfile: async () => {
     const res = await apiClient.get('/users/me');
     set({ myProfile: res.data });
+  },
+
+  fetchInviteCode: async () => {
+    const res = await apiClient.get('/users/me/invite-code');
+    set({ inviteCode: res.data });
   },
 
   updateMyProfile: async ({ nickname, profileImageUrl }) => {

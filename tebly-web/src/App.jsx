@@ -28,6 +28,7 @@ import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
 import OnboardingPage from './Pages/Onboarding/OnboardingPage';
 import LoginPage from './Pages/Onboarding/LoginPage';
+import LoginCallbackPage from './Pages/Onboarding/LoginCallbackPage';
 import TermsAgreementPage from './Pages/Onboarding/TermsAgreementPage';
 import ProfileSetupPage from './Pages/Onboarding/ProfileSetupPage';
 import LocationConsentPage from './Pages/Onboarding/LocationConsentPage';
@@ -84,6 +85,7 @@ function Layout() {
         <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
         <Route path='/onboarding' element={<OnboardingPage />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/login/callback' element={<LoginCallbackPage />} />
         <Route path='/signup/terms' element={<TermsAgreementPage />} />
         <Route path='/signup/profile' element={<ProfileSetupPage />} />
         <Route path='/signup/location' element={<LocationConsentPage />} />

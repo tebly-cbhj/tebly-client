@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
+import apiClient from '../../api/client';
 import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
 import ScheduleCard from '../../components/room/ScheduleCard';
@@ -89,6 +90,12 @@ export default function RoomInfoPage() {
 
   const promises = currentTab === 'tab1' ? room.myPromises : room.invitedPromises;
 
+  async function handleLeaveRoom() {
+    await apiClient.delete(`/rooms/${roomId}/members/me`);
+    setIsSheetOpen(false);
+    navigate('/room-list');
+  }
+
   return (
     <>
       <HeaderWrapper>
@@ -156,8 +163,13 @@ export default function RoomInfoPage() {
           option1Text="방 수정하기"
           option2Text="방 나가기"
           option2Color="#E31818"
-          onOption1={() => { setIsSheetOpen(false); }}
-          onOption2={() => { setIsSheetOpen(false); }}
+          onOption1={() => {
+            setIsSheetOpen(false);
+            navigate('/create-room', {
+              state: { roomId: Number(roomId), name: room.name, description: room.description },
+            });
+          }}
+          onOption2={handleLeaveRoom}
         />
       )}
     </>

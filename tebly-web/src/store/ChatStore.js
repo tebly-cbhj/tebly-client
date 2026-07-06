@@ -1,11 +1,32 @@
 import { create } from 'zustand';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import apiClient from '../api/client';
+
+const MY_SENDER_ID = 6; // TODO: 로그인 후 실제 userId로 교체
 
 export const useChatStore = create((set, get) => ({
   client: null,
   isConnected: false,
   messagesByRoom: {},
+
+  // 채팅 히스토리 불러오기
+  fetchMessages: async (roomId) => {
+    const res = await apiClient.get(`/chat/rooms/${roomId}/messages`);
+    set((state) => ({
+      messagesByRoom: {
+        ...state.messagesByRoom,
+        [roomId]: res.data.map((msg) => ({
+          id: msg.id,
+          type: msg.senderId === MY_SENDER_ID ? 'sent' : 'received-shown',
+          senderName: msg.senderNickname,
+          profileImage: msg.senderProfileImageUrl,
+          text: msg.content,
+          sentAt: msg.sentAt,
+        })),
+      },
+    }));
+  },
 
   // 연결 시작
   connect: (roomId, accessToken) => {
@@ -25,8 +46,6 @@ export const useChatStore = create((set, get) => ({
       },
       onConnect: () => {
         set({ isConnected: true });
-
-        const MY_SENDER_ID = 6; // TODO: 로그인 후 실제 userId로 교체
 
         client.subscribe(`/topic/chat/room/${roomId}`, (message) => {
           const body = JSON.parse(message.body);

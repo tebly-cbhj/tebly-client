@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -7,6 +7,20 @@ import ToggleBtn from '../../components/more/ToggleBtn';
 import RoomInviteCard from '../../components/notification/RoomInviteCard';
 import AppointmentInviteCard from '../../components/notification/AppointmentInviteCard';
 import { useInviteStore } from '../../store/InviteStore';
+
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+const pad = (n) => String(n).padStart(2, '0');
+
+function formatDateLabel(isoDateTime) {
+  const d = new Date(isoDateTime);
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} (${WEEKDAY_KO[d.getDay()]})`;
+}
+
+function formatTimeLabel(startTimeIso, endTimeIso) {
+  const start = new Date(startTimeIso);
+  const end = new Date(endTimeIso);
+  return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())}`;
+}
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -52,11 +66,16 @@ export default function InviteNotiPage() {
   const {
     roomInvites,
     appointmentInvites,
+    fetchInvitations,
     rejectRoomInvite,
     acceptRoomInvite,
     rejectAppointmentInvite,
     acceptAppointmentInvite,
     } = useInviteStore();
+
+  useEffect(() => {
+    fetchInvitations();
+  }, [fetchInvitations]);
 
 
   return (
@@ -83,26 +102,26 @@ export default function InviteNotiPage() {
           {tab === 'left' ? (
             roomInvites.map((invite) => (
                 <RoomInviteCard
-                key={invite.id}
-                roomName={invite.roomName} // TODO: API 연동 후 roomId로 가져오기
+                key={invite.roomId}
+                roomName={invite.roomName}
                 description={invite.description}
                 inviter={invite.inviter}
-                onReject={() => rejectRoomInvite(invite.id)}
-                onAccept={() => acceptRoomInvite(invite.id)}
+                onReject={() => rejectRoomInvite(invite.roomId)}
+                onAccept={() => acceptRoomInvite(invite.roomId)}
                 />
             ))
             ) : (
             appointmentInvites.map((invite) => (
                 <AppointmentInviteCard
-                key={invite.id}
+                key={invite.promiseId}
                 appointmentName={invite.title}
-                date={invite.date}
-                time={invite.time}
+                date={formatDateLabel(invite.startTime)}
+                time={formatTimeLabel(invite.startTime, invite.endTime)}
                 location={invite.location}
-                roomName={invite.roomName} // TODO: API 연동 후 roomId로 가져오기
-                categoryId={invite.category}
-                onReject={() => rejectAppointmentInvite(invite.id)}
-                onAccept={() => acceptAppointmentInvite(invite.id)}
+                roomName={invite.roomName}
+                // TODO: categoryId 없음 — 백엔드 응답에 카테고리 정보 추가되면 연동
+                onReject={() => rejectAppointmentInvite(invite.promiseId)}
+                onAccept={() => acceptAppointmentInvite(invite.promiseId)}
                 />
             ))
             )}

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useRoomStore } from '../../store/RoomStore';
 import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
 import Searchfield from "../../components/common/Searchfield";
@@ -65,24 +64,29 @@ const BtnWrapper = styled.div`
 const SelectFriendPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
   const [searchText, setSearchText] = useState("");
 
   const appointmentMode = location.state?.appointmentMode ?? false;
   const currentRoomId = location.state?.roomId;
+  const roomName = location.state?.roomName;
+  const roomDescription = location.state?.description;
 
   const friendsList = useFriendStore((state) => state.friends);
-  const existingRoom = useRoomStore((state) =>
-    currentRoomId ? state.rooms.find((r) => r.roomId === currentRoomId) : undefined
-  );
 
-  const displayList = appointmentMode
-    ? (existingRoom?.members ?? [])
-    : friendsList;
+  const [roomMembers, setRoomMembers] = useState([]);
+  const [selected, setSelected] = useState([]);
 
-  const [selected, setSelected] = useState(
-    appointmentMode ? (existingRoom?.members ?? []) : (existingRoom?.members ?? [])
-  );
+  useEffect(() => {
+    if (currentRoomId) {
+      apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
+        const members = res.data.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+        setRoomMembers(members);
+        setSelected(members);
+      });
+    }
+  }, [currentRoomId]);
+
+  const displayList = appointmentMode ? roomMembers : friendsList;
 
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
 
@@ -106,14 +110,33 @@ const SelectFriendPage = () => {
         state: { roomId: currentRoomId, selectedMembers: selected },
       });
     } else if (currentRoomId) {
-      updateRoomMembers(currentRoomId, selected);
+      if (roomName) {
+        await apiClient.patch(`/rooms/${currentRoomId}`, {
+          name: roomName,
+          description: roomDescription,
+        });
+      }
+
+      const addedMembers = selected.filter((s) => !roomMembers.find((m) => m.id === s.id));
+      const removedMembers = roomMembers.filter((m) => !selected.find((s) => s.id === m.id));
+
+      if (addedMembers.length > 0) {
+        await apiClient.post(`/rooms/${currentRoomId}/members`, {
+          userIds: addedMembers.map((f) => f.id),
+        });
+      }
+      if (removedMembers.length > 0) {
+        await apiClient.delete(`/rooms/${currentRoomId}/members`, {
+          data: { userIds: removedMembers.map((f) => f.id) },
+        });
+      }
+
       navigate(-1);
     } else {
-      const { roomName, description } = location.state || {};
       await apiClient.post('/rooms', {
         name: roomName,
-        description,
-        member_ids: selected.map((f) => f.id),
+        description: roomDescription,
+        memberIds: selected.map((f) => f.id),
       });
       navigate('/room-list');
     }

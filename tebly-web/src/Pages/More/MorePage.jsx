@@ -9,6 +9,7 @@ import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 import BellLineIcon from '../../assets/icons/bell-line.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
+import apiClient from '../../api/client';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -87,6 +88,18 @@ export default function MorePage() {
 
   if (!user) return null; // TODO: 로딩 스피너로 교체
 
+  async function handleLogout() {
+    await apiClient.post('/auth/signout');
+    localStorage.removeItem('accessToken');
+    navigate('/onboarding');
+  }
+
+  async function handleWithdraw() {
+    await apiClient.delete('/auth/withdraw');
+    localStorage.removeItem('accessToken');
+    navigate('/onboarding');
+  }
+
   return (
     <PageWrapper>
       <Header2
@@ -146,11 +159,18 @@ export default function MorePage() {
             onClick={() => console.log('비밀번호 변경')} // TODO: 비밀번호 변경 페이지로 이동
           />
           <SelectRow
-            text_empty="로그아웃" // 회원 탈퇴 어디서 해요
+            text_empty="로그아웃"
             state="empty"
             right_icon={true}
-            color="alert"  
-            onClick={() => navigate('/onboarding')} // TODO: 로그아웃 API 연동
+            color="alert"
+            onClick={handleLogout}
+          />
+          <SelectRow
+            text_empty="회원탈퇴"
+            state="empty"
+            right_icon={true}
+            color="gray500"
+            onClick={handleWithdraw}
           />
         </SectionCard>
       </ContentWrapper>

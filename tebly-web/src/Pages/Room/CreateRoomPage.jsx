@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import RoomCover from "../../components/room/RoomCover";
 import Textfield from "../../components/common/Textfield";
 import { PageWrapper } from '../../PageWrapper';
@@ -37,17 +37,19 @@ const BtnWrapper = styled.div`
 `;
 
 const CreateRoom = () => {
-  const [roomName, setRoomName] = useState("");
-  const [description, setDescription] = useState("");
+  const location = useLocation();
+  const editRoomId = location.state?.roomId;
+  const [roomName, setRoomName] = useState(location.state?.name ?? "");
+  const [description, setDescription] = useState(location.state?.description ?? "");
   const [sheetVisible, setSheetVisible] = useState(false);
   const isActive = roomName.trim() !== "" && description.trim() !== "";
   const navigate = useNavigate();
-  
+
 
   return (
     <PageWrapper style={{ alignItems: 'center' }}>
-      <Header 
-        title="방 만들기"
+      <Header
+        title={editRoomId ? "방 수정하기" : "방 만들기"}
         leftIcon="back"
         onLeft={() => navigate(-1)}
         icons={[]}
@@ -77,7 +79,7 @@ const CreateRoom = () => {
           <Btn
             text="다음"
             disabled={!isActive}
-            onClick={() => navigate('/select-friend', { state: { roomName, description } })}
+            onClick={() => navigate('/select-friend', { state: { roomName, description, roomId: editRoomId } })}
           />
         </BtnWrapper>
       </ContentArea>

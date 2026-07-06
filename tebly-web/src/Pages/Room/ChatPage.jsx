@@ -115,7 +115,7 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
-  const { connect, sendMessage, messagesByRoom } = useChatStore();
+  const { connect, sendMessage, fetchMessages, messagesByRoom } = useChatStore();
   const messages = messagesByRoom[roomId] ?? [];
   const accessToken = import.meta.env.VITE_ACCESS_TOKEN;
 
@@ -125,6 +125,7 @@ export default function ChatPage() {
   const [cardExpanded, setCardExpanded] = useState(true);
 
   useEffect(() => {
+    fetchMessages(roomId);
     // ✅ accessToken 없으면 연결 시도 안 함
     if (!accessToken) return;
     connect(roomId, accessToken);

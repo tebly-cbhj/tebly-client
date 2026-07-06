@@ -63,7 +63,7 @@ export const useScheduleStore = create((set, get) => ({
     const res = await apiClient.post('/schedules/categories', {
       name: newCategory.name,
       icon: newCategory.iconId,
-      is_private: false,
+      isPrivate: false,
     });
     set((state) => ({ categories: [...state.categories, res.data] }));
   },
@@ -79,7 +79,7 @@ export const useScheduleStore = create((set, get) => ({
     const target = get().categories.find((c) => c.categoryId === categoryId);
     if (!target) return;
     const res = await apiClient.patch(`/schedules/categories/${categoryId}`, {
-      is_private: !target.isPrivate,
+      isPrivate: !target.isPrivate,
     });
     set((state) => ({
       categories: state.categories.map((c) => (c.categoryId === categoryId ? res.data : c)),
