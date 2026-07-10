@@ -144,7 +144,7 @@ export default function CategoryPopup({ selectedCategoryId, onClose, onSelect })
         <CategoryContainer>
           {categories.map((category) => {
             const isSelected = currentCategoryId === category.categoryId;
-            const icons = CATEGORY_ICON_MAP[category.categoryIcon] || CATEGORY_ICON_MAP.기타;
+            const icons = CATEGORY_ICON_MAP[category.categoryIcon] || CATEGORY_ICON_MAP.Other;
             const CategoryIcon = isSelected ? icons.SelectedIcon : icons.Icon;
 
             return (
