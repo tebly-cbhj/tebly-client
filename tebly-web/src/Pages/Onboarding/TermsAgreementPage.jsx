@@ -92,7 +92,7 @@ export default function TermsAgreementPage() {
       />
 
       <ProgressWrapper>
-        <ProgressBar step={1} total={4} />
+        <ProgressBar step={1} total={3} />
       </ProgressWrapper>
 
       <ContentWrapper>

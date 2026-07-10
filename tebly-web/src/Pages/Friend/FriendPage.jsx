@@ -203,12 +203,14 @@ export default function FriendPage() {
   const myProfile = useFriendStore((s) => s.myProfile);
   const fetchMyProfile = useFriendStore((s) => s.fetchMyProfile);
   const friends = useFriendStore((s) => s.friends);
+  const fetchFriends = useFriendStore((s) => s.fetchFriends);
   const toggleFavorite = useFriendStore((s) => s.toggleFavorite);
   const deleteFriend = useFriendStore((s) => s.deleteFriend);
 
   useEffect(() => {
     fetchMyProfile();
-  }, [fetchMyProfile]);
+    fetchFriends();
+  }, [fetchMyProfile, fetchFriends]);
 
   const sorted = useMemo(
     () =>
@@ -265,7 +267,7 @@ export default function FriendPage() {
         </ProfileImage>
         <TextArea>
           <Name>{myProfile?.nickname}</Name>
-          {/* TODO: 백엔드에 자기소개 필드 추가되면 여기 복구 */}
+          {myProfile?.bio && <Intro>{myProfile.bio}</Intro>}
         </TextArea>
       </MyProfileContainer>
 
@@ -280,7 +282,7 @@ export default function FriendPage() {
             profileImage={friend.profileImage}
             isFavorite={friend.isFavorite}
             onToggleFavorite={() => toggleFavorite(friend.id)}
-            onDelete={() => deleteFriend(friend.id)}
+            onDelete={() => deleteFriend(friend.id).catch(() => alert('친구 삭제에 실패했어요. 다시 시도해주세요.'))}
             onClick={() => navigate(`/friends/${friend.id}`)}
           />
         ))}

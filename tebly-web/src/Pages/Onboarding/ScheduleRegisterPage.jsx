@@ -84,7 +84,7 @@ export default function ScheduleRegisterPage() {
       />
 
       <ProgressWrapper>
-        <ProgressBar step={4} total={4} />
+        <ProgressBar step={3} total={3} />
       </ProgressWrapper>
 
       <ContentWrapper>
@@ -104,7 +104,7 @@ export default function ScheduleRegisterPage() {
         </SkipText>
         <Btn
           text="시간표 등록하러가기"
-          onClick={() => navigate('/ocr-loading')} // TODO: OCR 로딩 페이지로 이동
+          onClick={() => navigate('/', { state: { openFab: true } })}
         />
       </BtnWrapper>
     </PageWrapper>

@@ -7,6 +7,7 @@ import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
+import apiClient from '../../api/client';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -83,10 +84,10 @@ export default function EditProfilePage() {
   const navigate = useNavigate();
 
   const [name, setName] = useState(myProfile?.nickname ?? '');
-  const [bio, setBio] = useState(''); // TODO: 백엔드에 자기소개 필드 추가되면 연동
+  const [bio, setBio] = useState(myProfile?.bio ?? '');
 
   const [profileImagePreview, setProfileImagePreview] = useState(myProfile?.profileImageUrl ?? null);
-  const [profileImageFile, setProfileImageFile] = useState(null); // TODO: 이미지 업로드 API 확인 후 연동
+  const [profileImageFile, setProfileImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
   function handleImageSelect(e) {
@@ -97,8 +98,16 @@ export default function EditProfilePage() {
   }
 
   async function handleSave() {
-    // TODO: 이미지 업로드 API 나오면 profileImageFile 업로드 후 받은 URL을 여기 전달
-    await updateMyProfile({ nickname: name, profileImageUrl: myProfile?.profileImageUrl });
+    let profileImageUrl = myProfile?.profileImageUrl;
+
+    if (profileImageFile) {
+      const formData = new FormData();
+      formData.append('file', profileImageFile);
+      const uploadRes = await apiClient.post('/users/me/profile-image', formData);
+      profileImageUrl = uploadRes.data.profileImageUrl;
+    }
+
+    await updateMyProfile({ nickname: name, profileImageUrl, bio });
     navigate(-1);
   }
 

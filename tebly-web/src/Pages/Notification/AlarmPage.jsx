@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import ToggleBtn from '../../components/more/ToggleBtn';
 import NotiCard from '../../components/notification/NotiCard';
+import { useNotificationStore } from '../../store/NotificationStore';
+import { useScheduleStore } from '../../store/ScheduleStore';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -59,88 +61,33 @@ const HeaderWrapper = styled.div`
 export default function AlarmPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState('left'); // left: 일정/약속, right: 콕 찌르기
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
 
-  // TODO: 알림 목록 API 연동
-  // notifications, pokeNotifications를 useState로 변경
-const [notifications, setNotifications] = useState([
-  {
-    id: 1,
-    type: 'schedule',
-    categoryId: 'SelfDevelopment',
-    scheduleName: '헬스장',
-    timeLeft: '2시간',
-    notifiedAt: new Date(Date.now() - 1000 * 60 * 30),
-    isRead: false,
-  },
-  {
-    id: 2,
-    type: 'appointment',
-    categoryId: 'Appointment',
-    scheduleName: '떡볶이 모임',
-    roomName: 'TAVE 13기',
-    timeLeft: '1일',
-    notifiedAt: new Date(Date.now() - 1000 * 60 * 60 * 25),
-    isRead: true,
-    roomId: 1,
-    scheduleId: 1,
-  },
-]);
+  useEffect(() => {
+    fetchNotifications();
+    fetchCategories();
+  }, [fetchNotifications, fetchCategories]);
 
-const [pokeNotifications, setPokeNotifications] = useState([
-  {
-    id: 3,
-    type: 'poke',
-    categoryId: 'Appointment',
-    scheduleName: '떡볶이 모임',
-    pokerName: '홍길동',
-    pokerProfileImage: null,
-    userName: '김뿡치',
-    notifiedAt: new Date(Date.now() - 1000 * 60 * 10),
-    isRead: false,
-    roomId: 1,
-    scheduleId: 1,
-  },
-  {
-    id: 4,
-    type: 'poke',
-    categoryId: 'Club',
-    scheduleName: '동아리 회의',
-    pokerName: '이철수',
-    pokerProfileImage: null,
-    userName: '김뿡치',
-    notifiedAt: new Date(Date.now() - 1000 * 60 * 60 * 30),
-    isRead: true,
-    roomId: 2,
-    scheduleId: 3,
-  },
-]);
-
-// 읽음 처리 함수
-function markAsRead(id) {
-  if (tab === 'left') {
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-    );
-  } else {
-    setPokeNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-    );
+  function getCategoryIcon(categoryId) {
+    return categories.find((c) => c.categoryId === categoryId)?.categoryIcon;
   }
-  // TODO: 읽음 처리 API 연동
-}
 
-  const currentList = tab === 'left' ? notifications : pokeNotifications;
+  const currentList = notifications.filter((n) =>
+    tab === 'left' ? n.type !== 'POKE' : n.type === 'POKE'
+  );
 
-  // 24시간 기준으로 새 알림/이전 알림 분류
   const now = new Date();
   const newNoti = currentList.filter(
-    (n) => now - new Date(n.notifiedAt) < 1000 * 60 * 60 * 24
+    (n) => now - new Date(n.createdAt) < 1000 * 60 * 60 * 24
   );
   const oldNoti = currentList.filter(
-    (n) => now - new Date(n.notifiedAt) >= 1000 * 60 * 60 * 24
+    (n) => now - new Date(n.createdAt) >= 1000 * 60 * 60 * 24
   );
 
-  // notifiedAt을 표시용 문자열로 변환
   function formatNotifiedAt(date) {
     const diff = now - new Date(date);
     const minutes = Math.floor(diff / (1000 * 60));
@@ -151,6 +98,38 @@ function markAsRead(id) {
 
     const d = new Date(date);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function handleNotiClick(noti) {
+    markAsRead(noti.id);
+    if (noti.roomId) {
+      navigate('/my-appointments', {
+        state: { scheduleId: noti.scheduleId, roomId: noti.roomId },
+      });
+    } else if (noti.scheduleId) {
+      // 개인 일정 단건 조회 API가 없어서 상세로 바로 못 감 — 캘린더 홈으로 이동
+      navigate('/');
+    }
+  }
+
+  function renderSection(title, list) {
+    if (list.length === 0) return null;
+    return (
+      <SectionWrapper>
+        <SectionTitle>{title}</SectionTitle>
+        {list.map((noti) => (
+          <NotiCard
+            key={noti.id}
+            categoryId={getCategoryIcon(noti.categoryId)}
+            title={noti.title}
+            content={noti.content}
+            notifiedAt={formatNotifiedAt(noti.createdAt)}
+            isRead={noti.isRead}
+            onClick={() => handleNotiClick(noti)}
+          />
+        ))}
+      </SectionWrapper>
+    );
   }
 
   return (
@@ -174,111 +153,8 @@ function markAsRead(id) {
       </ContentWrapper>
 
       <ScrollArea>
-        {/* 새 알림 */}
-        {newNoti.length > 0 && (
-          <SectionWrapper>
-            <SectionTitle>새 알림</SectionTitle>
-            {newNoti.map((noti) => (
-              <NotiCard
-                key={noti.id}
-                type={noti.type}
-                categoryId={noti.categoryId}
-                scheduleName={noti.scheduleName}
-                roomName={noti.roomName}
-                timeLeft={noti.timeLeft}
-                notifiedAt={formatNotifiedAt(noti.notifiedAt)}
-                isRead={noti.isRead}
-                pokerName={noti.pokerName}
-                pokerProfileImage={noti.pokerProfileImage}
-                userName={noti.userName}
-                onClick={() => {
-                  markAsRead(noti.id);
-                  if (noti.type === 'schedule') {
-                    navigate('/calendar/event-detail', {
-                      state: {
-                        scheduleId: noti.scheduleId,
-                        schedule: {
-                          title: noti.scheduleName,
-                          startDate: '', // TODO: API 연동 후 실제 날짜로 대체
-                          endDate: '',
-                          startTime: '',
-                          endTime: '',
-                          place: '',
-                          category: noti.categoryId,
-                          alarmTime: '',
-                          repeat: '',
-                        },
-                      },
-                    });
-                    // TODO: 개인 일정 상세 API 연동
-                  }
-                  if (noti.type === 'appointment' || noti.type === 'poke') {
-                    navigate('/my-appointments', {
-                      state: {
-                        scheduleId: noti.scheduleId,
-                        roomId: noti.roomId,
-                      }
-                    });
-                    // TODO: 해당 방의 약속 상세로 이동 API 연동
-                  }
-                }}
-              />
-            ))}
-          </SectionWrapper>
-        )}
-
-        {/* 이전 알림 */}
-        {oldNoti.length > 0 && (
-          <SectionWrapper>
-            <SectionTitle>이전 알림</SectionTitle>
-            {oldNoti.map((noti) => (
-              <NotiCard
-                key={noti.id}
-                type={noti.type}
-                categoryId={noti.categoryId}
-                scheduleName={noti.scheduleName}
-                roomName={noti.roomName}
-                timeLeft={noti.timeLeft}
-                notifiedAt={formatNotifiedAt(noti.notifiedAt)}
-                isRead={noti.isRead}
-                pokerName={noti.pokerName}
-                pokerProfileImage={noti.pokerProfileImage}
-                userName={noti.userName}
-                onClick={() => {
-                  markAsRead(noti.id);
-                  if (noti.type === 'schedule') {
-                    navigate('/calendar/event-detail', {
-                      state: {
-                        scheduleId: noti.scheduleId,
-                        schedule: {
-                          title: noti.scheduleName,
-                          startDate: '', // TODO: API 연동 후 실제 날짜로 대체
-                          endDate: '',
-                          startTime: '',
-                          endTime: '',
-                          place: '',
-                          category: noti.categoryId,
-                          alarmTime: '',
-                          repeat: '',
-                        },
-                      },
-                    });
-                    // TODO: 개인 일정 상세 API 연동
-                  }
-                  if (noti.type === 'appointment' || noti.type === 'poke') {
-                    navigate('/my-appointments', {
-                      state: {
-                        scheduleId: noti.scheduleId,
-                        roomId: noti.roomId,
-                      }
-                    });
-                    // TODO: 해당 방의 약속 상세로 이동 API 연동
-                  }
-                }}
-              />
-            ))}
-          </SectionWrapper>
-        )}
+        {renderSection('새 알림', newNoti)}
+        {renderSection('이전 알림', oldNoti)}
       </ScrollArea>
     </>
   );
