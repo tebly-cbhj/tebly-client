@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Btn from '../common/Btn';
 import CreateCategoryPopup from './CreateCategoryPopup';
@@ -6,7 +6,7 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 
 import DragHandleIcon from '../../assets/icons/drag-handle.svg?react';
 
-import { CATEGORY_ICON_MAP } from './categoryIcons';
+import { CATEGORY_ICON_MAP } from './CategoryIcons';
 
 const Overlay = styled.div`
   position: fixed;
@@ -59,7 +59,7 @@ const CategoryContainer = styled.div`
   row-gap: 24px;
   column-gap: 24px;
   width: fit-content;
-  margin: 0 auto;   /* ← 가운데 정렬은 이걸로 */
+  margin: 0 auto;
 `;
 
 const CategoryItem = styled.button`
@@ -114,15 +114,23 @@ const AddPopupLayer = styled.div`
   align-items: center;
 `;
 
-
-export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
+export default function CategoryPopup({ selectedCategoryId, onClose, onSelect }) {
   const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const addCategory = useScheduleStore((state) => state.addCategory);
 
-  const [currentCategory, setCurrentCategory] = useState(
-    selectedCategory || categories[0]?.name
-  );
+  const [currentCategoryId, setCurrentCategoryId] = useState(selectedCategoryId ?? null);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    if (!currentCategoryId && categories.length > 0) {
+      setCurrentCategoryId(categories[0].categoryId);
+    }
+  }, [categories, currentCategoryId]);
 
   return (
     <Overlay onClick={onClose}>
@@ -135,20 +143,20 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
       <CategoryScroll>  
         <CategoryContainer>
           {categories.map((category) => {
-            const isSelected = currentCategory === category.name;
-            const icons = CATEGORY_ICON_MAP[category.iconId] || CATEGORY_ICON_MAP.기타;
+            const isSelected = currentCategoryId === category.categoryId;
+            const icons = CATEGORY_ICON_MAP[category.categoryIcon] || CATEGORY_ICON_MAP.기타;
             const CategoryIcon = isSelected ? icons.SelectedIcon : icons.Icon;
 
             return (
               <CategoryItem
-                key={category.name}
+                key={category.categoryId}
                 type="button"
-                onClick={() => setCurrentCategory(category.name)}
+                onClick={() => setCurrentCategoryId(category.categoryId)}
               >
                 <IconWrapper>
                   <CategoryIcon />
                 </IconWrapper>
-                <CategoryName>{category.name}</CategoryName>
+                <CategoryName>{category.categoryName}</CategoryName>
               </CategoryItem>
             );
           })}
@@ -161,7 +169,7 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
             text="추가하기"
             size="medium"
             variant="gray"
-            disabled={!currentCategory}
+            disabled={!currentCategoryId}
             onClick={() => setIsAddPopupOpen(true)}
           />
         </ResetButtonWrapper>
@@ -170,8 +178,11 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
           <Btn
             text="선택 완료"
             size="medium"
-            disabled={!currentCategory}
-            onClick={() => onSelect(currentCategory)}
+            disabled={!currentCategoryId}
+            onClick={() => {
+              const selected = categories.find((c) => c.categoryId === currentCategoryId);
+              onSelect(selected);
+            }}
           />
         </ConfirmButtonWrapper>
       </ButtonRow>
@@ -182,9 +193,8 @@ export default function CategoryPopup({ selectedCategory, onClose, onSelect }) {
         <AddPopupLayer onClick={(e) => e.stopPropagation()}>
           <CreateCategoryPopup
             onClose={() => setIsAddPopupOpen(false)}
-            onSave={(newCategory) => {
-              addCategory(newCategory);
-              setCurrentCategory(newCategory.name);
+            onSave={async (newCategory) => {
+              await addCategory(newCategory);
               setIsAddPopupOpen(false);
             }}
           />

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
 import TimeOptionCard from '../../components/room/TimeOptionCard';
@@ -10,6 +10,9 @@ import SortButton from '../../components/common/SortButton';
 import OptionItem from '../../components/room/OptionItem';
 import DateCell from '../../components/room/DateCell';
 import Header from '../../components/common/Header';
+import AttendeePopup from '../../components/room/AttendeePopup';
+import apiClient from '../../api/client';
+import MagicWandIcon from '../../assets/icons/magicwand.svg?react';
 
 // ─── 페이지 레이아웃 ────────────────────────────────────────────
 
@@ -42,6 +45,37 @@ const BottomArea = styled.div`
   padding: 0.75rem 1.25rem 2.125rem;
   box-sizing: border-box;
   background: ${({ theme }) => theme.colors.bg};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SelectBtnWrapper = styled.div`
+  width: 17.5rem; /* 280px */
+`;
+
+const MagicWandBtn = styled.button`
+  display: flex;
+  width: 3.875rem; /* 62px */
+  height: 3.375rem; /* 54px */
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.75rem;
+  border: 2px solid var(--grayscale-gray-300, #DCDCDC);
+  background: var(--grayscale-white, #FEFEFE);
+  padding: 0;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  svg {
+    width: 1.5rem; /* 24px */
+    height: auto;
+    aspect-ratio: 24 / 41.875;
+  }
 `;
 
 // ─── 공용 시트 요소 ─────────────────────────────────────────────
@@ -224,6 +258,7 @@ const ConfirmBtn = styled.button`
 `;
 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+const DAY_NAMES = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 
 function buildCalendarDays(year, month) {
   const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
@@ -249,37 +284,64 @@ function resolveDate(day, type, year, month) {
   return { year: y, month: m, day };
 }
 
-// ─── 목업 데이터 ────────────────────────────────────────────────
+function formatDateForApi(d) {
+  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`;
+}
 
-// TODO: API에서 추천 시간 목록 받아오기
-// 예상 응답 형태: [{ id, date, dayOfWeek, timeRange, memberCount, totalCount }]
-// totalCount가 RoomStore 더미 멤버 수와 다르지만 API 연동 시 실제 값으로 대체되므로 수정 불필요
-const dummyOptions = [
-  { id: 1, date: 22, dayOfWeek: '금요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 2, date: 22, dayOfWeek: '금요일', timeRange: '18:00~19:00', memberCount: 5, totalCount: 6 },
-  { id: 3, date: 23, dayOfWeek: '토요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 4, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-  { id: 5, date: 24, dayOfWeek: '일요일', timeRange: '11:00~13:00', memberCount: 4, totalCount: 6 },
-];
+function toAttendee(member) {
+  return { id: member.userId, name: member.nickname, profileImage: member.profileImageUrl };
+}
+
+function toOptionViewModel(rec, index) {
+  const start = new Date(rec.startTime);
+  const end = new Date(rec.endTime);
+  const pad = (n) => String(n).padStart(2, '0');
+  return {
+    id: index,
+    date: start.getDate(),
+    dayOfWeek: DAY_NAMES[start.getDay()],
+    timeRange: `${pad(start.getHours())}:${pad(start.getMinutes())}~${pad(end.getHours())}:${pad(end.getMinutes())}`,
+    memberCount: rec.availableMemberCount,
+    totalCount: rec.totalMemberCount,
+    availableAttendees: rec.availableMembers.map(toAttendee),
+    unavailableAttendees: rec.unavailableMembers.map(toAttendee),
+    startTimeRaw: rec.startTime,
+    endTimeRaw: rec.endTime,
+  };
+}
 
 // ─── 페이지 컴포넌트 ────────────────────────────────────────────
 
 export default function TimeRecommendPage() {
   const navigate = useNavigate();
+  const routerLocation = useLocation();
   const today = new Date();
 
-  // TODO: useParams 등으로 roomId 받아오기
+  const {
+    roomId,
+    promiseId,
+    title,
+    comment,
+    categoryId,
+    location,
+    proposeStartDate: initialStart,
+    proposeEndDate: initialEnd,
+    minDuration,
+    selectedMemberIds,
+  } = routerLocation.state ?? {};
+
+const isUpdateMode = Boolean(promiseId);
+
   const [selectedId, setSelectedId] = useState(null);
+  const [attendeePopupOption, setAttendeePopupOption] = useState(null);
+  const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 정렬 시트
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortValue, setSortValue] = useState('recommended');
 
-  // 날짜 선택 시트
   const [isDateSheetOpen, setIsDateSheetOpen] = useState(false);
-  // TODO: 초기 날짜 범위를 방 생성 시 설정한 값으로 초기화
-  const [dateRange, setDateRange] = useState(null);
+  const [dateRange, setDateRange] = useState({ start: initialStart, end: initialEnd });
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth() + 1);
   const [startDate, setStartDate] = useState(null);
@@ -287,18 +349,102 @@ export default function TimeRecommendPage() {
   const [hoverDate, setHoverDate] = useState(null);
   const [phase, setPhase] = useState('start');
 
+  async function fetchRecommendations(range) {
+    setIsLoading(true);
+    try {
+      const payload = {
+        proposeStartDate: formatDateForApi(range.start),
+        proposeEndDate: formatDateForApi(range.end),
+        searchStartTime: '00:00',
+        searchEndTime: '23:59',
+        minDuration,
+        sortType: 'EARLIEST',
+      };
+      const res = isUpdateMode
+        ? await apiClient.post(`/promises/${promiseId}/time-recommendations`, payload)
+        : await apiClient.post(`/rooms/${roomId}/promise-time-recommendations`, { ...payload, selectedMemberIds });
+      setOptions(res.data.map(toOptionViewModel));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
-    // TODO: 실제 API 호출로 교체 (추천 시간 목록 조회)
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
+    if (dateRange.start && dateRange.end) {
+      fetchRecommendations(dateRange);
+    }
   }, []);
 
-  const handleConfirm = () => {
+  const sortedOptions = useMemo(() => {
+    const list = [...options];
+    if (sortValue === 'members') return list.sort((a, b) => b.memberCount - a.memberCount);
+    if (sortValue === 'earliest') return list.sort((a, b) => new Date(a.startTimeRaw) - new Date(b.startTimeRaw));
+    if (sortValue === 'latest') return list.sort((a, b) => new Date(b.startTimeRaw) - new Date(a.startTimeRaw));
+    return list;
+  }, [options, sortValue]);
+
+  const handleConfirm = async () => {
+    const selectedOption = options.find((o) => o.id === selectedId);
+    if (!selectedOption) return;
+
     setIsLoading(true);
-    // TODO: 선택한 시간(selectedId)으로 약속 확정 API 호출
-    // TODO: API 완료 후 setIsLoading(false) 및 다음 페이지로 navigate
+    try {
+      if (isUpdateMode) {
+        await apiClient.patch(`/promises/${promiseId}/time/from-recommendation`, {
+          proposeStartDate: formatDateForApi(dateRange.start),
+          proposeEndDate: formatDateForApi(dateRange.end),
+          searchStartTime: '00:00',
+          searchEndTime: '23:59',
+          recommendedStartTime: selectedOption.startTimeRaw,
+          recommendedEndTime: selectedOption.endTimeRaw,
+          minDuration,
+          sortType: 'EARLIEST',
+        });
+        navigate(-1);
+      } else {
+        await apiClient.post(`/rooms/${roomId}/promises/from-recommendation`, {
+          title,
+          comment,
+          categoryId,
+          proposeStartDate: formatDateForApi(dateRange.start),
+          proposeEndDate: formatDateForApi(dateRange.end),
+          searchStartTime: '00:00',
+          searchEndTime: '23:59',
+          recommendedStartTime: selectedOption.startTimeRaw,
+          recommendedEndTime: selectedOption.endTimeRaw,
+          location,
+          minDuration,
+          sortType: 'EARLIEST',
+          selectedMemberIds,
+        });
+        navigate(`/room/${roomId}`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleDecisionHelper = async () => {
+    setIsLoading(true);
+    try {
+      await apiClient.post(`/api/v1/rooms/${roomId}/decision-helper`, {
+        title,
+        comment,
+        categoryId,
+        proposeStartDate: formatDateForApi(dateRange.start),
+        proposeEndDate: formatDateForApi(dateRange.end),
+        searchStartTime: '00:00',
+        searchEndTime: '23:59',
+        minDuration,
+        sortType: 'RECOMMENDED',
+        location,
+        selectedMemberIds,
+      });
+      navigate(`/room/${roomId}/chat`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const prevMonth = () => {
     if (viewMonth === 1) { setViewYear(y => y - 1); setViewMonth(12); }
     else setViewMonth(m => m - 1);
@@ -344,26 +490,23 @@ export default function TimeRecommendPage() {
   };
 
   const handleDateConfirm = () => {
-    setDateRange({ start: startDate, end: endDate });
+    const newRange = { start: startDate, end: endDate };
+    setDateRange(newRange);
     setIsDateSheetOpen(false);
-    setIsLoading(true);
-    // TODO: 변경된 날짜 범위로 추천 시간 목록 재조회 API 호출
-    // TODO: API 완료 후 setIsLoading(false) 및 목록 업데이트
+    fetchRecommendations(newRange);
   };
 
   const cells = buildCalendarDays(viewYear, viewMonth);
 
   return (
     <PageWrapper noNav>
-      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
+      <Header title={title ?? '약속 만들기'} leftIcon="back" onLeft={() => navigate(-1)} />
 
       <FilterBar>
         <ChipScheduleOption
-          // TODO: 초기값을 방 생성 시 설정한 날짜 범위로 교체
-          text={dateRange?.start ? `${dateRange.start.month}.${dateRange.start.day}~${dateRange.end?.month}.${dateRange.end?.day}` : '5.17~5.26'}
+          text={dateRange.start ? `${dateRange.start.month}.${dateRange.start.day}~${dateRange.end?.month}.${dateRange.end?.day}` : ''}
           onClick={() => setIsDateSheetOpen(true)}
         />
-        {/* TODO: 정렬 기준 변경 시 목록 재정렬 연동 */}
         <SortButton
           text={SORT_OPTIONS.find(o => o.value === sortValue)?.label ?? '추천순'}
           onClick={() => setIsSortOpen(true)}
@@ -371,8 +514,7 @@ export default function TimeRecommendPage() {
       </FilterBar>
 
       <CardList>
-        {/* TODO: dummyOptions → API 응답 데이터로 교체 */}
-        {dummyOptions.map((option) => (
+        {sortedOptions.map((option) => (
           <TimeOptionCard
             key={option.id}
             date={option.date}
@@ -387,12 +529,30 @@ export default function TimeRecommendPage() {
       </CardList>
 
       <BottomArea>
-        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+        {isUpdateMode ? (
+          <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+        ) : (
+          <>
+            <MagicWandBtn onClick={handleDecisionHelper} disabled={isLoading} aria-label="결정이에게 맡기기">
+              <MagicWandIcon />
+            </MagicWandBtn>
+            <SelectBtnWrapper>
+              <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+            </SelectBtnWrapper>
+          </>
+        )}
       </BottomArea>
 
       <LoadingOverlay isLoading={isLoading} />
 
-      {/* 날짜 선택 시트 */}
+      {attendeePopupOption && (
+        <AttendeePopup
+          availableAttendees={attendeePopupOption.availableAttendees}
+          unavailableAttendees={attendeePopupOption.unavailableAttendees}
+          onClose={() => setAttendeePopupOption(null)}
+        />
+      )}
+
       {isDateSheetOpen && (
         <>
           <Dim onClick={() => setIsDateSheetOpen(false)} />
@@ -444,7 +604,6 @@ export default function TimeRecommendPage() {
         </>
       )}
 
-      {/* 정렬 시트 */}
       {isSortOpen && (
         <>
           <Dim onClick={() => setIsSortOpen(false)} />

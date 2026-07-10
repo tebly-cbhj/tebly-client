@@ -9,7 +9,7 @@ import RepeatPopup from '../room/RepeatPopup';
 import RepeatEndDatePopup from '../room/RepeatEndDatePopup';
 import ExpandIcon from '../common/ExpandIcon';
 import TimePicker from '../common/TimePicker';
-import { CATEGORY_KO, CATEGORY_ICON_MAP } from '../room/CategoryIcons';
+import { CATEGORY_ICON_MAP } from '../room/CategoryIcons';
 import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
 
 import CloseIcon from '../../assets/icons/close-m.svg?react';
@@ -406,7 +406,7 @@ export default function OCREditSheet({ scheduleId, onClose }) {
 
   const [title, setTitle] = useState(schedule.title || '');
   const [memo, setMemo] = useState(schedule.memo || '');
-  const [category, setCategory] = useState(schedule.category || '');
+  const [category, setCategory] = useState(schedule.category || null);
   const [allDay, setAllDay] = useState(schedule.allDay || false);
   const [startDate, setStartDate] = useState(schedule.startDate ?? parsed.startDate);
   const [endDate, setEndDate] = useState(schedule.endDate ?? parsed.endDate);
@@ -424,7 +424,7 @@ export default function OCREditSheet({ scheduleId, onClose }) {
   const [timePickerTarget, setTimePickerTarget] = useState(null);
   const [pendingTime, setPendingTime] = useState({ hour: '09', minute: '00' });
 
-  const iconData = CATEGORY_ICON_MAP[category] || CATEGORY_ICON_MAP.Other;
+  const iconData = CATEGORY_ICON_MAP[category?.categoryIcon] || CATEGORY_ICON_MAP.Other;
   const CategoryIconComp = iconData.SelectedIcon;
 
   function openTimePicker(target) {
@@ -530,7 +530,7 @@ export default function OCREditSheet({ scheduleId, onClose }) {
               <SelectRow
                 LeftIcon={CategoryIconSvg}
                 text_empty="카테고리 선택"
-                text_selected={CATEGORY_KO[category] ?? category}
+                text_selected={category?.categoryName ?? ''}
                 state={category ? 'selected' : 'empty'}
                 right_icon
                 onClick={() => setPopupType('category')}
@@ -606,7 +606,7 @@ export default function OCREditSheet({ scheduleId, onClose }) {
 
       {popupType === 'category' && (
         <CategoryPopup
-          selectedCategory={category}
+          selectedCategoryId={category?.categoryId}
           onClose={() => setPopupType(null)}
           onSelect={(value) => { setCategory(value); setPopupType(null); }}
         />

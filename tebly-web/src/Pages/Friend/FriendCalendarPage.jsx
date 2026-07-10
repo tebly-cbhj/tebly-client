@@ -5,7 +5,7 @@ import { useFriendStore } from '../../store/FriendStore';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
 import DateCell from '../../components/calendar/month/DateCell';
 import MonthSelect from '../../components/calendar/month/MonthSelect';
-import DatePickerPopup from '../../components/calendar/month/DatepickerPopup';
+import DatePickerPopup from '../../components/calendar/month/DatePickerPopup';
 import MonthWeekToggle from '../../components/calendar/MonthWeekToggle';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
@@ -169,6 +169,8 @@ export default function FriendCalendarPage() {
   const { friendId } = useParams();
   const friends = useFriendStore((s) => s.friends);
   const friend = friends.find((f) => String(f.id) === String(friendId));
+  const friendEvents = useFriendStore((s) => s.friendSchedules[friendId]) || [];
+  const fetchFriendSchedules = useFriendStore((s) => s.fetchFriendSchedules);
 
   const today = useMemo(() => new Date(), []);
   const [currentMonthDate, setCurrentMonthDate] = useState(today);
@@ -182,6 +184,26 @@ export default function FriendCalendarPage() {
 
   const monthDates = useMemo(() => createMonthDates(currentMonthDate), [currentMonthDate]);
   const sunday = useMemo(() => getWeekSunday(selectedDate), [selectedDate]);
+
+  useEffect(() => {
+    const y = currentMonthDate.getFullYear();
+    const m = String(currentMonthDate.getMonth() + 1).padStart(2, '0');
+    fetchFriendSchedules(friendId, 'monthly', `${y}-${m}-01`);
+  }, [friendId, currentMonthDate, fetchFriendSchedules]);
+
+  const schedulesByDate = useMemo(() => {
+    const grouped = {};
+    friendEvents.forEach((event) => {
+      const key = formatDateKey(new Date(event.startAt));
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push({
+        id: event.eventId,
+        label: event.title,
+        category: event.category?.categoryIcon || 'Other',
+      });
+    });
+    return grouped;
+  }, [friendEvents]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -264,11 +286,10 @@ export default function FriendCalendarPage() {
               if (!isCurrentMonth) variant = 'muted';
               if (isSelected) variant = 'selected';
               return (
-                // TODO: GET /api/friends/:id/schedules — 친구 일정 조회 API 연동 후 schedules 교체
                 <DateCell
                   key={dateKey}
                   date={date.getDate()}
-                  schedules={[]}
+                  schedules={schedulesByDate[dateKey] || []}
                   variant={variant}
                   onClick={() => setSelectedDate(date)}
                   onScheduleClick={() => {}}

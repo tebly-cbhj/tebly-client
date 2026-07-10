@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import AddBtnIcon from '../../assets/icons/add_schedule.svg';
 import CalendarFabMenu from './CalendarFabMenu';
@@ -27,12 +27,24 @@ const FabButton = styled.img`
   transform: ${({ $isOpen }) => ($isOpen ? 'rotate(45deg)' : 'rotate(0deg)')};
 `;
 
-export default function CalendarFab({ onDirectInput, onAiRecognition }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function CalendarFab({ onDirectInput, onAiRecognition, initialOpen = false }) {
+  const [isOpen, setIsOpen] = useState(initialOpen);
+  const fileInputRef = useRef(null);
 
   function handleMenuAction(action) {
     setIsOpen(false);
     action?.();
+  }
+
+  function handleAiRecognitionClick() {
+    setIsOpen(false);
+    fileInputRef.current?.click();
+  }
+
+  function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) onAiRecognition?.(file);
   }
 
   return (
@@ -42,7 +54,7 @@ export default function CalendarFab({ onDirectInput, onAiRecognition }) {
         {isOpen && (
           <CalendarFabMenu
             onDirectInput={() => handleMenuAction(onDirectInput)}
-            onAiRecognition={() => handleMenuAction(onAiRecognition)}
+            onAiRecognition={handleAiRecognitionClick}
           />
         )}
         <FabButton
@@ -52,6 +64,13 @@ export default function CalendarFab({ onDirectInput, onAiRecognition }) {
           onClick={() => setIsOpen((prev) => !prev)}
         />
       </Wrapper>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
     </>
   );
 }

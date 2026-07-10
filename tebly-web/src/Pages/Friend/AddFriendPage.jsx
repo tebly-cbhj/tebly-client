@@ -1,12 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import DigitSlot from '../../components/friend/DigitSlot';
 import CopyIcon from '../../assets/icons/copy.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
 
-// TODO: GET /api/user/code — 유저 고유 코드 발급 API 연동 후 교체
-const MY_CODE = '543348';
 const CODE_LENGTH = 6;
 
 // TODO: POST /api/friends/search — 친구 코드 검색 API 연동 후 교체
@@ -267,12 +265,18 @@ export default function AddFriendPage() {
   const navigate = useNavigate();
   const addFriend = useFriendStore((s) => s.addFriend);
   const friends = useFriendStore((s) => s.friends);
+  const inviteCode = useFriendStore((s) => s.inviteCode);
+  const fetchInviteCode = useFriendStore((s) => s.fetchInviteCode);
   const [code, setCode] = useState('');
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [copyToast, setCopyToast] = useState(false);
   const [foundFriend, setFoundFriend] = useState(null);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    fetchInviteCode();
+  }, [fetchInviteCode]);
 
   function handleCodeChange(e) {
     const val = e.target.value.replace(/[^0-9]/g, '').slice(0, CODE_LENGTH);
@@ -290,7 +294,7 @@ export default function AddFriendPage() {
 
   function handleCopy() {
     if (window.isSecureContext && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(MY_CODE).catch(fallbackCopy);
+      navigator.clipboard.writeText(inviteCode ?? '').catch(fallbackCopy);
     } else {
       fallbackCopy();
     }
@@ -300,7 +304,7 @@ export default function AddFriendPage() {
 
   function fallbackCopy() {
     const el = document.createElement('textarea');
-    el.value = MY_CODE;
+    el.value = inviteCode ?? '';
     el.style.cssText = 'position:fixed;opacity:0;pointer-events:none;';
     document.body.appendChild(el);
     el.focus();
@@ -311,7 +315,7 @@ export default function AddFriendPage() {
 
   function handleSubmit() {
     if (code.length < CODE_LENGTH) return;
-    if (code === MY_CODE) {
+    if (code === inviteCode) {
       showError('자신의 코드는 입력할 수 없어요');
       return;
     }
@@ -351,7 +355,7 @@ export default function AddFriendPage() {
         <Card>
           <CardLabel>나의 코드</CardLabel>
           <CodeDisplay>
-            <MyCodeText>{MY_CODE}</MyCodeText>
+            <MyCodeText>{inviteCode ?? '-'}</MyCodeText>
             <CopyBtn type="button" onClick={handleCopy} aria-label="코드 복사">
               <CopyIcon />
             </CopyBtn>

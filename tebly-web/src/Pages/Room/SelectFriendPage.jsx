@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useRoomStore } from '../../store/RoomStore';
+import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
-import SearchField from "../../components/common/SearchField";
+import Searchfield from "../../components/common/Searchfield";
 import FriendsSelect from "../../components/room/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
@@ -18,7 +18,6 @@ const ContentArea = styled.div`
   flex: 1;
 `;
 
-// SearchField ~ FriendsSelect 간격
 const FriendsWrapper = styled.div`
   margin-top: 12px;
   &::-webkit-scrollbar {
@@ -26,7 +25,6 @@ const FriendsWrapper = styled.div`
   }
 `;
 
-// 하단 고정 컨테이너
 const SelectListContainer = styled.div`
   position: fixed;
   bottom: 0;
@@ -37,12 +35,11 @@ const SelectListContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.bg};
   display: flex;
   flex-direction: column;
-  padding: 12px 20px 34px 20px;  /* 하단 34px */
+  padding: 12px 20px 34px 20px;
   box-sizing: border-box;
   max-width: 480px;
 `;
 
-// 뱃지 가로 스크롤
 const BadgeScrollArea = styled.div`
   display: flex;
   flex-direction: row;
@@ -67,42 +64,83 @@ const BtnWrapper = styled.div`
 const SelectFriendPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const addRoom = useRoomStore((state) => state.addRoom);
-  const updateRoomMembers = useRoomStore((state) => state.updateRoomMembers);
   const [searchText, setSearchText] = useState("");
 
   const appointmentMode = location.state?.appointmentMode ?? false;
   const currentRoomId = location.state?.roomId;
+  const roomName = location.state?.roomName;
+  const roomDescription = location.state?.description;
 
   const friendsList = useFriendStore((state) => state.friends);
-  const existingRoom = useRoomStore((state) =>
-    state.rooms.find((r) => r.id === currentRoomId)
-  );
 
-  const displayList = appointmentMode
-    ? (existingRoom?.members ?? [])
-    : friendsList;
+  const [roomMembers, setRoomMembers] = useState([]);
+  const [selected, setSelected] = useState([]);
+
+  useEffect(() => {
+    if (currentRoomId) {
+      apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
+        const members = res.data.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+        setRoomMembers(members);
+        setSelected(members);
+      });
+    }
+  }, [currentRoomId]);
+
+  const displayList = appointmentMode ? roomMembers : friendsList;
 
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
 
-  const [selected, setSelected] = useState(
-    appointmentMode ? (existingRoom?.members ?? []) : (existingRoom ? existingRoom.members : [])
-  ); 
   const isActive = selected.length > 0;
 
-  // 체크박스 토글 함수
   const handleToggle = (friend) => {
     setSelected((prev) =>
       prev.find((f) => f.id === friend.id)
-        ? prev.filter((f) => f.id !== friend.id) // 이미 선택됐으면 제거
-        : [...prev, friend]                      // 없으면 추가
+        ? prev.filter((f) => f.id !== friend.id)
+        : [...prev, friend]
     );
   };
 
-  // 뱃지 X 버튼 삭제 함수
   const handleRemove = (friendId) => {
     setSelected((prev) => prev.filter((f) => f.id !== friendId));
   };
+
+  async function handleComplete() {
+    if (appointmentMode) {
+      navigate('/create-appointment', {
+        state: { roomId: currentRoomId, selectedMembers: selected },
+      });
+    } else if (currentRoomId) {
+      if (roomName) {
+        await apiClient.patch(`/rooms/${currentRoomId}`, {
+          name: roomName,
+          description: roomDescription,
+        });
+      }
+
+      const addedMembers = selected.filter((s) => !roomMembers.find((m) => m.id === s.id));
+      const removedMembers = roomMembers.filter((m) => !selected.find((s) => s.id === m.id));
+
+      if (addedMembers.length > 0) {
+        await apiClient.post(`/rooms/${currentRoomId}/members`, {
+          userIds: addedMembers.map((f) => f.id),
+        });
+      }
+      if (removedMembers.length > 0) {
+        await apiClient.delete(`/rooms/${currentRoomId}/members`, {
+          data: { userIds: removedMembers.map((f) => f.id) },
+        });
+      }
+
+      navigate(-1);
+    } else {
+      await apiClient.post('/rooms', {
+        name: roomName,
+        description: roomDescription,
+        memberIds: selected.map((f) => f.id),
+      });
+      navigate('/room-list');
+    }
+  }
 
   return (
     <PageWrapper noNav>
@@ -113,7 +151,7 @@ const SelectFriendPage = () => {
               icons={[]}
             />
       <ContentArea>
-        <SearchField
+        <Searchfield
           placeholder="초대 할 친구 검색"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
@@ -145,21 +183,7 @@ const SelectFriendPage = () => {
           <Btn
             text="완료"
             disabled={!isActive}
-            onClick={() => {
-                if (appointmentMode) {
-                  // 약속 만들기 흐름: 선택된 멤버를 CreateAppointmentPage로 전달
-                  navigate('/create-appointment', {
-                    state: { roomId: currentRoomId, selectedMembers: selected },
-                  });
-                } else if (currentRoomId) {
-                  updateRoomMembers(currentRoomId, selected);
-                  navigate(-1);
-                } else {
-                  const { roomName, description } = location.state || {};
-                  addRoom(roomName, description, selected);
-                  navigate('/room-list');
-                }
-            }}
+            onClick={handleComplete}
           />
         </BtnWrapper>
       </SelectListContainer>

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { FieldWrapper } from './TextFieldBase';
+import { FieldWrapper } from './TextfieldBase';
 
 // 내부 프레임 (YYYY/MM/DD)
 const DateInner = styled.div`

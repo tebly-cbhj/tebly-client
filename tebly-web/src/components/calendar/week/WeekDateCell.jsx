@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { getWeekDates } from '../../../utils/dateUtils';
+import { getWeekDates } from '../../../utils/DateUtils';
 
 const Row = styled.div`
   display: flex;

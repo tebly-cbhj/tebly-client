@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -7,14 +8,15 @@ import SelectRow from '../../components/room/SelectRow';
 import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 import BellLineIcon from '../../assets/icons/bell-line.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
-// TODO: 유저 프로필 이미지 및 정보 API 연동
+import { useFriendStore } from '../../store/FriendStore';
+import apiClient from '../../api/client';
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  padding: 8px 20px 0 20px;
+  padding: 8px 0px 0 0px;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -77,12 +79,26 @@ const Bio = styled.span`
 
 export default function MorePage() {
   const navigate = useNavigate();
-  // TODO: 유저 정보 API 연동 후 아래 하드코딩 데이터 대체
-  const user = {
-    name: '김뿡치',
-    bio: '캘박하조 야호~',
-    profileImage: null,
-  };
+  const user = useFriendStore((state) => state.myProfile);
+  const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
+
+  useEffect(() => {
+    fetchMyProfile();
+  }, [fetchMyProfile]);
+
+  if (!user) return null; // TODO: 로딩 스피너로 교체
+
+  async function handleLogout() {
+    await apiClient.post('/auth/signout');
+    localStorage.removeItem('accessToken');
+    navigate('/onboarding');
+  }
+
+  async function handleWithdraw() {
+    await apiClient.delete('/auth/withdraw');
+    localStorage.removeItem('accessToken');
+    navigate('/onboarding');
+  }
 
   return (
     <PageWrapper>
@@ -99,20 +115,20 @@ export default function MorePage() {
         {/* 프로필 카드 */}
         <ProfileCard>
           <ProfileImage>
-            {user.profileImage
-              ? <img src={user.profileImage} alt="프로필" />
+            {user.profileImageUrl
+              ? <img src={user.profileImageUrl} alt="프로필" />
               : null // TODO: 기본 프로필 이미지 추가
             }
           </ProfileImage>
 
           <ProfileInfo>
             <NameRow>
-              <Name>{user.name}</Name>
+              <Name>{user.nickname}</Name>
               <EditIcon onClick={() => navigate('/edit-profile')}> 
                 <EditSmallIcon width={24} height={24} />
               </EditIcon>
             </NameRow>
-            <Bio>{user.bio}</Bio>
+            {/* TODO: 백엔드에 자기소개 필드 추가되면 <Bio> 복구 */}
           </ProfileInfo>
         </ProfileCard>
 
@@ -143,11 +159,18 @@ export default function MorePage() {
             onClick={() => console.log('비밀번호 변경')} // TODO: 비밀번호 변경 페이지로 이동
           />
           <SelectRow
-            text_empty="로그아웃" // 회원 탈퇴 어디서 해요
+            text_empty="로그아웃"
             state="empty"
             right_icon={true}
-            color="alert"  
-            onClick={() => navigate('/onboarding')} // TODO: 로그아웃 API 연동
+            color="alert"
+            onClick={handleLogout}
+          />
+          <SelectRow
+            text_empty="회원탈퇴"
+            state="empty"
+            right_icon={true}
+            color="gray500"
+            onClick={handleWithdraw}
           />
         </SectionCard>
       </ContentWrapper>

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import ProgressBar from '../../components/common/ProgressBar';
-import TextFieldBase from '../../components/common/TextField';
+import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
 
@@ -144,7 +144,7 @@ export default function ProfileSetupPage() {
       />
 
       <ProgressWrapper>
-        <ProgressBar step={2} total={4} />
+        <ProgressBar step={2} total={3} />
       </ProgressWrapper>
 
       <ContentWrapper>
@@ -199,7 +199,7 @@ export default function ProfileSetupPage() {
         <Btn
           text="다음"
           disabled={!canNext}
-          onClick={() => navigate('/signup/location')} // TODO: 다음 단계 이동
+          onClick={() => navigate('/signup/schedule')}
         />
       </BtnWrapper>
     </PageWrapper>

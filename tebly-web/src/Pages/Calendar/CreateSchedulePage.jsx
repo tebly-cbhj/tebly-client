@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
-import TextField from '../../components/common/TextField';
+import Textfield from '../../components/common/Textfield';
 import Toggle from '../../components/common/Toggle';
 import SelectRow from '../../components/room/SelectRow';
 import Btn from '../../components/common/Btn';
@@ -11,11 +11,11 @@ import DatePopup from '../../components/room/DatePopup';
 import CategoryPopup from '../../components/room/CategoryPopup';
 import AlarmPopup from '../../components/room/AlarmPopup';
 import RepeatPopup from '../../components/room/RepeatPopup';
-import { CATEGORY_KO } from '../../components/room/CategoryIcons';
 import RepeatEndDatePopup from '../../components/room/RepeatEndDatePopup';
 import ExpandIcon from '../../components/common/ExpandIcon';
 import TimePicker from '../../components/common/TimePicker';
-import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import apiClient from '../../api/client';
+import { ALARM_TO_MINUTES } from '../../store/PersonalScheduleStore';
 
 import ClockIcon from '../../assets/icons/clock.svg?react';
 import PlaceIcon from '../../assets/icons/place.svg?react';
@@ -288,7 +288,6 @@ const BtnWrapper = styled.div`
   z-index: 10;
 `;
 
-const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
 const DAY_FULL = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 
 function toDisplayDate(dateObj) {
@@ -297,27 +296,39 @@ function toDisplayDate(dateObj) {
   return `${dateObj.month}월 ${dateObj.day}일 ${DAY_FULL[d.getDay()]}`;
 }
 
-function toStoreDate(dateObj) {
-  if (!dateObj) return '';
-  const d = new Date(dateObj.year, dateObj.month - 1, dateObj.day);
-  const day = DAY_NAMES[d.getDay()];
-  return `${dateObj.year}.${String(dateObj.month).padStart(2, '0')}.${String(dateObj.day).padStart(2, '0')} (${day})`;
+const REPEAT_TYPE_TO_KO = { daily: '매일', weekly: '매주', monthly: '매월', yearly: '매년' };
+const REPEAT_KO_TO_TYPE = { 없음: 'NONE', 매일: 'DAILY', 매주: 'WEEKLY', 매월: 'MONTHLY', 매년: 'YEARLY' };
+
+function toIsoDateTime(dateObj, timeStr) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${dateObj.year}-${pad(dateObj.month)}-${pad(dateObj.day)}T${timeStr}:00`;
 }
 
-const REPEAT_TYPE_TO_KO = { daily: '매일', weekly: '매주', monthly: '매월', yearly: '매년' };
+function getNotificationLeadMinutes(alarmTime) {
+  if (!alarmTime) return null;
+  const minutesList = alarmTime
+    .split(',')
+    .map((label) => ALARM_TO_MINUTES[label.trim()])
+    .filter((n) => n !== undefined);
+  return minutesList.length > 0 ? Math.min(...minutesList) : null;
+}
 
 function parseDateString(dateStr) {
   if (!dateStr) return null;
-  const parts = dateStr.split(/[-.]/).map(Number);
+  const datePart = dateStr.split(' ')[0]; // '2026.08.01 (토)' 같은 형식의 요일 부분 제거
+  const parts = datePart.split(/[-.]/).map(Number);
   if (parts.length >= 3 && parts[0] > 999) {
     return { year: parts[0], month: parts[1], day: parts[2] };
   }
   return null;
 }
 
-function parseRepeatString(repeatStr) {
-  if (!repeatStr || repeatStr === '반복 없음') return '없음';
-  const match = repeatStr.match(/^(\w+) 반복$/);
+function parseRepeatString(repeat) {
+  if (!repeat) return '없음';
+  // PersonalScheduleStore에서 오는 반복 일정은 {type, interval, until} 객체 형태
+  if (typeof repeat === 'object') return REPEAT_TYPE_TO_KO[repeat.type] || '없음';
+  if (repeat === '반복 없음') return '없음';
+  const match = repeat.match(/^(\w+) 반복$/);
   return match ? (REPEAT_TYPE_TO_KO[match[1]] || '없음') : '없음';
 }
 
@@ -327,9 +338,6 @@ export default function CreateSchedulePage() {
   const { scheduleId, schedule: initialSchedule } = location.state || {};
   const isEditing = !!scheduleId;
 
-  const addSchedule = usePersonalScheduleStore((state) => state.addSchedule);
-  const updateSchedule = usePersonalScheduleStore((state) => state.updateSchedule);
-
   const [title, setTitle] = useState(initialSchedule?.title || '');
   const [memo, setMemo] = useState(initialSchedule?.memo || '');
   const [allDay, setAllDay] = useState(false);
@@ -338,11 +346,11 @@ export default function CreateSchedulePage() {
   const [startTime, setStartTime] = useState(initialSchedule?.startTime || '09:00');
   const [endTime, setEndTime] = useState(initialSchedule?.endTime || '10:00');
   const [place, setPlace] = useState(initialSchedule?.place || '');
-  const [category, setCategory] = useState(initialSchedule?.category || '');
+  const [category, setCategory] = useState(initialSchedule?.category || null);
   const [alarmTime, setAlarmTime] = useState(initialSchedule?.alarmTime || '');
   const [repeat, setRepeat] = useState(() => parseRepeatString(initialSchedule?.repeat));
-  const [repeatEnd, setRepeatEnd] = useState('안 함');
-  const [repeatEndDate, setRepeatEndDate] = useState(null);
+  const [repeatEnd, setRepeatEnd] = useState(initialSchedule?.repeat?.until ? '날짜' : '안 함');
+  const [repeatEndDate, setRepeatEndDate] = useState(() => parseDateString(initialSchedule?.repeat?.until));
   const [showRepeatEndMenu, setShowRepeatEndMenu] = useState(false);
   const [showRepeatEndDatePopup, setShowRepeatEndDatePopup] = useState(false);
   const [editingField, setEditingField] = useState(null);
@@ -364,26 +372,36 @@ export default function CreateSchedulePage() {
     setTimePickerTarget(null);
   }
 
-  // TODO: POST/PUT /api/schedules 로 교체 — 현재는 로컬 스토어에만 저장됨
-  function handleSave() {
-    if (!title.trim()) return;
-    const payload = {
-      title,
-      memo,
-      startDate: toStoreDate(startDate),
-      endDate: toStoreDate(endDate || startDate),
-      time: allDay ? '' : `${startTime} - ${endTime}`,
-      location: place,
-      category,
-      alarmTime,
-      repeat: null,
-    };
-    if (isEditing) {
-      updateSchedule(scheduleId, payload);
-    } else {
-      addSchedule(payload);
+  async function handleSave() {
+    if (!title.trim() || !startDate) return;
+    if (!category?.categoryId) {
+      alert('카테고리를 선택해주세요.');
+      return;
     }
-    navigate(-1);
+    const repeatType = REPEAT_KO_TO_TYPE[repeat];
+
+    const payload = {
+      categoryId: category.categoryId,
+      title,
+      startTime: toIsoDateTime(startDate, startTime),
+      endTime: toIsoDateTime(endDate || startDate, endTime),
+      repeatType,
+      notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
+      location: place,
+      memo,
+      repeatUntil: repeatEnd === '날짜' && repeatEndDate ? toIsoDateTime(repeatEndDate, '23:59') : undefined,
+    };
+
+    try {
+      if (isEditing) {
+        await apiClient.patch(`/schedules/events/${scheduleId}`, payload);
+      } else {
+        await apiClient.post('/schedules/events', payload);
+      }
+      navigate(-1);
+    } catch {
+      alert('일정 저장에 실패했어요. 다시 시도해주세요.');
+    }
   }
 
   return (
@@ -393,7 +411,7 @@ export default function CreateSchedulePage() {
       <ScrollContent>
         <InputContainer>
           <Label>일정 이름</Label>
-          <TextField
+          <Textfield
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="이름을 적어주세요."
@@ -402,7 +420,7 @@ export default function CreateSchedulePage() {
 
         <InputContainer>
           <Label>메모</Label>
-          <TextField
+          <Textfield
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
             placeholder="참고할 내용을 적어주세요."
@@ -461,7 +479,7 @@ export default function CreateSchedulePage() {
           <SelectRow
             LeftIcon={CategoryIcon}
             text_empty="카테고리 선택"
-            text_selected={CATEGORY_KO[category] ?? category}
+            text_selected={category?.categoryName ?? ''}
             state={category ? 'selected' : 'empty'}
             right_icon
             onClick={() => setPopupType('category')}
@@ -548,7 +566,7 @@ export default function CreateSchedulePage() {
 
       {popupType === 'category' && (
         <CategoryPopup
-          selectedCategory={category}
+          selectedCategoryId={category?.categoryId}
           onClose={() => setPopupType(null)}
           onSelect={(value) => {
             setCategory(value);

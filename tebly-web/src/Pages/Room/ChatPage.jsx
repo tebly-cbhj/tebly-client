@@ -4,8 +4,11 @@ import styled from 'styled-components';
 import Header from '../../components/common/Header';
 import MessageBubble from '../../components/room/MessageBubble';
 import MessageInput from '../../components/room/MessageInput';
+import DecisionBanner from '../../components/room/DecisionBanner';
+import DecisionCard from '../../components/room/DecisionCard';
 import { useRoomStore } from '../../store/RoomStore';
 import { useChatStore } from '../../store/ChatStore';
+import { useFriendStore } from '../../store/FriendStore';
 
 const ChatContainer = styled.div`
   width: 100%;
@@ -115,9 +118,11 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
-  const { connect, sendMessage, messagesByRoom } = useChatStore();
+  const { connect, sendMessage, fetchMessages, messagesByRoom } = useChatStore();
+  const myProfile = useFriendStore((state) => state.myProfile);
+  const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
   const messages = messagesByRoom[roomId] ?? [];
-  const accessToken = import.meta.env.VITE_ACCESS_TOKEN;
+  const accessToken = localStorage.getItem('accessToken') || import.meta.env.VITE_ACCESS_TOKEN;
 
   const [inputValue, setInputValue] = useState('');
   // TODO: API 연결 시 서버에서 받아온 약속 확정 여부로 대체
@@ -125,10 +130,16 @@ export default function ChatPage() {
   const [cardExpanded, setCardExpanded] = useState(true);
 
   useEffect(() => {
+    if (!myProfile) fetchMyProfile();
+  }, [myProfile, fetchMyProfile]);
+
+  useEffect(() => {
+    if (!myProfile) return;
+    fetchMessages(roomId, myProfile.id);
     // ✅ accessToken 없으면 연결 시도 안 함
     if (!accessToken) return;
-    connect(roomId, accessToken);
-  }, [roomId]);
+    connect(roomId, accessToken, myProfile.id);
+  }, [roomId, myProfile, accessToken]);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
@@ -162,15 +173,22 @@ export default function ChatPage() {
       )}
 
       <MessageList>
-        {messages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            type={msg.type}
-            senderName={msg.senderName}
-            text={msg.text}
-            profileImage={msg.profileImage}
-          />
-        ))}
+        {messages.map((msg) =>
+          msg.text?.startsWith('[결정이]') ? (
+            <div key={msg.id}>
+              <DecisionBanner />
+              <DecisionCard content={msg.text} />
+            </div>
+          ) : (
+            <MessageBubble
+              key={msg.id}
+              type={msg.type}
+              senderName={msg.senderName}
+              text={msg.text}
+              profileImage={msg.profileImage}
+            />
+          )
+        )}
       </MessageList>
 
       <InputBar>

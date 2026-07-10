@@ -12,7 +12,6 @@ const CardWrapper = styled.div`
   cursor: pointer;
 `;
 
-// 이미지 혹은 기본 색상 부분
 const TopArea = styled.div`
   height: 177px;
   flex-shrink: 0;
@@ -20,7 +19,6 @@ const TopArea = styled.div`
   background: ${(props) => props.theme.colors.primary50}; 
 `;
 
-// 방 이름, 설명 부분
 const BottomArea = styled.div`
   display: flex;
   height: 94px;
@@ -32,7 +30,6 @@ const BottomArea = styled.div`
   background: ${(props) => props.theme.colors.white}; 
 `;
 
-// 방 이름
 const Title = styled.h2`
   margin: 0;
   align-self: stretch;
@@ -45,7 +42,6 @@ const Title = styled.h2`
   min-height: 34px;
 `;
 
-// description 부분
 const DescRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -63,7 +59,6 @@ const AvatarGroup = styled.div`
   align-items: center;
 `;
 
-// 참여 인원 프로필
 const Avatar = styled.div`
   width: 33px;
   height: 33px;
@@ -82,7 +77,6 @@ const Avatar = styled.div`
   }
 `;
 
-// 추가 인원수 관련 스타일
 const ExtraCount = styled.div`
   position: absolute;
   top: 0;
@@ -98,11 +92,10 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomListCard({ title, description, members, onClick }) { 
-  const MAX_VISIBLE = 3;  // 최대 3명까지만 표시
-  const avatarList = members ? members.map(m => m.profileImage) : [];
-  const visibleAvatars = avatarList.slice(0, MAX_VISIBLE);
-  const extraCount = avatarList.length - MAX_VISIBLE;
+export default function RoomListCard({ title, description, profileImages = [], totalMemberCount = 0, onClick }) {
+  const MAX_VISIBLE = 3;
+  const visibleAvatars = profileImages.slice(0, MAX_VISIBLE);
+  const extraCount = totalMemberCount - visibleAvatars.length;
 
   return (
     <CardWrapper onClick={onClick}>
@@ -113,8 +106,7 @@ export default function RoomListCard({ title, description, members, onClick }) {
           <DescText>{description}</DescText>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl} $isLast={index === visibleAvatars.length - 1}>
-                {/* 마지막 프사 위에 +n 표시 */}
+              <Avatar key={index} $imgUrl={imgUrl}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}

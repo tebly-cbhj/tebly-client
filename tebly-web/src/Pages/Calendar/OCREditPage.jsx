@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Toggle from '../../components/common/Toggle';
 import SelectRow from '../../components/room/SelectRow';
-import TextField from '../../components/common/TextField';
 import DatePopup from '../../components/room/DatePopup';
 import CategoryPopup from '../../components/room/CategoryPopup';
 import AlarmPopup from '../../components/room/AlarmPopup';
@@ -12,7 +11,7 @@ import RepeatPopup from '../../components/room/RepeatPopup';
 import RepeatEndDatePopup from '../../components/room/RepeatEndDatePopup';
 import ExpandIcon from '../../components/common/ExpandIcon';
 import TimePicker from '../../components/common/TimePicker';
-import { CATEGORY_KO, CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
+import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
 
 import CloseIcon from '../../assets/icons/close-m.svg?react';
@@ -84,10 +83,10 @@ const InlineField = styled.input`
   width: 100%;
   padding: 0;
   ${({ $isTitle, theme }) => $isTitle ? theme.typography.s1 : theme.typography.body3};
-  color: ${({ $isEmpty, theme }) => $isEmpty ? theme.colors.gray400 : theme.colors.gray900};
+  color: ${({ $isEmpty, theme }) => $isEmpty ? theme.colors.gray500 : theme.colors.gray900};
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.gray400};
+    color: ${({ theme }) => theme.colors.gray500};
   }
 `;
 
@@ -132,12 +131,8 @@ const AllDayContent = styled.div`
 `;
 
 const AllDayLabel = styled.span`
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 140%;
-  letter-spacing: -0.025rem;
-  color: #1A1A1A;
+  ${({ theme }) => theme.typography.s2};
+  color: ${({ theme }) => theme.colors.gray900};
 `;
 
 const DateTimeRow = styled.div`
@@ -177,7 +172,7 @@ const TimePickerOverlay = styled.div`
 
 const TimePickerSheet = styled.div`
   width: 390px;
-  background: #fefefe;
+  background: ${({ theme }) => theme.colors.white};
   border-radius: 2rem 2rem 0 0;
   box-shadow: 0 -4px 12px 0 rgba(68, 68, 68, 0.08);
   display: flex;
@@ -189,7 +184,7 @@ const TimePickerSheet = styled.div`
 const DragHandle = styled.div`
   width: 3rem;
   height: 0.3125rem;
-  background: #dcdcdc;
+  background: ${({ theme }) => theme.colors.gray300};
   border-radius: 2.5px;
   margin-top: 0.75rem;
   margin-bottom: 2.625rem;
@@ -209,11 +204,9 @@ const CancelBtn = styled.button`
   height: 2.75rem;
   border: none;
   border-radius: 0.5rem;
-  background: #efefef;
-  font-size: 1rem;
-  font-family: Pretendard;
-  font-weight: 400;
-  color: #525252;
+  background: ${({ theme }) => theme.colors.gray200};
+  ${({ theme }) => theme.typography.body2};
+  color: ${({ theme }) => theme.colors.gray800};
   cursor: pointer;
 `;
 
@@ -223,10 +216,8 @@ const ConfirmBtn = styled.button`
   border: none;
   border-radius: 0.5rem;
   background: ${({ theme }) => theme.colors.primary100};
-  font-size: 1rem;
-  font-family: Pretendard;
-  font-weight: 600;
-  color: #fefefe;
+  ${({ theme }) => theme.typography.btn1};
+  color: ${({ theme }) => theme.colors.white};
   cursor: pointer;
 `;
 
@@ -271,8 +262,8 @@ const FabMenu = styled.div`
   align-items: center;
   gap: 1.25rem;
   border-radius: 0.5rem;
-  background: #FEFEFE;
-  box-shadow: 0 0 12px 0 rgba(68, 68, 68, 0.16);
+  background: ${({ theme }) => theme.colors.white};
+  box-shadow: ${({ theme }) => theme.effects.shadow2};
 `;
 
 const FabMenuItem = styled.button`
@@ -282,12 +273,8 @@ const FabMenuItem = styled.button`
   padding: 0;
   cursor: pointer;
   text-align: left;
-  font-family: Pretendard;
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: -0.02188rem;
-  color: #1A1A1A;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray900};
 `;
 
 const RepeatEndRow = styled.div`
@@ -301,12 +288,8 @@ const RepeatEndRow = styled.div`
 `;
 
 const RepeatEndLabel = styled.span`
-  color: #1A1A1A;
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: -0.025rem;
+  ${({ theme }) => theme.typography.body2};
+  color: ${({ theme }) => theme.colors.gray900};
 `;
 
 const RepeatEndValue = styled.div`
@@ -316,12 +299,8 @@ const RepeatEndValue = styled.div`
 `;
 
 const RepeatEndText = styled.span`
-  color: #525252;
-  font-family: Pretendard;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 140%;
-  letter-spacing: -0.025rem;
+  ${({ theme }) => theme.typography.body2};
+  color: ${({ theme }) => theme.colors.gray800};
 `;
 
 const DAY_FULL = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
@@ -349,7 +328,7 @@ export default function OCREditPage() {
 
   const [title, setTitle] = useState(schedule.title || '');
   const [memo, setMemo] = useState(schedule.memo || '');
-  const [category, setCategory] = useState(schedule.category || '');
+  const [category, setCategory] = useState(schedule.category || null);
   const [allDay, setAllDay] = useState(schedule.allDay || false);
   const [startDate, setStartDate] = useState(schedule.startDate || null);
   const [endDate, setEndDate] = useState(schedule.endDate || null);
@@ -367,7 +346,7 @@ export default function OCREditPage() {
   const [timePickerTarget, setTimePickerTarget] = useState(null);
   const [pendingTime, setPendingTime] = useState({ hour: '09', minute: '00' });
 
-  const iconData = CATEGORY_ICON_MAP[category] || CATEGORY_ICON_MAP.Other;
+  const iconData = CATEGORY_ICON_MAP[category?.categoryIcon] || CATEGORY_ICON_MAP.Other;
   const CategoryIconComp = iconData.SelectedIcon;
 
   function openTimePicker(target) {
@@ -468,7 +447,7 @@ export default function OCREditPage() {
           <SelectRow
             LeftIcon={CategoryIconSvg}
             text_empty="카테고리 선택"
-            text_selected={CATEGORY_KO[category] ?? category}
+            text_selected={category?.categoryName ?? ''}
             state={category ? 'selected' : 'empty'}
             right_icon
             onClick={() => setPopupType('category')}
@@ -546,7 +525,7 @@ export default function OCREditPage() {
 
       {popupType === 'category' && (
         <CategoryPopup
-          selectedCategory={category}
+          selectedCategoryId={category?.categoryId}
           onClose={() => setPopupType(null)}
           onSelect={(value) => { setCategory(value); setPopupType(null); }}
         />

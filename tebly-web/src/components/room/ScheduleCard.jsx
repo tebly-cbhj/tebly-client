@@ -4,7 +4,7 @@ import ChipFilter from './ChipFilter';
 
 const Card = styled.div`
   display: flex;
-  width: 390px;
+  width: 100%;
   padding: 20px 20px 24px 20px;
   align-items: center;
   gap: 20px;
@@ -71,7 +71,7 @@ const CountText = styled.span`
 `;
 
 const SliderTrack = styled.div`
-  width: 250px;
+  width: 100%;
   height: 8px;
   background-color: ${({ theme }) => theme.colors.gray200};
   overflow: hidden;

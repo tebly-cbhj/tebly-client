@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
@@ -7,12 +8,11 @@ import CreateRoomPage from './Pages/Room/CreateRoomPage';
 import SelectFriendPage from './Pages/Room/SelectFriendPage';
 import RoomInfoPage from './Pages/Room/RoomInfoPage';
 import TimeRecommendPage from './Pages/Room/TimeRecommendPage';
-import TestPage from './TestPage';
+import Testpage from './Testpage';
 import MyAppointMentPage from './Pages/Room/MyAppointMentPage';
 import ChatPage from './Pages/Room/ChatPage';
 import CreateAppointmentPage from './Pages/Room/CreateAppointmentPage';
 import CalendarTestpage from './CalendarTestpage';
-import BottomNavBar from './components/common/BottomNavBar';
 import EventDetailPage from './Pages/Calendar/EventDetailPage';
 import CreateSchedulePage from './Pages/Calendar/CreateSchedulePage';
 import CalendarPage from './Pages/Calendar/CalendarPage';
@@ -28,17 +28,34 @@ import FriendCalendarPage from './Pages/Friend/FriendCalendarPage';
 import AddFriendPage from './Pages/Friend/AddFriendPage';
 import OnboardingPage from './Pages/Onboarding/OnboardingPage';
 import LoginPage from './Pages/Onboarding/LoginPage';
+import LoginCallbackPage from './Pages/Onboarding/LoginCallbackPage';
 import TermsAgreementPage from './Pages/Onboarding/TermsAgreementPage';
 import ProfileSetupPage from './Pages/Onboarding/ProfileSetupPage';
-import LocationConsentPage from './Pages/Onboarding/LocationConsentPage';
 import ScheduleRegisterPage from './Pages/Onboarding/ScheduleRegisterPage';
 import InviteNotiPage from './Pages/Notification/InviteNotiPage';
 import AlarmPage from './Pages/Notification/AlarmPage';
 
 function Layout() {
-  const location = useLocation();
-  
-  const showNavBar = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'].includes(location.pathname);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'NAVIGATE') {
+          navigate(data.path);
+        }
+      } catch (e) {
+        // RN이 보낸 게 아닌 다른 메시지는 무시
+      }
+    }
+    document.addEventListener('message', handleMessage);
+    window.addEventListener('message', handleMessage);
+    return () => {
+      document.removeEventListener('message', handleMessage);
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [navigate]);
   return (
     <>
       <Routes>
@@ -48,7 +65,7 @@ function Layout() {
         <Route path="/room/:roomId" element={<RoomInfoPage />} />
         <Route path="/room/:roomId/chat" element={<ChatPage />} />
         <Route path="/time-recommend" element={<TimeRecommendPage />} />
-        <Route path="/test" element={<TestPage />} />
+        <Route path="/test" element={<Testpage />} />
         <Route path="/my-appointments" element={<MyAppointMentPage />} />
         <Route path="/create-appointment" element={<CreateAppointmentPage />} />
         <Route path="/calendar-test" element={<CalendarTestpage />} />
@@ -67,14 +84,13 @@ function Layout() {
         <Route path="/friends/:friendId" element={<FriendCalendarPage />} />
         <Route path='/onboarding' element={<OnboardingPage />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/login/callback' element={<LoginCallbackPage />} />
         <Route path='/signup/terms' element={<TermsAgreementPage />} />
         <Route path='/signup/profile' element={<ProfileSetupPage />} />
-        <Route path='/signup/location' element={<LocationConsentPage />} />
         <Route path='/signup/schedule' element={<ScheduleRegisterPage />} />
         <Route path='/noti-invitaion' element={<InviteNotiPage />} />
         <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
-      {showNavBar && <BottomNavBar />}  {/* 지정된 페이지에서만 표시 */}
     </>
   );
 }
