@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import apiClient from '../api/client';
 
-export const useScheduleStore = create((set) => ({
+export const useScheduleStore = create((set, get) => ({
   schedules: [
     {
       id: 1,
@@ -14,7 +15,6 @@ export const useScheduleStore = create((set) => ({
       memberIds: [1, 2, 3, 4, 5],
       acceptedIds: [1, 2],
       confirmed: true,
-      // TODO: API 연동 시 서버에서 내려오는 createdByMe, myStatus로 교체
       createdByMe: true,
       myStatus: null,
     },
@@ -31,7 +31,7 @@ export const useScheduleStore = create((set) => ({
       acceptedIds: [1, 2, 3, 4],
       confirmed: true,
       createdByMe: false,
-      myStatus: 'accepted', // 'accepted' | 'rejected' | 'pending'
+      myStatus: 'accepted',
     },
     {
       id: 3,
@@ -50,20 +50,51 @@ export const useScheduleStore = create((set) => ({
     },
   ],
 
-  categories: [
-    { name: '약속', iconId: 'Appointment', isPrivate: false, isDefault: true },
-    { name: '동아리', iconId: 'Club', isPrivate: false, isDefault: true },
-    { name: '가족', iconId: 'Family', isPrivate: false, isDefault: true },
-    { name: '자기개발', iconId: 'SelfDevelopment', isPrivate: false, isDefault: true },
-    { name: '알바', iconId: 'Work', isPrivate: false, isDefault: true },
-    { name: '수업', iconId: 'Class', isPrivate: false, isDefault: true },
-    { name: '여가', iconId: 'Leisure', isPrivate: false, isDefault: true },
-    { name: '팀 프로젝트', iconId: 'TeamProject', isPrivate: false, isDefault: true },
-    { name: '기타', iconId: 'Other', isPrivate: false, isDefault: true },
-    { name: '테스트', iconId: 'Class', isPrivate: true, isDefault: false },
-  ],
+  categories: [],
 
   alarmOptions: ['1일 전', '1시간 전', '30분 전', '15분 전'],
+
+  fetchCategories: async () => {
+    const res = await apiClient.get('/schedules/categories');
+    set({ categories: res.data });
+  },
+
+  addCategory: async (newCategory) => {
+    const res = await apiClient.post('/schedules/categories', {
+      name: newCategory.name,
+      icon: newCategory.iconId,
+      isPrivate: false,
+    });
+    set((state) => ({ categories: [...state.categories, res.data] }));
+  },
+
+  deleteCategory: async (categoryId) => {
+    await apiClient.delete(`/schedules/categories/${categoryId}`);
+    set((state) => ({
+      categories: state.categories.filter((c) => c.categoryId !== categoryId),
+    }));
+  },
+
+  togglePrivate: async (categoryId) => {
+    const target = get().categories.find((c) => c.categoryId === categoryId);
+    if (!target) return;
+    const res = await apiClient.patch(`/schedules/categories/${categoryId}`, {
+      isPrivate: !target.isPrivate,
+    });
+    set((state) => ({
+      categories: state.categories.map((c) => (c.categoryId === categoryId ? res.data : c)),
+    }));
+  },
+
+  updateCategory: async (categoryId, updatedCategory) => {
+    const res = await apiClient.patch(`/schedules/categories/${categoryId}`, {
+      name: updatedCategory.name,
+      icon: updatedCategory.iconId,
+    });
+    set((state) => ({
+      categories: state.categories.map((c) => (c.categoryId === categoryId ? res.data : c)),
+    }));
+  },
 
   addSchedule: (roomId, newSchedule) =>
     set((state) => ({
@@ -71,29 +102,6 @@ export const useScheduleStore = create((set) => ({
         ...state.schedules,
         { id: Date.now(), roomId, ...newSchedule },
       ],
-    })),
-
-  addCategory: (newCategory) =>
-    set((state) => ({
-      categories: [
-        ...state.categories,
-        { ...newCategory, isPrivate: false, isDefault: false }, // TODO: 카테고리 추가 API 연동
-      ],
-    })),
-
-  deleteCategory: (categoryName) =>
-    set((state) => ({
-      categories: state.categories.filter(
-        (c) => !(c.name === categoryName && !c.isDefault) // isDefault: false인 것만 삭제 가능
-      ),
-    })),
-
-  togglePrivate: (categoryName) =>
-    set((state) => ({
-      categories: state.categories.map((c) =>
-        c.name === categoryName ? { ...c, isPrivate: !c.isPrivate } : c
-        // TODO: 카테고리 공개/비공개 API 연동
-      ),
     })),
 
   deleteSchedule: (scheduleId) =>
@@ -107,13 +115,4 @@ export const useScheduleStore = create((set) => ({
         s.id === scheduleId ? { ...s, confirmed: true } : s
       ),
     })),
-    
-  updateCategory: (originalName, updatedCategory) =>
-  set((state) => ({
-    categories: state.categories.map((c) =>
-      c.name === originalName
-        ? { ...c, name: updatedCategory.name, iconId: updatedCategory.iconId }
-        : c
-    ),
-  })),
 }));

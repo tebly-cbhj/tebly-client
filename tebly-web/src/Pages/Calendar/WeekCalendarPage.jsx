@@ -96,11 +96,13 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const lastDistanceRef = useRef(null);
+  const ocrFileInputRef = useRef(null);
   const [cellHeight, setCellHeight] = useState(60);
 
   const personalSchedules = usePersonalScheduleStore(
     useShallow((state) => state.schedules)
   );
+  const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
   const groupSchedules = useScheduleStore(
     useShallow((state) => state.schedules.filter((s) => s.confirmed))
   );
@@ -116,6 +118,13 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     expandRepeatingSchedules(personalSchedules, sunday, saturday),
     [personalSchedules, sunday, saturday]
   );
+
+  useEffect(() => {
+    const y = sunday.getFullYear();
+    const m = String(sunday.getMonth() + 1).padStart(2, '0');
+    const d = String(sunday.getDate()).padStart(2, '0');
+    fetchSchedules('weekly', `${y}-${m}-${d}`);
+  }, [sunday, fetchSchedules]);
 
   const weekGroup = useMemo(() =>
     groupSchedules.filter((s) => {
@@ -153,8 +162,10 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
           startTime: startTime || '',
           endDate: dateStr,
           endTime: endTime || '',
-          place: schedule.place || '',
-          category: categoryIconMap[schedule.category] || schedule.category || 'Other',
+          place: schedule.location || '',
+          category: schedule.category && typeof schedule.category === 'object'
+            ? schedule.category
+            : (categoryIconMap[schedule.category] || schedule.category || 'Other'),
           alarmTime: schedule.alarmTime || '',
           repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
         },
@@ -258,7 +269,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                 $dayIndex={getDayIndex(schedule)}
               >
                 <ScheduleBlock
-                  category={schedule.category}
+                  category={schedule.category?.categoryIcon}
                   text={schedule.title}
                   onClick={() => handleScheduleClick(schedule, schedule._occurrenceDate)}
                 />
@@ -291,8 +302,20 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
       </ScrollArea>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => navigate('/ocr-loading')} />
+        <AddBtn onClick={() => ocrFileInputRef.current?.click()} />
       </FloatingWrapper>
+
+      <input
+        ref={ocrFileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = '';
+          if (file) navigate('/ocr-loading', { state: { imageFile: file } });
+        }}
+      />
     </PageWrapper>
   );
 }

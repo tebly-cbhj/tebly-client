@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,7 +39,7 @@ const SlideWrapper = styled.div`
 `;
 
 const Slide = styled.div`
-  min-width: 100%;  /* ✅ 각 슬라이드가 100% 너비 차지 */
+  min-width: 100%;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -66,7 +66,7 @@ const IndicatorWrapper = styled.div`
   align-items: center;
   gap: 12px;
   position: fixed;
-  bottom: ${54 + 5 + 60}px; /* 버튼높이 + bottom + 간격 */
+  bottom: ${54 + 5 + 60}px;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -109,6 +109,19 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const touchStartX = useRef(null);
+  const timerRef = useRef(null);
+
+  function resetTimer() {
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setStep(prev => (prev + 1) % STEP_COUNT); // ✅ 마지막이면 다시 첫번째로
+    }, 3000);
+  }
+
+  useEffect(() => {
+    resetTimer();
+    return () => clearInterval(timerRef.current);
+  }, []);
 
   function handleTouchStart(e) {
     touchStartX.current = e.touches[0].clientX;
@@ -119,11 +132,12 @@ export default function OnboardingPage() {
     const diff = touchStartX.current - e.changedTouches[0].clientX;
 
     if (diff > 50 && step < STEP_COUNT - 1) {
-      setStep(prev => prev + 1); // 왼쪽으로 슬라이드 → 다음
+      setStep(prev => prev + 1);
     } else if (diff < -50 && step > 0) {
-      setStep(prev => prev - 1); // 오른쪽으로 슬라이드 → 이전
+      setStep(prev => prev - 1);
     }
     touchStartX.current = null;
+    resetTimer(); // ✅ 스와이프 후 타이머 리셋
   }
 
   function handleStart() {
@@ -137,13 +151,13 @@ export default function OnboardingPage() {
       onTouchEnd={handleTouchEnd}
     >
       <SlideContainer>
-        <SlideWrapper $step={step} $count={STEP_COUNT}>
+        <SlideWrapper $step={step}>
 
           {/* 1페이지 */}
-          <Slide $count={STEP_COUNT}>
+          <Slide>
             <Title>{`복잡한 약속 잡기\n이제 테블리에게 맡겨요`}</Title>
             <ImageArea>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', background: '#FFFFFF', borderRadius: '12px' }}>
                 <ScheduleList width={256} height={348} />
               </div>
               <div style={{ position: 'absolute', top: '134px', left: '50%', transform: 'translateX(-50%)' }}>
@@ -153,7 +167,7 @@ export default function OnboardingPage() {
           </Slide>
 
           {/* 2페이지 */}
-          <Slide $count={STEP_COUNT}>
+          <Slide>
             <Title>{`기존 시간표 캡쳐하면\n편안하게 일정 등록 완료!`}</Title>
             <ImageArea>
               <div style={{ marginLeft: '39px' }}>
@@ -166,7 +180,7 @@ export default function OnboardingPage() {
           </Slide>
 
           {/* 3페이지 */}
-          <Slide $count={STEP_COUNT}>
+          <Slide>
             <Title>{`초대장만 보내면\nAI가 알아서 약속을 잡아줘요`}</Title>
             <ImageArea>
               <div style={{ marginLeft: '50px' }}>
@@ -179,8 +193,8 @@ export default function OnboardingPage() {
           </Slide>
 
           {/* 4페이지 */}
-          <Slide $count={STEP_COUNT}>
-            <Title>{`약속, 까먹을 걱정 없어요\n테블리가 먼저 알려드릴게요`}</Title>
+          <Slide>
+            <Title>{`약속, 잊어버릴 걱정 없어요\n테블리가 먼저 알려드릴게요`}</Title>
             <ImageArea>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <Notification width={256} height={377} />

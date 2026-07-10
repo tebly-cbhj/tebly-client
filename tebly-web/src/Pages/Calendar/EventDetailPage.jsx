@@ -17,6 +17,7 @@ import RoomFillIcon from '../../assets/icons/room-fill.svg?react';
 import MoreLineIcon from '../../assets/icons/more-line.svg?react';
 
 import { CATEGORY_ICON_MAP, CATEGORY_KO } from '../../components/room/CategoryIcons';
+import apiClient from '../../api/client';
 
 const CATEGORY_BG = {
   Appointment:     { bg: '#FFBEBE', outline: '#FF8989' },
@@ -31,7 +32,8 @@ const CATEGORY_BG = {
 };
 
 function getCategoryConfig(category) {
-  const key = category in CATEGORY_ICON_MAP ? category : 'Other';
+  const iconKey = category && typeof category === 'object' ? category.categoryIcon : category;
+  const key = iconKey in CATEGORY_ICON_MAP ? iconKey : 'Other';
   return {
     Icon: CATEGORY_ICON_MAP[key].SelectedIcon,
     ...CATEGORY_BG[key],
@@ -197,6 +199,20 @@ export default function EventDetailPage() {
   const categoryConfig = getCategoryConfig(schedule.category);
   const CategoryImg = categoryConfig.Icon;
 
+  async function handleDelete() {
+    setShowActionSheet(false);
+    if (!scheduleId) {
+      navigate(-1);
+      return;
+    }
+    try {
+      await apiClient.delete(`/schedules/events/${scheduleId}`);
+      navigate(-1);
+    } catch {
+      alert('일정 삭제에 실패했어요. 다시 시도해주세요.');
+    }
+  }
+
   return (
     <PageWrapper>
       <Header
@@ -207,7 +223,6 @@ export default function EventDetailPage() {
         onIconClick={(icon) => { if (icon === 'more') setShowActionSheet(true); }}
       />
 
-      {/* TODO: 수정/삭제 API 연동 필요 */}
       <ActionSheet
         visible={showActionSheet}
         onClose={() => setShowActionSheet(false)}
@@ -218,11 +233,7 @@ export default function EventDetailPage() {
           setShowActionSheet(false);
           navigate('/calendar/create', { state: { scheduleId, schedule } });
         }}
-        onOption2={() => {
-          setShowActionSheet(false);
-          // TODO: DELETE /api/schedules/:id 호출 후 navigate(-1)
-          console.log('일정 삭제');
-        }}
+        onOption2={handleDelete}
       />
 
       <ScrollContent>
@@ -266,7 +277,11 @@ export default function EventDetailPage() {
         <SelectRow
           LeftIcon={CategoryIcon}
           text_empty="카테고리"
-          text_selected={CATEGORY_KO[schedule.category] ?? schedule.category}
+          text_selected={
+            schedule.category && typeof schedule.category === 'object'
+              ? schedule.category.categoryName
+              : (CATEGORY_KO[schedule.category] ?? schedule.category)
+          }
           state={schedule.category ? 'selected' : 'empty'}
           right_icon
         />

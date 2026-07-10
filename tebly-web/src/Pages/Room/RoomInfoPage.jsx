@@ -1,16 +1,21 @@
-import { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useScheduleStore } from '../../store/ScheduleStore';
-import {useRoomStore} from '../../store/RoomStore';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useRoomStore } from '../../store/RoomStore';
+import apiClient from '../../api/client';
 import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
 import ScheduleCard from '../../components/room/ScheduleCard';
 import styled from 'styled-components';
+import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
 import ActionSheet from '../../components/common/ActionSheet';
-import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
+
+const HeaderWrapper = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
 
 const ScrollContent = styled.div`
   flex: 1;
@@ -40,7 +45,8 @@ const CardList = styled.div`
 `;
 
 const SummaryWrapper = styled.div`
-  width: 100%;
+  width: 390px;
+  max-width: 100%;
   flex-shrink: 0;
 `;
 
@@ -51,42 +57,50 @@ const FloatingWrapper = styled.div`
   z-index: 100;
 `;
 
-const HeaderWrapper = styled.div`
-  width: 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
-`;
+const PROMISE_STATUS_LABEL = { PENDING: '진행 중', CONFIRMED: '확정', CANCELED: '취소됨' };
+const MY_STATUS_LABEL = { ACCEPTED: '참석', REJECTED: '불참', PENDING: '미응답' };
+
+function formatPromiseDate(promise) {
+  const start = new Date(promise.startTime);
+  const end = new Date(promise.endTime);
+  const pad = (n) => String(n).padStart(2, '0');
+  const dateLabel = promise.proposeStartDate.replaceAll('-', '.');
+  const startLabel = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
+  const endLabel = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+  return `${dateLabel} ${startLabel}~${endLabel}`;
+}
 
 export default function RoomInfoPage() {
-  const { roomId } = useParams();  
+  const { roomId } = useParams();
   const navigate = useNavigate();
   const [currentTab, setCurrentTab] = useState('tab1');
-  const allSchedules = useScheduleStore((state) => state.schedules);
-  const roomSchedules = allSchedules.filter((s) => s.roomId === Number(roomId));
-  const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+  const room = useRoomStore((state) => state.roomDetail);
+  const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
+
+  useEffect(() => {
+    fetchRoomDetail(Number(roomId));
+  }, [roomId, fetchRoomDetail]);
+
   // TODO: GET /api/rooms/:id/unread — 안 읽은 채팅 여부 API 연동 후 교체
   const hasUnreadChat = false;
 
-  const mySchedules = useMemo(
-    () => roomSchedules.filter((s) => s.createdByMe),
-    [roomSchedules]
-  );
+  if (!room) return null; // TODO: 로딩 스피너로 교체
 
-  const invitedSchedules = useMemo(
-    () => roomSchedules.filter((s) => !s.createdByMe),
-    [roomSchedules]
-  );
+  const promises = currentTab === 'tab1' ? room.myPromises : room.invitedPromises;
 
-  const schedules = currentTab === 'tab1' ? mySchedules : invitedSchedules;
-
-  const MY_STATUS_LABEL = { accepted: '참석', rejected: '불참', pending: '미응답' };
+  async function handleLeaveRoom() {
+    await apiClient.delete(`/rooms/${roomId}/members/me`);
+    setIsSheetOpen(false);
+    navigate('/room-list');
+  }
 
   return (
     <>
       <HeaderWrapper>
         <Header
-          title={room?.title}
+          title={room.name}
           leftIcon="back"
           onLeft={() => navigate(-1)}
           icons={[hasUnreadChat ? 'bubble-noti' : 'bubble', 'more']}
@@ -99,31 +113,36 @@ export default function RoomInfoPage() {
 
       <ScrollContent>
         <SummaryWrapper>
-          <RoomSummarySection roomId={Number(roomId)} />
+          <RoomSummarySection
+            roomId={Number(roomId)}
+            name={room.name}
+            description={room.description}
+            profileImages={room.memberProfileImages}
+            totalMemberCount={room.totalMemberCount}
+          />
         </SummaryWrapper>
 
         <TabBtn activeTab={currentTab} onTabClick={setCurrentTab} />
 
         <CardList>
-          {schedules.map((schedule) => (
+          {promises.map((promise) => (
             <ScheduleCard
-              key={schedule.id}
-              title={schedule.title}
-              date={`${schedule.date} ${schedule.time}`}
-              location={schedule.location}
-              acceptedCount={schedule.acceptedIds.length}
-              totalCount={schedule.memberIds.length}
-              CategoryImage={CATEGORY_ICON_MAP[schedule.category]?.SelectedIcon}
+              key={promise.promiseId}
+              title={promise.title}
+              date={formatPromiseDate(promise)}
+              location={promise.location}
+              acceptedCount={promise.acceptedCount}
+              totalCount={promise.totalMemberCount}
               chipLabel={
                 currentTab === 'tab1'
-                  ? (schedule.confirmed ? '확정' : '진행 중')
-                  : MY_STATUS_LABEL[schedule.myStatus]
+                  ? PROMISE_STATUS_LABEL[promise.promiseStatus]
+                  : MY_STATUS_LABEL[promise.myStatus]
               }
               onClick={() =>
                 navigate('/my-appointments', {
                   state: {
-                    scheduleId: schedule.id,
-                    roomId: schedule.roomId,
+                    promiseId: promise.promiseId,
+                    roomId: Number(roomId),
                     isInvited: currentTab === 'tab2',
                   },
                 })
@@ -144,8 +163,13 @@ export default function RoomInfoPage() {
           option1Text="방 수정하기"
           option2Text="방 나가기"
           option2Color="#E31818"
-          onOption1={() => { setIsSheetOpen(false); }}
-          onOption2={() => { setIsSheetOpen(false); }}
+          onOption1={() => {
+            setIsSheetOpen(false);
+            navigate('/create-room', {
+              state: { roomId: Number(roomId), name: room.name, description: room.description },
+            });
+          }}
+          onOption2={handleLeaveRoom}
         />
       )}
     </>

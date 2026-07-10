@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useFriendStore } from '../../store/FriendStore';
@@ -201,9 +201,16 @@ export default function FriendPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const myProfile = useFriendStore((s) => s.myProfile);
+  const fetchMyProfile = useFriendStore((s) => s.fetchMyProfile);
   const friends = useFriendStore((s) => s.friends);
+  const fetchFriends = useFriendStore((s) => s.fetchFriends);
   const toggleFavorite = useFriendStore((s) => s.toggleFavorite);
   const deleteFriend = useFriendStore((s) => s.deleteFriend);
+
+  useEffect(() => {
+    fetchMyProfile();
+    fetchFriends();
+  }, [fetchMyProfile, fetchFriends]);
 
   const sorted = useMemo(
     () =>
@@ -256,11 +263,11 @@ export default function FriendPage() {
 
       <MyProfileContainer>
         <ProfileImage>
-          {myProfile.profileImage && <img src={myProfile.profileImage} alt={myProfile.name} />}
+          {myProfile?.profileImageUrl && <img src={myProfile.profileImageUrl} alt={myProfile.nickname} />}
         </ProfileImage>
         <TextArea>
-          <Name>{myProfile.name}</Name>
-          {myProfile.intro && <Intro>{myProfile.intro}</Intro>}
+          <Name>{myProfile?.nickname}</Name>
+          {myProfile?.bio && <Intro>{myProfile.bio}</Intro>}
         </TextArea>
       </MyProfileContainer>
 
@@ -275,7 +282,7 @@ export default function FriendPage() {
             profileImage={friend.profileImage}
             isFavorite={friend.isFavorite}
             onToggleFavorite={() => toggleFavorite(friend.id)}
-            onDelete={() => deleteFriend(friend.id)}
+            onDelete={() => deleteFriend(friend.id).catch(() => alert('친구 삭제에 실패했어요. 다시 시도해주세요.'))}
             onClick={() => navigate(`/friends/${friend.id}`)}
           />
         ))}

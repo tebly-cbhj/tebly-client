@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useMemo, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
@@ -49,7 +49,8 @@ const CATEGORY_MAP = {
 };
 
 function normalizeCategory(category) {
-  return CATEGORY_MAP[category] || category || 'Other';
+  const key = category && typeof category === 'object' ? category.categoryIcon : category;
+  return CATEGORY_MAP[key] || key || 'Other';
 }
 
 function formatDateKey(date) {
@@ -160,10 +161,11 @@ function expandScheduleDates(schedule) {
 
 export default function MonthCalendarPage({ viewMode, onViewModeChange, selectedDate: initialSelectedDate, onDateChange }) {
   const navigate = useNavigate();
+  const location = useLocation();
   // TODO: GET /api/schedules (방 확정 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const confirmedSchedules = useScheduleStore((state) => state.schedules);
-  // TODO: GET /api/personal-schedules (개인 일정) API 호출로 교체 — 현재 로컬 스토어 사용
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
+  const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
 
   const today = useMemo(() => new Date(), []);
 
@@ -174,6 +176,12 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
   );
 
   const [selectedDate, setSelectedDate] = useState(today);
+
+  useEffect(() => {
+    const y = currentMonthDate.getFullYear();
+    const m = String(currentMonthDate.getMonth() + 1).padStart(2, '0');
+    fetchSchedules('monthly', `${y}-${m}-01`);
+  }, [currentMonthDate, fetchSchedules]);
 
   // TODO: DB 연동 시 schedule ID로 상세 데이터를 API에서 fetch하도록 교체
   function handleScheduleClick(schedule) {
@@ -189,7 +197,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           endDate: schedule.date,
           endTime: endTime || '',
           place: schedule.place,
-          category: schedule.category,
+          category: schedule.originalCategory,
           alarmTime: schedule.alarmTime,
           repeat: schedule.repeat,
         },
@@ -215,9 +223,8 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         originalCategory: schedule.category,
         label: schedule.title,
         time: schedule.time,
-        // TODO: DB 연동 시 아래 필드를 실제 데이터로 교체
         memo: schedule.memo || '',
-        place: schedule.place || '',
+        place: schedule.location || '',
         alarmTime: schedule.alarmTime || '',
         repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
       }));
@@ -310,8 +317,9 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
 
       <FloatingWrapper>
         <CalendarFab
-          onDirectInput={() => navigate('/ocr-loading')}
-          onAiRecognition={() => navigate('/ocr-loading')}
+          initialOpen={location.state?.openFab ?? false}
+          onDirectInput={() => navigate('/calendar/create')}
+          onAiRecognition={(file) => navigate('/ocr-loading', { state: { imageFile: file } })}
         />
       </FloatingWrapper>
     </PageWrapper>

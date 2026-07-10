@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import basicProfile from '../../assets/default/profile/basic-selected.svg';
+import basicProfile from '../../assets/default/profile/basic.svg';
 
 const AttendeeWrapper = styled.div`
   display: inline-flex;

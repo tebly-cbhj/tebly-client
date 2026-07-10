@@ -1,8 +1,42 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import {useNavigate} from 'react-router-dom';
-import ocrIcon from '../../assets/icons/OCR_icon.svg'; 
-import { PageWrapper } from '../../PageWrapper';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ocrIcon from '../../assets/icons/OCR_icon.svg';
+import apiClient from '../../api/client';
+import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
+
+const DAY_INDEX = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 };
+
+function nearestDateForDay(dayOfWeek) {
+  const targetDay = DAY_INDEX[dayOfWeek];
+  const base = new Date();
+  if (targetDay === undefined) return { year: base.getFullYear(), month: base.getMonth() + 1, day: base.getDate() };
+  const diff = (targetDay - base.getDay() + 7) % 7;
+  base.setDate(base.getDate() + diff);
+  return { year: base.getFullYear(), month: base.getMonth() + 1, day: base.getDate() };
+}
+
+const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+function mapOcrItem(item, index) {
+  const dateObj = nearestDateForDay(item.dayOfWeek);
+  const d = new Date(dateObj.year, dateObj.month - 1, dateObj.day);
+  return {
+    id: `ocr-${Date.now()}-${index}`,
+    title: item.title,
+    memo: '',
+    category: null,
+    allDay: false,
+    startDate: dateObj,
+    endDate: dateObj,
+    startTime: item.startTime,
+    endTime: item.endTime,
+    place: '',
+    alarmTime: '',
+    repeat: '없음',
+    time: `${DAY_KO[d.getDay()]}요일 ${item.startTime}~${item.endTime}`,
+  };
+}
 
 const Container = styled.div`
   display: flex;
@@ -15,7 +49,7 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  ${({ theme }) => theme.typography.h1}
+  ${({ theme }) => theme.typography.h1};
   color: ${({ theme }) => theme.colors.gray900};
   margin: 0;
   text-align: center;
@@ -34,7 +68,7 @@ const Icon = styled.img`
 `;
 
 const Description = styled.p`
-  ${({ theme }) => theme.typography.body2}
+  ${({ theme }) => theme.typography.body2};
   color: ${({ theme }) => theme.colors.gray500};
   margin: 56px 0 0 0;
   text-align: center;
@@ -42,30 +76,33 @@ const Description = styled.p`
 
 function OCRLoadingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const setSchedules = useOCRScheduleStore((state) => state.setSchedules);
+
   useEffect(() => {
-    // TODO: OCR 분석 API 연결
-    // const fetchOcrResult = async () => {
-    //   try {
-    //     const response = await api.post('/schedule/ocr', { imageUrl });
-    //     navigate('/calendar/ocr-result', { state: { schedule: response.data } });
-    //   } catch (error) {
-    //     // TODO: 실패 시 처리 (에러 페이지 이동, 토스트 노출 등)
-    //   }
-    // };
-    // fetchOcrResult();
+    const imageFile = location.state?.imageFile;
+    if (!imageFile) {
+      navigate(-1);
+      return;
+    }
 
-    // API 연결 전 임시: 2초 후 페이지 이동
-    const timer = setTimeout(() => {
-      navigate('/ocr-result');
-    }, 2000);
+    const formData = new FormData();
+    formData.append('image', imageFile);
 
-    return () => clearTimeout(timer); // 언마운트 시 타이머 정리
-  }, [navigate]);
-
+    apiClient
+      .post('/schedules/ocr', formData)
+      .then((res) => {
+        setSchedules(res.data.schedules.map(mapOcrItem));
+        navigate('/ocr-result', { replace: true });
+      })
+      .catch(() => {
+        alert('일정을 인식하지 못했어요. 다시 시도해주세요.');
+        navigate(-1);
+      });
+  }, [location.state, navigate, setSchedules]);
 
   return (
-    <PageWrapper>
-        <Container>
+    <Container>
       <Title>
         사진 속 일정을
         <br />
@@ -82,7 +119,6 @@ function OCRLoadingPage() {
         일정으로 정리하고 있어요.
       </Description>
     </Container>
-    </PageWrapper>
   );
 }
 

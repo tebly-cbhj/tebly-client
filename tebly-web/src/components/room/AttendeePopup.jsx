@@ -14,13 +14,11 @@ const Overlay = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   z-index: 9999;
-  align-items: center;
 `;
 
 const Sheet = styled.div`
   display: inline-flex;
   width: 100%;
-  max-width: 390px;
   box-sizing: border-box;
   padding: 12px 20px 44px 20px;
   flex-direction: column;
@@ -81,7 +79,7 @@ const AttendeeGrid = styled.div`
   width: 100%;
 `;
 
-export default function AttendeePopup({
+export default function TimeSlotAttendeeSheet({
   onClose,
   availableAttendees = [],
   unavailableAttendees = [],

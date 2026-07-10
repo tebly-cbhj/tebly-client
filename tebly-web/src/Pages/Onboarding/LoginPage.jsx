@@ -86,8 +86,16 @@ const InquiryText = styled.span`
   margin-bottom: 10px;
 `;
 
+function handleKakaoLogin() {
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/kakao`;
+}
+
+function handleGoogleLogin() {
+  window.location.href = `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`;
+}
+
+
 export default function LoginPage() {
-    const navigate = useNavigate();
   return (
     <Wrapper>
       <div style={{ marginTop: '110px' }}>
@@ -104,12 +112,12 @@ export default function LoginPage() {
 
       <div style={{ marginTop: '140px', width: '100%', display: 'flex', justifyContent: 'center' }}>
         <BtnWrapper>
-            <KakaoBtn onClick={() => navigate('/signup/terms')}> {/* TODO: 카카오 로그인 API 연동 */}
+            <KakaoBtn onClick={handleKakaoLogin}>
                 <img src={KakaoIcon} width={20} height={20} alt="kakao" />
                 <KakaoText>카카오로 시작하기</KakaoText>
             </KakaoBtn>
 
-            <GoogleBtn onClick={() => navigate('/signup/terms')}> {/* TODO: 구글 로그인 API 연동 */}
+            <GoogleBtn onClick={handleGoogleLogin}>
                 <img src={GoogleIcon} width={20} height={20} alt="google" />
                 <GoogleText>구글로 시작하기</GoogleText>
             </GoogleBtn>

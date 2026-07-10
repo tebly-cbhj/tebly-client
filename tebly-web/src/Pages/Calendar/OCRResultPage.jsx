@@ -8,7 +8,7 @@ import { PageWrapper } from '../../PageWrapper';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
-import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import apiClient from '../../api/client';
 import OCREditSheet from '../../components/calendar/OCREditSheet';
 
 const ResultHeaderContainer = styled.div`
@@ -78,7 +78,6 @@ const BottomBtnWrapper = styled.div`
 export default function OCRResultPage() {
   const navigate = useNavigate();
   const { schedules } = useOCRScheduleStore();
-  const addSchedule = usePersonalScheduleStore((state) => state.addSchedule);
   const [selectedIds, setSelectedIds] = useState([]);
   const [editScheduleId, setEditScheduleId] = useState(null);
 
@@ -96,48 +95,35 @@ export default function OCRResultPage() {
     }
   };
 
-  const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
-  const DAY_MAP = { 일: 0, 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6 };
-
-  function toDateStr(dateObj) {
-    const d = new Date(dateObj.year, dateObj.month - 1, dateObj.day);
-    return `${dateObj.year}.${String(dateObj.month).padStart(2, '0')}.${String(dateObj.day).padStart(2, '0')} (${DAY_KO[d.getDay()]})`;
+  function toIsoDateTime(dateObj, timeStr) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${dateObj.year}-${pad(dateObj.month)}-${pad(dateObj.day)}T${timeStr}:00`;
   }
 
-  function nearestDateFromTimeStr(timeStr) {
-    const dayChar = timeStr?.split(' ')[0]?.charAt(0);
-    const targetDay = DAY_MAP[dayChar];
-    const base = new Date();
-    if (targetDay === undefined) return base;
-    const diff = (targetDay - base.getDay() + 7) % 7;
-    base.setDate(base.getDate() + diff);
-    return base;
-  }
-
-  function resolveDateStr(dateObj, timeStr) {
-    if (dateObj) return toDateStr(dateObj);
-    const d = nearestDateFromTimeStr(timeStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${DAY_KO[d.getDay()]})`;
-  }
-
-  const handleAddCalendar = () => {
+  const handleAddCalendar = async () => {
     const selected = schedules.filter((s) => selectedIds.includes(s.id));
-    selected.forEach((s) => {
-      const startDateStr = resolveDateStr(s.startDate, s.time);
-      const endDateStr = resolveDateStr(s.endDate ?? s.startDate, s.time);
-      addSchedule({
+
+    if (selected.some((s) => !s.category?.categoryId)) {
+      alert('카테고리를 선택하지 않은 일정이 있어요. 먼저 카테고리를 선택해주세요.');
+      return;
+    }
+
+    const payload = {
+      schedules: selected.map((s) => ({
+        categoryId: s.category.categoryId,
         title: s.title,
-        memo: s.memo || '',
-        startDate: startDateStr,
-        endDate: endDateStr,
-        time: s.allDay ? '' : `${s.startTime} - ${s.endTime}`,
-        location: s.place || '',
-        category: s.category,
-        alarmTime: s.alarmTime || '',
-        repeat: null,
-      });
-    });
-    navigate('/');
+        startTime: toIsoDateTime(s.startDate, s.startTime),
+        endTime: toIsoDateTime(s.endDate ?? s.startDate, s.endTime),
+        repeatType: 'NONE',
+      })),
+    };
+
+    try {
+      await apiClient.post('/schedules/ocr/confirm', payload);
+      navigate('/');
+    } catch {
+      alert('일정 저장에 실패했어요. 다시 시도해주세요.');
+    }
   };
 
   return (
@@ -165,7 +151,7 @@ export default function OCRResultPage() {
 
       <CardListContainer>
         {schedules.map((schedule) => {
-          const iconData = CATEGORY_ICON_MAP[schedule.category] || CATEGORY_ICON_MAP.Other;
+          const iconData = CATEGORY_ICON_MAP[schedule.category?.categoryIcon] || CATEGORY_ICON_MAP.Other;
           const CategoryIcon = iconData.SelectedIcon;
 
           return (

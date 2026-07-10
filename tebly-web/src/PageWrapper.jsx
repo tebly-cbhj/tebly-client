@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const PageWrapper = styled.div`
+const StyledPageWrapper = styled.div`
   width: 100%; /* 앱(웹뷰) 안에서는 스마트폰 화면 가로폭에 100% 딱 맞춤! */
   max-width: 390px; /* 컴퓨터(PC) 브라우저에서 볼 때 너무 넓어지는 것만 방지 */
   margin: 0 auto;
@@ -21,3 +21,7 @@ export const PageWrapper = styled.div`
   flex-direction: column;
   position: relative;
 `;
+
+export function PageWrapper({ noNav, children, ...props }) {
+  return <StyledPageWrapper {...props}>{children}</StyledPageWrapper>;
+}

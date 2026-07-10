@@ -6,7 +6,8 @@ import Header from '../../components/common/Header';
 import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
-// TODO: 유저 프로필 정보 API 연동
+import { useFriendStore } from '../../store/FriendStore';
+import apiClient from '../../api/client';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -78,13 +79,15 @@ const SaveButtonWrapper = styled.div`
 `;
 
 export default function EditProfilePage() {
-  // TODO: API에서 유저 정보 받아와서 초기값으로 설정
-  const [name, setName] = useState('김뿡치'); // TODO: 로그인된 유저 이름으로 대체
-  const [bio, setBio] = useState(''); // TODO: 저장된 자기소개로 대체
+  const myProfile = useFriendStore((state) => state.myProfile);
+  const updateMyProfile = useFriendStore((state) => state.updateMyProfile);
   const navigate = useNavigate();
 
-  const [profileImagePreview, setProfileImagePreview] = useState(null);
-  const [profileImageFile, setProfileImageFile] = useState(null); // TODO: 저장 시 이 File을 백엔드 업로드 API에 전달
+  const [name, setName] = useState(myProfile?.nickname ?? '');
+  const [bio, setBio] = useState(myProfile?.bio ?? '');
+
+  const [profileImagePreview, setProfileImagePreview] = useState(myProfile?.profileImageUrl ?? null);
+  const [profileImageFile, setProfileImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
   function handleImageSelect(e) {
@@ -94,9 +97,18 @@ export default function EditProfilePage() {
     setProfileImagePreview(URL.createObjectURL(file));
   }
 
-  function handleSave() {
-    console.log('저장:', { name, bio, profileImageFile });
-    // TODO: 프로필 수정 API 연동 (profileImageFile은 FormData로 전송)
+  async function handleSave() {
+    let profileImageUrl = myProfile?.profileImageUrl;
+
+    if (profileImageFile) {
+      const formData = new FormData();
+      formData.append('file', profileImageFile);
+      const uploadRes = await apiClient.post('/users/me/profile-image', formData);
+      profileImageUrl = uploadRes.data.profileImageUrl;
+    }
+
+    await updateMyProfile({ nickname: name, profileImageUrl, bio });
+    navigate(-1);
   }
 
   return (
@@ -104,14 +116,13 @@ export default function EditProfilePage() {
       <Header
         title="프로필 수정"
         leftIcon="back"
-        onLeft={() => navigate(-1)} // TODO: navigate(-1) 연동
+        onLeft={() => navigate(-1)}
       />
 
       <ContentWrapper>
         {/* 프로필 이미지 */}
         <ProfileImageWrapper>
           <ProfileImage>
-            {/* TODO: 유저 프로필 이미지 API 연동 */}
             {profileImagePreview && <img src={profileImagePreview} alt="프로필 미리보기" />}
           </ProfileImage>
           <EditIconWrapper onClick={() => fileInputRef.current.click()}>

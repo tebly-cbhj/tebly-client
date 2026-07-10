@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
@@ -81,6 +81,7 @@ const DeleteText = styled.span`
 export default function CategorySettingPage() {
   const navigate = useNavigate();
   const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const togglePrivate = useScheduleStore((state) => state.togglePrivate);
   const deleteCategory = useScheduleStore((state) => state.deleteCategory);
   const updateCategory = useScheduleStore((state) => state.updateCategory);
@@ -88,9 +89,13 @@ export default function CategorySettingPage() {
   const [tab, setTab] = useState('left');
   const [showPopup, setShowPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
-  const [selectedCategoryName, setSelectedCategoryName] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
-  const selectedCategory = categories.find((c) => c.name === selectedCategoryName);
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const selectedCategory = categories.find((c) => c.categoryId === selectedCategoryId);
 
   const defaultCategories = categories.filter((c) => c.isDefault);
   const myCategories = categories.filter((c) => !c.isDefault);
@@ -98,7 +103,7 @@ export default function CategorySettingPage() {
   const currentList = tab === 'left' ? defaultCategories : myCategories;
 
   function handleButtonClick(category) {
-    setSelectedCategoryName(category.name);
+    setSelectedCategoryId(category.categoryId);
     setShowPopup(true);
   }
 
@@ -122,14 +127,14 @@ export default function CategorySettingPage() {
 
         {currentList.map((category) => (
           <CategorySettingList
-            key={category.name}
-            iconId={category.iconId}
-            name={category.name}
+            key={category.categoryId}
+            iconId={category.categoryIcon}
+            name={category.categoryName}
             isPrivate={category.isPrivate}
             isDefault={category.isDefault}
             onButtonClick={() => handleButtonClick(category)}
             onRowClick={() => {
-              setSelectedCategoryName(category.name);
+              setSelectedCategoryId(category.categoryId);
               setShowEditPopup(true);
             }}
           />
@@ -146,8 +151,7 @@ export default function CategorySettingPage() {
               isPrivate={selectedCategory?.isPrivate}
               onSelect={(value) => {
                 if (value !== selectedCategory.isPrivate) {
-                  togglePrivate(selectedCategory.name);
-                  // TODO: 공개/비공개 API 연동
+                  togglePrivate(selectedCategory.categoryId);
                 }
                 setShowPopup(false);
               }}
@@ -157,9 +161,8 @@ export default function CategorySettingPage() {
               <>
                 <Divider />
                 <DeleteRow onClick={() => {
-                  deleteCategory(selectedCategory.name);
+                  deleteCategory(selectedCategory.categoryId);
                   setShowPopup(false);
-                  // TODO: 카테고리 삭제 API 연동
                 }}>
                   <DeleteText>삭제</DeleteText>
                 </DeleteRow>
@@ -175,12 +178,11 @@ export default function CategorySettingPage() {
           <div onClick={(e) => e.stopPropagation()}>
             <CreateCategoryPopup
               title="카테고리 수정"
-              initialName={selectedCategory.name}
-              initialIconId={selectedCategory.iconId}
+              initialName={selectedCategory.categoryName}
+              initialIconId={selectedCategory.categoryIcon}
               onClose={() => setShowEditPopup(false)}
               onSave={(updated) => {
-                updateCategory(selectedCategory.name, updated); // ✅ 추가
-                // TODO: 카테고리 수정 API 연동
+                updateCategory(selectedCategory.categoryId, updated);
                 setShowEditPopup(false);
                 }}
             />
