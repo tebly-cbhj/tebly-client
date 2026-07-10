@@ -7,24 +7,30 @@ import ProgressBar from '../../components/common/ProgressBar';
 import TextFieldBase from '../../components/common/Textfield';
 import Btn from '../../components/common/Btn';
 import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?react';
+import { useFriendStore } from '../../store/FriendStore';
 
 import Basic from '../../assets/default/profile/basic.svg?react';
 import BasicSelected from '../../assets/default/profile/basic-selected.svg?react';
+import BasicUrl from '../../assets/default/profile/basic-selected.svg';
 import Wink from '../../assets/default/profile/wink.svg?react';
 import WinkSelected from '../../assets/default/profile/wink-selected.svg?react';
+import WinkUrl from '../../assets/default/profile/wink-selected.svg';
 import Glasses from '../../assets/default/profile/glasses.svg?react';
 import GlassesSelected from '../../assets/default/profile/glasses-selected.svg?react';
+import GlassesUrl from '../../assets/default/profile/glasses-selected.svg';
 import Sleepy from '../../assets/default/profile/sleepy.svg?react';
 import SleepySelected from '../../assets/default/profile/sleepy-selected.svg?react';
+import SleepyUrl from '../../assets/default/profile/sleepy-selected.svg';
 import Headphone from '../../assets/default/profile/headphone.svg?react';
 import HeadphoneSelected from '../../assets/default/profile/headphone-selected.svg?react';
+import HeadphoneUrl from '../../assets/default/profile/headphone-selected.svg';
 
 const PROFILE_ICONS = [
-  { id: 'basic', Icon: Basic, SelectedIcon: BasicSelected },
-  { id: 'wink', Icon: Wink, SelectedIcon: WinkSelected },
-  { id: 'glasses', Icon: Glasses, SelectedIcon: GlassesSelected },
-  { id: 'sleepy', Icon: Sleepy, SelectedIcon: SleepySelected },
-  { id: 'headphone', Icon: Headphone, SelectedIcon: HeadphoneSelected },
+  { id: 'basic', Icon: Basic, SelectedIcon: BasicSelected, url: BasicUrl },
+  { id: 'wink', Icon: Wink, SelectedIcon: WinkSelected, url: WinkUrl },
+  { id: 'glasses', Icon: Glasses, SelectedIcon: GlassesSelected, url: GlassesUrl },
+  { id: 'sleepy', Icon: Sleepy, SelectedIcon: SleepySelected, url: SleepyUrl },
+  { id: 'headphone', Icon: Headphone, SelectedIcon: HeadphoneSelected, url: HeadphoneUrl },
 ];
 
 const ContentWrapper = styled.div`
@@ -127,14 +133,28 @@ const BtnWrapper = styled.div`
 
 export default function ProfileSetupPage() {
   const navigate = useNavigate();
+  const updateMyProfile = useFriendStore((state) => state.updateMyProfile);
   const [selectedIcon, setSelectedIcon] = useState('basic');
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const currentIcon = PROFILE_ICONS.find((p) => p.id === selectedIcon);
   const SelectedIcon = currentIcon?.SelectedIcon;
 
-  const canNext = name.trim() !== '';
+  const canNext = name.trim() !== '' && !isSaving;
+
+  async function handleNext() {
+    setIsSaving(true);
+    try {
+      await updateMyProfile({ nickname: name, bio, profileImageUrl: currentIcon?.url });
+      navigate('/signup/schedule');
+    } catch {
+      alert('프로필 저장에 실패했어요. 다시 시도해주세요.');
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
     <PageWrapper>
@@ -199,7 +219,7 @@ export default function ProfileSetupPage() {
         <Btn
           text="다음"
           disabled={!canNext}
-          onClick={() => navigate('/signup/schedule')}
+          onClick={handleNext}
         />
       </BtnWrapper>
     </PageWrapper>

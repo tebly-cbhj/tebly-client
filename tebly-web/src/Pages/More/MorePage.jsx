@@ -89,14 +89,24 @@ export default function MorePage() {
   if (!user) return null; // TODO: 로딩 스피너로 교체
 
   async function handleLogout() {
-    await apiClient.post('/auth/signout');
+    try {
+      await apiClient.post('/auth/signout');
+    } catch {
+      // 서버 로그아웃 실패해도 로컬은 로그아웃 처리함
+    }
     localStorage.removeItem('accessToken');
-    navigate('/onboarding');
+    localStorage.removeItem('refreshToken');
+    navigate('/login');
   }
 
   async function handleWithdraw() {
-    await apiClient.delete('/auth/withdraw');
+    try {
+      await apiClient.delete('/auth/withdraw');
+    } catch {
+      // 서버 탈퇴 실패해도 로컬은 로그아웃 처리함
+    }
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     navigate('/onboarding');
   }
 

@@ -94,7 +94,9 @@ export default function EditProfilePage() {
     const file = e.target.files[0];
     if (!file) return;
     setProfileImageFile(file);
-    setProfileImagePreview(URL.createObjectURL(file));
+    const reader = new FileReader();
+    reader.onload = () => setProfileImagePreview(reader.result);
+    reader.readAsDataURL(file);
   }
 
   async function handleSave() {
