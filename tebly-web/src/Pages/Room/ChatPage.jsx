@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import Header from '../../components/common/Header';
 import MessageBubble from '../../components/room/MessageBubble';
 import MessageInput from '../../components/room/MessageInput';
+import DecisionBanner from '../../components/room/DecisionBanner';
+import DecisionCard from '../../components/room/DecisionCard';
 import { useRoomStore } from '../../store/RoomStore';
 import { useChatStore } from '../../store/ChatStore';
 import { useFriendStore } from '../../store/FriendStore';
@@ -171,15 +173,22 @@ export default function ChatPage() {
       )}
 
       <MessageList>
-        {messages.map((msg) => (
-          <MessageBubble
-            key={msg.id}
-            type={msg.type}
-            senderName={msg.senderName}
-            text={msg.text}
-            profileImage={msg.profileImage}
-          />
-        ))}
+        {messages.map((msg) =>
+          msg.text?.startsWith('[결정이]') ? (
+            <div key={msg.id}>
+              <DecisionBanner />
+              <DecisionCard content={msg.text} />
+            </div>
+          ) : (
+            <MessageBubble
+              key={msg.id}
+              type={msg.type}
+              senderName={msg.senderName}
+              text={msg.text}
+              profileImage={msg.profileImage}
+            />
+          )
+        )}
       </MessageList>
 
       <InputBar>

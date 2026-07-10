@@ -12,6 +12,7 @@ import DateCell from '../../components/room/DateCell';
 import Header from '../../components/common/Header';
 import AttendeePopup from '../../components/room/AttendeePopup';
 import apiClient from '../../api/client';
+import MagicWandIcon from '../../assets/icons/magicwand.svg?react';
 
 // ─── 페이지 레이아웃 ────────────────────────────────────────────
 
@@ -44,6 +45,37 @@ const BottomArea = styled.div`
   padding: 0.75rem 1.25rem 2.125rem;
   box-sizing: border-box;
   background: ${({ theme }) => theme.colors.bg};
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const SelectBtnWrapper = styled.div`
+  width: 17.5rem; /* 280px */
+`;
+
+const MagicWandBtn = styled.button`
+  display: flex;
+  width: 3.875rem; /* 62px */
+  height: 3.375rem; /* 54px */
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.75rem;
+  border: 2px solid var(--grayscale-gray-300, #DCDCDC);
+  background: var(--grayscale-white, #FEFEFE);
+  padding: 0;
+  cursor: pointer;
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  svg {
+    width: 1.5rem; /* 24px */
+    height: auto;
+    aspect-ratio: 24 / 41.875;
+  }
 `;
 
 // ─── 공용 시트 요소 ─────────────────────────────────────────────
@@ -390,7 +422,29 @@ const isUpdateMode = Boolean(promiseId);
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
+
+  const handleDecisionHelper = async () => {
+    setIsLoading(true);
+    try {
+      await apiClient.post(`/api/v1/rooms/${roomId}/decision-helper`, {
+        title,
+        comment,
+        categoryId,
+        proposeStartDate: formatDateForApi(dateRange.start),
+        proposeEndDate: formatDateForApi(dateRange.end),
+        searchStartTime: '00:00',
+        searchEndTime: '23:59',
+        minDuration,
+        sortType: 'RECOMMENDED',
+        location,
+        selectedMemberIds,
+      });
+      navigate(`/room/${roomId}/chat`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   const prevMonth = () => {
     if (viewMonth === 1) { setViewYear(y => y - 1); setViewMonth(12); }
     else setViewMonth(m => m - 1);
@@ -475,7 +529,18 @@ const isUpdateMode = Boolean(promiseId);
       </CardList>
 
       <BottomArea>
-        <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+        {isUpdateMode ? (
+          <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+        ) : (
+          <>
+            <MagicWandBtn onClick={handleDecisionHelper} disabled={isLoading} aria-label="결정이에게 맡기기">
+              <MagicWandIcon />
+            </MagicWandBtn>
+            <SelectBtnWrapper>
+              <Btn text="선택 완료" disabled={selectedId === null} onClick={handleConfirm} navigate={navigate} />
+            </SelectBtnWrapper>
+          </>
+        )}
       </BottomArea>
 
       <LoadingOverlay isLoading={isLoading} />
