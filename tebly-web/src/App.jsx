@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
@@ -35,6 +35,15 @@ import ScheduleRegisterPage from './Pages/Onboarding/ScheduleRegisterPage';
 import InviteNotiPage from './Pages/Notification/InviteNotiPage';
 import AlarmPage from './Pages/Notification/AlarmPage';
 
+function RootGate() {
+  const accessToken = localStorage.getItem('accessToken');
+  const onboardingDone = localStorage.getItem('onboardingDone');
+
+  if (accessToken) return <CalendarPage />;
+  if (!onboardingDone) return <Navigate to="/onboarding" replace />;
+  return <Navigate to="/login" replace />;
+}
+
 function Layout() {
   const navigate = useNavigate();
 
@@ -69,7 +78,7 @@ function Layout() {
         <Route path="/my-appointments" element={<MyAppointMentPage />} />
         <Route path="/create-appointment" element={<CreateAppointmentPage />} />
         <Route path="/calendar-test" element={<CalendarTestpage />} />
-        <Route path="/" element={<CalendarPage />} />
+        <Route path="/" element={<RootGate />} />
         <Route path="/ocr-loading" element={<OCRLoadingPage />} />
         <Route path="/ocr-result" element={<OCRResultPage />} />
         <Route path="/ocr-edit" element={<OCREditPage />} />
