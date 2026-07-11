@@ -94,7 +94,7 @@ const ExtraCount = styled.div`
 
 export default function RoomListCard({ title, description, profileImages = [], totalMemberCount = 0, onClick }) {
   const MAX_VISIBLE = 3;
-  const visibleAvatars = profileImages.slice(0, MAX_VISIBLE);
+  const visibleAvatars = (profileImages ?? []).slice(0, MAX_VISIBLE);
   const extraCount = totalMemberCount - visibleAvatars.length;
 
   return (

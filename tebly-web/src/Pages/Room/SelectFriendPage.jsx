@@ -84,7 +84,9 @@ const SelectFriendPage = () => {
   useEffect(() => {
     if (currentRoomId) {
       apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
-        const members = res.data.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+        const members = res.data
+          .filter((m) => m.role !== 'HOST')
+          .map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
         setRoomMembers(members);
         setSelected(members);
       });
