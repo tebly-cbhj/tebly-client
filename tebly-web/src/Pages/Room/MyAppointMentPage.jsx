@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
+import { MINUTES_TO_ALARM } from '../../store/PersonalScheduleStore';
 import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
@@ -258,8 +259,11 @@ export default function MyAppointmentPage() {
           <SelectRow
             LeftIcon={BellIcon}
             text_empty="알람을 줄 시간"
-            text_selected={promise.notificationLeadMinutes ? `${promise.notificationLeadMinutes}분 전` : ''}
-            state={promise.notificationLeadMinutes ? 'selected' : 'empty'}
+            text_selected={(promise.notificationLeadMinutes || [])
+              .map((minutes) => MINUTES_TO_ALARM[minutes])
+              .filter(Boolean)
+              .join(', ')}
+            state={promise.notificationLeadMinutes?.length ? 'selected' : 'empty'}
           />
 
           <MyResponseRow>

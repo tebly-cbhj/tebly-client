@@ -327,6 +327,7 @@ export default function TimeRecommendPage() {
     proposeStartDate: initialStart,
     proposeEndDate: initialEnd,
     minDuration,
+    notificationLeadMinutes,
     selectedMemberIds,
   } = routerLocation.state ?? {};
 
@@ -414,6 +415,7 @@ const isUpdateMode = Boolean(promiseId);
           recommendedEndTime: selectedOption.endTimeRaw,
           location,
           minDuration,
+          notificationLeadMinutes,
           sortType: 'EARLIEST',
           selectedMemberIds,
         });
@@ -438,6 +440,7 @@ const isUpdateMode = Boolean(promiseId);
         minDuration,
         sortType: 'RECOMMENDED',
         location,
+        notificationLeadMinutes,
         selectedMemberIds,
       });
       navigate(`/room/${roomId}/chat`);
