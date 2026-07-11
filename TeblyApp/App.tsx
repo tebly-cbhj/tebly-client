@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { StatusBar, StyleSheet, BackHandler, ActivityIndicator, View, Text, Button } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 import { theme } from './src/theme';
 import BottomNavBar from './src/components/BottomNavBar';
 import { ThemeProvider } from 'styled-components/native';
@@ -9,6 +10,9 @@ import { ThemeProvider } from 'styled-components/native';
 const WEB_URL = __DEV__
   ? 'http://172.30.1.82:5173/'
   : 'https://tebly-client.vercel.app';
+
+// 구글이 웹뷰 안에서의 로그인을 막아서, 구글 로그인만 인앱 브라우저로 열어야 함
+const OAUTH_REDIRECT_URL = 'https://tebly-client.vercel.app/login/callback';
 
 const NAVBAR_VISIBLE_PATHS = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'];
 
@@ -22,6 +26,7 @@ export default function App() {
   const [canGoBack, setCanGoBack] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
+  const [webViewSource, setWebViewSource] = useState(WEB_URL);
 
   useEffect(() => {
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -37,6 +42,22 @@ export default function App() {
 
   function navigateWebView(path) {
     webViewRef.current?.postMessage(JSON.stringify({ type: 'NAVIGATE', path }));
+  }
+
+  function handleShouldStartLoad(request) {
+    if (request.url.includes('accounts.google.com')) {
+      InAppBrowser.openAuth(request.url, OAUTH_REDIRECT_URL, {
+        showTitle: false,
+        enableUrlBarHiding: true,
+        enableDefaultShare: false,
+      }).then((result) => {
+        if (result.type === 'success' && result.url) {
+          setWebViewSource(result.url);
+        }
+      });
+      return false;
+    }
+    return true;
   }
 
   return (
@@ -57,8 +78,9 @@ export default function App() {
           ) : (
             <WebView
               ref={webViewRef}
-              source={{ uri: WEB_URL }}
+              source={{ uri: webViewSource }}
               style={{ flex: 1 }}
+              onShouldStartLoadWithRequest={handleShouldStartLoad}
               onNavigationStateChange={(navState) => {
                 setCanGoBack(navState.canGoBack);
                 setCurrentPath(getPathname(navState.url));

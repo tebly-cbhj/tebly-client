@@ -268,7 +268,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
           hasUnreadNotification={false}
-          onNotificationClick={() => console.log('알림 클릭')}
+          onNotificationClick={() => navigate('/noti-invitaion')}
           onDateChange={(date) => {
             setCurrentMonthDate(new Date(date.year, date.month - 1, date.day));
             setSelectedDate(new Date(date.year, date.month - 1, date.day));
