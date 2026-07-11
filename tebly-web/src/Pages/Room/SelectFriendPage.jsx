@@ -72,9 +72,14 @@ const SelectFriendPage = () => {
   const roomDescription = location.state?.description;
 
   const friendsList = useFriendStore((state) => state.friends);
+  const fetchFriends = useFriendStore((state) => state.fetchFriends);
 
   const [roomMembers, setRoomMembers] = useState([]);
   const [selected, setSelected] = useState([]);
+
+  useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
 
   useEffect(() => {
     if (currentRoomId) {
