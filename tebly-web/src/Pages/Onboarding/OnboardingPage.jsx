@@ -157,7 +157,7 @@ export default function OnboardingPage() {
           <Slide>
             <Title>{`복잡한 약속 잡기\n이제 테블리에게 맡겨요`}</Title>
             <ImageArea>
-              <div style={{ display: 'flex', justifyContent: 'center', background: '#FFFFFF', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', borderRadius: '12px' }}>
                 <ScheduleList width={256} height={348} />
               </div>
               <div style={{ position: 'absolute', top: '134px', left: '50%', transform: 'translateX(-50%)' }}>
