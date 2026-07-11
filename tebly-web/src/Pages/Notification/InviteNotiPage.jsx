@@ -77,6 +77,15 @@ export default function InviteNotiPage() {
     fetchInvitations();
   }, [fetchInvitations]);
 
+  async function handleRespond(action, id) {
+    try {
+      await action(id);
+    } catch (err) {
+      alert(err.message || '처리에 실패했어요.');
+      fetchInvitations();
+    }
+  }
+
 
   return (
     <PageWrapper>
@@ -106,8 +115,8 @@ export default function InviteNotiPage() {
                 roomName={invite.roomName}
                 description={invite.description}
                 inviter={invite.inviter}
-                onReject={() => rejectRoomInvite(invite.roomId)}
-                onAccept={() => acceptRoomInvite(invite.roomId)}
+                onReject={() => handleRespond(rejectRoomInvite, invite.roomId)}
+                onAccept={() => handleRespond(acceptRoomInvite, invite.roomId)}
                 />
             ))
             ) : (
@@ -120,8 +129,8 @@ export default function InviteNotiPage() {
                 location={invite.location}
                 roomName={invite.roomName}
                 // TODO: categoryId 없음 — 백엔드 응답에 카테고리 정보 추가되면 연동
-                onReject={() => rejectAppointmentInvite(invite.promiseId)}
-                onAccept={() => acceptAppointmentInvite(invite.promiseId)}
+                onReject={() => handleRespond(rejectAppointmentInvite, invite.promiseId)}
+                onAccept={() => handleRespond(acceptAppointmentInvite, invite.promiseId)}
                 />
             ))
             )}

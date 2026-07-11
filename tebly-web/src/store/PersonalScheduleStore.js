@@ -4,7 +4,7 @@ import apiClient from '../api/client';
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
 
 export const ALARM_TO_MINUTES = { '5분 전': 5, '10분 전': 10, '30분 전': 30, '1시간 전': 60, '12시간 전': 720, '1일 전': 1440 };
-const MINUTES_TO_ALARM = Object.fromEntries(
+export const MINUTES_TO_ALARM = Object.fromEntries(
   Object.entries(ALARM_TO_MINUTES).map(([label, minutes]) => [minutes, label])
 );
 
@@ -34,7 +34,10 @@ function mapEventDto(event) {
     memo: event.memo || '',
     // 카테고리는 실제 백엔드 객체({categoryId, categoryName, categoryIcon})를 그대로 들고 있음
     category: event.category,
-    alarmTime: MINUTES_TO_ALARM[event.notificationLeadMinutes] || '',
+    alarmTime: (event.notificationLeadMinutes || [])
+      .map((minutes) => MINUTES_TO_ALARM[minutes])
+      .filter(Boolean)
+      .join(', '),
     repeat: event.repeatType && event.repeatType !== 'NONE'
       ? { type: event.repeatType.toLowerCase(), interval: 1, until: event.repeatUntil ? toKoreanDateStr(event.repeatUntil) : null }
       : null,

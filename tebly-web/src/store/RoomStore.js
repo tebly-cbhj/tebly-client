@@ -15,6 +15,13 @@ export const useRoomStore = create((set) => ({
     set({ roomDetail: res.data });
   },
 
+  uploadRoomImage: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await apiClient.post('/rooms/image', formData);
+    return res.data.roomImageUrl;
+  },
+
   addRoom: (newTitle, newDesc, members) => set((state) => ({
     rooms: [
       ...state.rooms,

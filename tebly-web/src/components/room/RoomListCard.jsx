@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import DefaultProfile from '../../assets/default/profile/basic.svg';
 
 const CardWrapper = styled.div`
   display: flex;
@@ -106,7 +107,7 @@ export default function RoomListCard({ title, description, profileImages = [], t
           <DescText>{description}</DescText>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl}>
+              <Avatar key={index} $imgUrl={imgUrl || DefaultProfile}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}

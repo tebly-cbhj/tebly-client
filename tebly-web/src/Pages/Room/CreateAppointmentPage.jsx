@@ -12,6 +12,8 @@ import CategoryPopup from '../../components/room/CategoryPopup';
 import AlarmPopup from '../../components/room/AlarmPopup';
 import MinTimePickerPopup from '../../components/room/MinTimePickerPopup';
 
+import { ALARM_TO_MINUTES } from '../../store/PersonalScheduleStore';
+
 import PlaceIcon from '../../assets/icons/place.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
@@ -70,6 +72,14 @@ const BtnWrapper = styled.div`
   transform: translateX(-50%);
   width: 350px;
 `;
+
+function getNotificationLeadMinutes(alarmTime) {
+  if (!alarmTime) return [];
+  return alarmTime
+    .split(',')
+    .map((label) => ALARM_TO_MINUTES[label.trim()])
+    .filter((n) => n !== undefined);
+}
 
 export default function CreateAppointmentPage() {
   const [appointmentName, setAppointmentName] = useState('');
@@ -192,6 +202,7 @@ export default function CreateAppointmentPage() {
               proposeStartDate: dateRange?.start,
               proposeEndDate: dateRange?.end,
               minDuration: minDurationMinutes,
+              notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
               selectedMemberIds: selectedMembers.map((m) => m.id),
             }
           })}

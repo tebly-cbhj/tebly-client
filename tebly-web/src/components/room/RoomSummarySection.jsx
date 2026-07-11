@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Btn from '../common/Btn';
+import DefaultProfile from '../../assets/default/profile/basic.svg';
 
 const Container = styled.div`
   display: flex;
@@ -106,7 +107,7 @@ export default function RoomSummarySection({ roomId, name, description, profileI
         <ActionRow>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl} $isFirst={index === 0}>
+              <Avatar key={index} $imgUrl={imgUrl || DefaultProfile} $isFirst={index === 0}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}
