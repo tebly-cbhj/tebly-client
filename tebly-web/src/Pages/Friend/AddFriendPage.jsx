@@ -97,7 +97,7 @@ const Card = styled.div`
 `;
 
 const CardLabel = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;
@@ -114,7 +114,7 @@ const CodeDisplay = styled.div`
 `;
 
 const MyCodeText = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.75rem;
   font-style: normal;
   font-weight: 600;

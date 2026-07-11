@@ -18,7 +18,7 @@ const DigitText = styled.span`
   width: 100%;
   color: ${({ theme }) => theme.colors.gray900};
   text-align: center;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.75rem;
   font-style: normal;
   font-weight: 600;

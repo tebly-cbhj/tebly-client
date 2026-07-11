@@ -34,7 +34,7 @@ const AppointmentBanner = styled.div`
 `;
 
 const BannerText = styled.span`
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 0.8125rem;
   font-weight: 400;
   color: #525252;
@@ -60,7 +60,7 @@ const AppointmentCardLeft = styled.div`
 `;
 
 const AppointmentCardTitle = styled.span`
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: #525252;

@@ -28,7 +28,7 @@ const MenuItem = styled.button`
 const Label = styled.span`
   flex: 1 1 0;
   color: rgba(0, 0, 0, 0.80);
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;

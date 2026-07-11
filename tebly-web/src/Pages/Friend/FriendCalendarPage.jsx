@@ -62,7 +62,7 @@ const CenterArea = styled.div`
 
 const FriendName = styled.span`
   color: #000;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 140%;

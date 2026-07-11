@@ -26,7 +26,7 @@ const Block = styled.div`
 
 const Text = styled.p`
   color: ${({ theme }) => theme.colors.gray900};
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 8px;
   font-weight: 400;
   line-height: 140%;

@@ -72,7 +72,7 @@ const AllDayContent = styled.div`
 `;
 
 const AllDayLabel = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 600;
@@ -152,7 +152,7 @@ const CancelBtn = styled.button`
   border-radius: 0.5rem;
   background: #efefef;
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 400;
   color: #525252;
   cursor: pointer;
@@ -165,7 +165,7 @@ const ConfirmBtn = styled.button`
   border-radius: 0.5rem;
   background: ${({ theme }) => theme.colors.primary100};
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 600;
   color: #fefefe;
   cursor: pointer;
@@ -206,7 +206,7 @@ const FabMenuItem = styled.button`
   padding: 0;
   cursor: pointer;
   text-align: left;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;
@@ -239,7 +239,7 @@ const RepeatEndLabel = styled.span`
   color: var(--grayscale-gray-900, #1A1A1A);
 
   /* body2 */
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;
@@ -258,7 +258,7 @@ const RepeatEndValue = styled.div`
 const RepeatEndText = styled.span`
   color: var(--grayscale-gray-800, #525252);
   /* body2 */
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;

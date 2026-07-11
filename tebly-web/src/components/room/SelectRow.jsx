@@ -27,7 +27,7 @@ const Text = styled.span`
   color: ${({ $state, $color, theme }) =>
     $color ? theme.colors[$color] :
     $state === 'empty' ? theme.colors.gray800 : theme.colors.gray900};
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 140%;
@@ -42,7 +42,7 @@ const Input = styled.input`
   background: transparent;
   padding: 0;
   color: ${({ theme }) => theme.colors.gray900};
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 1rem;
   font-weight: 400;
   line-height: 140%;

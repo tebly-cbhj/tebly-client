@@ -16,7 +16,7 @@ const Overlay = styled.div`
 const Title = styled.h2`
   color: var(--grayscale-gray-900, #1A1A1A);
   text-align: center;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.75rem;
   font-weight: 600;
   line-height: 140%;
@@ -28,7 +28,7 @@ const Title = styled.h2`
 const Subtitle = styled.p`
   color: var(--grayscale-gray-500, #A3A3A3);
   text-align: center;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-weight: 400;
   line-height: 140%;

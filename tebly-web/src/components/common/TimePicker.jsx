@@ -76,7 +76,7 @@ const Item = styled.div`
   justify-content: center;
   scroll-snap-align: center;
   font-size: 1.125rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 400;
   line-height: 1.4;
   color: ${({ $selected }) => ($selected ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.20)')};
@@ -86,7 +86,7 @@ const Item = styled.div`
 
 const Colon = styled.span`
   font-size: 1.125rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 400;
   color: rgba(0, 0, 0, 0.85);
   z-index: 3;
