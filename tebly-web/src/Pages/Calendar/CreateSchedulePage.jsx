@@ -443,7 +443,7 @@ export default function CreateSchedulePage() {
                   $empty={!startDate}
                   onClick={() => setPopupType('date')}
                 >
-                  {startDate ? toDisplayDate(startDate) : '시작 시간'}
+                  {startDate ? toDisplayDate(startDate) : '시작 날짜'}
                 </DateButton>
                 <TimeButton onClick={() => openTimePicker('start')}>
                   {startTime}
@@ -454,7 +454,7 @@ export default function CreateSchedulePage() {
                   $empty={!endDate}
                   onClick={() => setPopupType('date')}
                 >
-                  {endDate ? toDisplayDate(endDate) : '종료 시간'}
+                  {endDate ? toDisplayDate(endDate) : '종료 날짜'}
                 </DateButton>
                 <TimeButton onClick={() => openTimePicker('end')}>
                   {endTime}

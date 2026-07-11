@@ -72,14 +72,21 @@ const SelectFriendPage = () => {
   const roomDescription = location.state?.description;
 
   const friendsList = useFriendStore((state) => state.friends);
+  const fetchFriends = useFriendStore((state) => state.fetchFriends);
 
   const [roomMembers, setRoomMembers] = useState([]);
   const [selected, setSelected] = useState([]);
 
   useEffect(() => {
+    fetchFriends();
+  }, [fetchFriends]);
+
+  useEffect(() => {
     if (currentRoomId) {
       apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
-        const members = res.data.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+        const members = res.data
+          .filter((m) => m.role !== 'HOST')
+          .map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
         setRoomMembers(members);
         setSelected(members);
       });

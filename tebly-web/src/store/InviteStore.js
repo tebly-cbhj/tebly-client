@@ -8,18 +8,11 @@ export const useInviteStore = create((set) => ({
   fetchInvitations: async () => {
     const res = await apiClient.get('/notifications/invitation');
 
-    const roomInvites = await Promise.all(
-      res.data.roomInvitations.map(async (invite) => {
-        const roomId = Number(invite.redirectPath.split('/').pop());
-        const roomRes = await apiClient.get(`/rooms/${roomId}`);
-        return {
-          roomId,
-          roomName: roomRes.data.name,
-          description: roomRes.data.description,
-          inviter: invite.user.nickname,
-        };
-      })
-    );
+    const roomInvites = res.data.roomInvitations.map((invite) => ({
+      roomId: invite.roomId,
+      roomName: invite.roomName,
+      description: invite.content,
+    }));
 
     set({ roomInvites, appointmentInvites: res.data.promiseInvitations });
   },

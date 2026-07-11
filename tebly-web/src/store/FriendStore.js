@@ -15,6 +15,10 @@ export const useFriendStore = create((set) => ({
     set({ inviteCode: res.data });
   },
 
+  addFriendByCode: async (inviteCode) => {
+    await apiClient.post('/friends/requests/code', { inviteCode });
+  },
+
   updateMyProfile: async ({ nickname, profileImageUrl, bio }) => {
     const res = await apiClient.patch('/users/me', { nickname, profileImageUrl, bio });
     set({ myProfile: res.data });

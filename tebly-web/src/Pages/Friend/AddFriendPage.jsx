@@ -7,12 +7,6 @@ import { useFriendStore } from '../../store/FriendStore';
 
 const CODE_LENGTH = 6;
 
-// TODO: POST /api/friends/search — 친구 코드 검색 API 연동 후 교체
-const MOCK_USERS = {
-  '123456': { id: 100, name: '오뚜기', intro: '아이고 허리 아프다 내일 뭐 먹지', profileImage: null },
-  '111111': { id: 1, name: '조정묵', intro: '엽덕 개땡기네', profileImage: null },
-};
-
 const Wrapper = styled.div`
   width: 100%;
   max-width: 480px;
@@ -204,74 +198,16 @@ const SubmitBtnText = styled.span`
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
-const ProfileCard = styled.div`
-  width: 100%;
-  max-width: 440px;
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 20px 24px;
-  gap: 0;
-  box-sizing: border-box;
-`;
-
-const ProfileImgWrap = styled.div`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-bottom: 12px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const FriendName = styled.span`
-  ${({ theme }) => theme.typography.h2};
-  color: ${({ theme }) => theme.colors.gray900};
-  margin-bottom: 8px;
-`;
-
-const FriendIntro = styled.span`
-  ${({ theme }) => theme.typography.body2};
-  color: ${({ theme }) => theme.colors.gray800};
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const AddFriendBtn = styled.button`
-  width: 100%;
-  padding: 16px 10px;
-  background: ${({ theme }) => theme.colors.primary100};
-  border-radius: 16px;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-`;
-
-const AddFriendBtnText = styled.span`
-  ${({ theme }) => theme.typography.h3};
-  color: ${({ theme }) => theme.colors.white};
-`;
-
 export default function AddFriendPage() {
   const navigate = useNavigate();
-  const addFriend = useFriendStore((s) => s.addFriend);
-  const friends = useFriendStore((s) => s.friends);
+  const addFriendByCode = useFriendStore((s) => s.addFriendByCode);
   const inviteCode = useFriendStore((s) => s.inviteCode);
   const fetchInviteCode = useFriendStore((s) => s.fetchInviteCode);
   const [code, setCode] = useState('');
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [copyToast, setCopyToast] = useState(false);
-  const [foundFriend, setFoundFriend] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -283,7 +219,6 @@ export default function AddFriendPage() {
     setCode(val);
     setIsError(false);
     setErrorMsg('');
-    setFoundFriend(null);
   }
 
   function showError(msg) {
@@ -313,25 +248,21 @@ export default function AddFriendPage() {
     document.body.removeChild(el);
   }
 
-  function handleSubmit() {
-    if (code.length < CODE_LENGTH) return;
+  async function handleSubmit() {
+    if (code.length < CODE_LENGTH || isSubmitting) return;
     if (code === inviteCode) {
       showError('자신의 코드는 입력할 수 없어요');
       return;
     }
-    const found = MOCK_USERS[code];
-    if (found) {
-      setFoundFriend(found);
-    } else {
-      showError('존재하지 않는 코드예요');
+    setIsSubmitting(true);
+    try {
+      await addFriendByCode(code);
+      navigate(-1);
+    } catch (err) {
+      showError(err.message || '존재하지 않는 코드예요');
+    } finally {
+      setIsSubmitting(false);
     }
-  }
-
-  // TODO: POST /api/friends — 친구 추가 API 연동 후 교체
-  function handleAddFriend() {
-    if (!foundFriend) return;
-    addFriend(foundFriend);
-    navigate(-1);
   }
 
   return (
@@ -383,37 +314,11 @@ export default function AddFriendPage() {
           </Card>
         </div>
 
-        {foundFriend && (
-          <div style={{ marginTop: '1.5rem' }}>
-            <ProfileCard>
-              <ProfileImgWrap>
-                {foundFriend.profileImage ? (
-                  <img src={foundFriend.profileImage} alt={foundFriend.name} />
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
-                    <circle cx="60" cy="60" r="60" fill="#DCDCDC" />
-                  </svg>
-                )}
-              </ProfileImgWrap>
-              <FriendName>{foundFriend.name}</FriendName>
-              {foundFriend.intro && <FriendIntro>{foundFriend.intro}</FriendIntro>}
-              {friends.some((f) => f.id === foundFriend.id) ? (
-                <AddFriendBtn disabled style={{ background: '#A3A3A3', cursor: 'default' }}>
-                  <AddFriendBtnText>이미 친구예요</AddFriendBtnText>
-                </AddFriendBtn>
-              ) : (
-                <AddFriendBtn onClick={handleAddFriend}>
-                  <AddFriendBtnText>친구 추가</AddFriendBtnText>
-                </AddFriendBtn>
-              )}
-            </ProfileCard>
-          </div>
-        )}
       </ContentArea>
 
       <BottomArea>
-        <SubmitBtn type="button" onClick={handleSubmit} disabled={code.length < CODE_LENGTH}>
-          <SubmitBtnText>입력 완료</SubmitBtnText>
+        <SubmitBtn type="button" onClick={handleSubmit} disabled={code.length < CODE_LENGTH || isSubmitting}>
+          <SubmitBtnText>{isSubmitting ? '추가하는 중...' : '입력 완료'}</SubmitBtnText>
         </SubmitBtn>
       </BottomArea>
 

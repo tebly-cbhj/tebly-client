@@ -91,7 +91,7 @@ export default function RoomSummarySection({ roomId, name, description, profileI
   const MAX_VISIBLE = 3;
   const navigate = useNavigate();
 
-  const visibleAvatars = profileImages.slice(0, MAX_VISIBLE);
+  const visibleAvatars = (profileImages ?? []).slice(0, MAX_VISIBLE);
   const extraCount = totalMemberCount - visibleAvatars.length;
 
   return (
