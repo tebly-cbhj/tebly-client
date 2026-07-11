@@ -2,8 +2,9 @@
 
 // '2026.06.12 (금)' → Date 객체로 변환
 export const parseDate = (dateStr) => {
-  const cleaned = dateStr.split(' ')[0].replace(/\./g, '-');
-  return new Date(cleaned);
+  const datePart = dateStr.split(' ')[0];
+  const [year, month, day] = datePart.split(/[-.]/).map(Number);
+  return new Date(year, month - 1, day);
 };
 
 export const parseTime = (timeStr) => {

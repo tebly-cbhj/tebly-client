@@ -1,14 +1,12 @@
-import { useState } from 'react';
 import MonthCalendarPage from './MonthCalendarPage';
 import WeekCalendarPage from './WeekCalendarPage';
+import { useCalendarViewStore } from '../../store/CalendarViewStore';
 
 export default function CalendarPage() {
-  const [viewMode, setViewMode] = useState('month');
-  const [selectedDate, setSelectedDate] = useState({
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
-    day: new Date().getDate(),
-  });
+  const viewMode = useCalendarViewStore((state) => state.viewMode);
+  const setViewMode = useCalendarViewStore((state) => state.setViewMode);
+  const selectedDate = useCalendarViewStore((state) => state.selectedDate);
+  const setSelectedDate = useCalendarViewStore((state) => state.setSelectedDate);
 
   return viewMode === 'month'
     ? <MonthCalendarPage
