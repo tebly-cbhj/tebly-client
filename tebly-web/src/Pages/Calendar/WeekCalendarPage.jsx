@@ -10,7 +10,7 @@ import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
-import AddBtn from '../../components/common/AddBtn';
+import CalendarFab from '../../components/calendar/CalendarFab';
 
 const WeekHeader = styled.div`
   display: flex;
@@ -96,7 +96,6 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
   const navigate = useNavigate();
   const scrollRef = useRef(null);
   const lastDistanceRef = useRef(null);
-  const ocrFileInputRef = useRef(null);
   const [cellHeight, setCellHeight] = useState(60);
 
   const personalSchedules = usePersonalScheduleStore(
@@ -222,7 +221,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
         hasUnreadNotification={false} // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
-        onNotificationClick={() => console.log('알림 클릭')} // TODO: 알림 페이지 navigate 연동
+        onNotificationClick={() => navigate('/noti-invitaion')} // TODO: 알림 페이지 navigate 연동
         onDateChange={(date) => {
           onDateChange?.(date);
           // TODO: 선택된 날짜 기준으로 해당 주 일정 API 호출 연동
@@ -302,20 +301,11 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
       </ScrollArea>
 
       <FloatingWrapper>
-        <AddBtn onClick={() => ocrFileInputRef.current?.click()} />
+        <CalendarFab
+          onDirectInput={() => navigate('/calendar/create')}
+          onAiRecognition={(file) => navigate('/ocr-loading', { state: { imageFile: file } })}
+        />
       </FloatingWrapper>
-
-      <input
-        ref={ocrFileInputRef}
-        type="file"
-        accept="image/jpeg,image/png"
-        style={{ display: 'none' }}
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          e.target.value = '';
-          if (file) navigate('/ocr-loading', { state: { imageFile: file } });
-        }}
-      />
     </PageWrapper>
   );
 }
