@@ -23,7 +23,7 @@ const ProfileCircle = styled.div`
   flex-shrink: 0;
   background: ${({ $image }) =>
     $image
-      ? `url(${$image}) lightgray 50% / cover no-repeat, #D9D9D9`
+      ? `url("${$image}") lightgray 50% / cover no-repeat, #D9D9D9`
       : '#D9D9D9'};
 `;
 

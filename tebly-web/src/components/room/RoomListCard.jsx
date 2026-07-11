@@ -65,7 +65,7 @@ const Avatar = styled.div`
   height: 33px;
   border-radius: 33px;
   background-color: ${(props) => props.theme.colors.gray500}; 
-  background-image: ${(props) => (props.$imgUrl ? `url(${props.$imgUrl})` : 'none')};
+  background-image: ${(props) => (props.$imgUrl ? `url("${props.$imgUrl}")` : 'none')};
   background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
