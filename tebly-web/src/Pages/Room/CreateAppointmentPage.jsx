@@ -82,21 +82,21 @@ function getNotificationLeadMinutes(alarmTime) {
 }
 
 export default function CreateAppointmentPage() {
-  const [appointmentName, setAppointmentName] = useState('');
-  const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const routerLocation = useLocation();
 
   const roomId = routerLocation.state?.roomId;
   const selectedMembers = routerLocation.state?.selectedMembers ?? [];
 
-  const [location, setLocation] = useState('');
-  const [category, setCategory] = useState(null); // { categoryId, categoryName, categoryIcon, isPrivate }
-  const [alarmTime, setAlarmTime] = useState('');
-  const [date, setDate] = useState('');
-  const [dateRange, setDateRange] = useState(null);
-  const [minTime, setMinTime] = useState('');
-  const [minDurationMinutes, setMinDurationMinutes] = useState(0);
+  const [appointmentName, setAppointmentName] = useState(routerLocation.state?.appointmentName ?? '');
+  const [memo, setMemo] = useState(routerLocation.state?.memo ?? '');
+  const [location, setLocation] = useState(routerLocation.state?.location ?? '');
+  const [category, setCategory] = useState(routerLocation.state?.category ?? null); // { categoryId, categoryName, categoryIcon, isPrivate }
+  const [alarmTime, setAlarmTime] = useState(routerLocation.state?.alarmTime ?? '');
+  const [date, setDate] = useState(routerLocation.state?.date ?? '');
+  const [dateRange, setDateRange] = useState(routerLocation.state?.dateRange ?? null);
+  const [minTime, setMinTime] = useState(routerLocation.state?.minTime ?? '');
+  const [minDurationMinutes, setMinDurationMinutes] = useState(routerLocation.state?.minDurationMinutes ?? 0);
 
   const [editingField, setEditingField] = useState(null);
   const [popupType, setPopupType] = useState(null);
@@ -182,7 +182,22 @@ export default function CreateAppointmentPage() {
               text_empty="친구 선택"
               text_selected={selectedMembers.length > 0 ? `${selectedMembers.length}명 선택됨` : ''}
               state={selectedMembers.length > 0 ? 'selected' : 'empty'}
-              onClick={() => navigate('/select-friend', { state: { appointmentMode: true, roomId } })}
+              onClick={() => navigate('/select-friend', {
+                state: {
+                  appointmentMode: true,
+                  roomId,
+                  appointmentName,
+                  memo,
+                  location,
+                  category,
+                  alarmTime,
+                  date,
+                  dateRange,
+                  minTime,
+                  minDurationMinutes,
+                  selectedMembers,
+                },
+              })}
             />
 
           </SelectRowContainer>

@@ -115,7 +115,7 @@ const SelectFriendPage = () => {
   async function handleComplete() {
     if (appointmentMode) {
       navigate('/create-appointment', {
-        state: { roomId: currentRoomId, selectedMembers: selected },
+        state: { ...location.state, selectedMembers: selected },
       });
     } else if (currentRoomId) {
       if (roomName) {
