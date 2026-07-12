@@ -70,6 +70,7 @@ const SelectFriendPage = () => {
   const currentRoomId = location.state?.roomId;
   const roomName = location.state?.roomName;
   const roomDescription = location.state?.description;
+  const roomImageUrl = location.state?.imageUrl;
 
   const friendsList = useFriendStore((state) => state.friends);
   const fetchFriends = useFriendStore((state) => state.fetchFriends);
@@ -121,6 +122,7 @@ const SelectFriendPage = () => {
         await apiClient.patch(`/rooms/${currentRoomId}`, {
           name: roomName,
           description: roomDescription,
+          imageUrl: roomImageUrl,
         });
       }
 
@@ -143,6 +145,7 @@ const SelectFriendPage = () => {
       await apiClient.post('/rooms', {
         name: roomName,
         description: roomDescription,
+        imageUrl: roomImageUrl,
         memberIds: selected.map((f) => f.id),
       });
       navigate('/room-list');

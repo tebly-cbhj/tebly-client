@@ -1,8 +1,9 @@
 import styled from 'styled-components';
+import DefaultProfile from '../../assets/default/profile/basic.svg';
 
 const CardWrapper = styled.div`
   display: flex;
-  width: 330px;
+  width: 100%;
   height: 272px;
   flex-direction: column;
   align-items: flex-start;
@@ -64,7 +65,7 @@ const Avatar = styled.div`
   height: 33px;
   border-radius: 33px;
   background-color: ${(props) => props.theme.colors.gray500}; 
-  background-image: ${(props) => (props.$imgUrl ? `url(${props.$imgUrl})` : 'none')};
+  background-image: ${(props) => (props.$imgUrl ? `url("${props.$imgUrl}")` : 'none')};
   background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
@@ -106,7 +107,7 @@ export default function RoomListCard({ title, description, profileImages = [], t
           <DescText>{description}</DescText>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl}>
+              <Avatar key={index} $imgUrl={imgUrl || DefaultProfile}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 import { useNavigate, useLocation } from "react-router-dom";
 import RoomCover from "../../components/room/RoomCover";
@@ -7,6 +7,7 @@ import { PageWrapper } from '../../PageWrapper';
 import Btn from "../../components/common/Btn";
 import ActionSheet from "../../components/common/ActionSheet";
 import Header from "../../components/common/Header";
+import { useRoomStore } from "../../store/RoomStore";
 
 
 const ContentArea = styled.div`
@@ -41,9 +42,24 @@ const CreateRoom = () => {
   const editRoomId = location.state?.roomId;
   const [roomName, setRoomName] = useState(location.state?.name ?? "");
   const [description, setDescription] = useState(location.state?.description ?? "");
+  const [imageUrl, setImageUrl] = useState(location.state?.imageUrl ?? null);
   const [sheetVisible, setSheetVisible] = useState(false);
   const isActive = roomName.trim() !== "" && description.trim() !== "";
   const navigate = useNavigate();
+  const uploadRoomImage = useRoomStore((state) => state.uploadRoomImage);
+  const fileInputRef = useRef(null);
+
+  async function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const url = await uploadRoomImage(file);
+      setImageUrl(url);
+    } catch {
+      alert('이미지 업로드에 실패했어요. 다시 시도해주세요.');
+    }
+  }
 
 
   return (
@@ -55,7 +71,7 @@ const CreateRoom = () => {
         icons={[]}
       />
       <ContentArea>
-        <RoomCover onClick={() => setSheetVisible(true)} />
+        <RoomCover imageUrl={imageUrl} onClick={() => setSheetVisible(true)} />
 
         <FieldContainer>
           <FieldLabel>방 이름</FieldLabel>
@@ -79,7 +95,7 @@ const CreateRoom = () => {
           <Btn
             text="다음"
             disabled={!isActive}
-            onClick={() => navigate('/select-friend', { state: { roomName, description, roomId: editRoomId } })}
+            onClick={() => navigate('/select-friend', { state: { roomName, description, imageUrl, roomId: editRoomId } })}
           />
         </BtnWrapper>
       </ContentArea>
@@ -89,8 +105,22 @@ const CreateRoom = () => {
         onClose={() => setSheetVisible(false)}
         option1Text="기본 커버 이미지"
         option2Text="앨범에서 선택"
-        onOption1={() => setSheetVisible(false)}
-        onOption2={() => setSheetVisible(false)}
+        onOption1={() => {
+          setImageUrl(null);
+          setSheetVisible(false);
+        }}
+        onOption2={() => {
+          setSheetVisible(false);
+          fileInputRef.current?.click();
+        }}
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
       />
     </PageWrapper>
   );

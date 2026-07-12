@@ -8,11 +8,19 @@ export const useInviteStore = create((set) => ({
   fetchInvitations: async () => {
     const res = await apiClient.get('/notifications/invitation');
 
-    const roomInvites = res.data.roomInvitations.map((invite) => ({
-      roomId: invite.roomId,
-      roomName: invite.roomName,
-      description: invite.content,
-    }));
+    const seenRoomIds = new Set();
+    const roomInvites = res.data.roomInvitations
+      .map((invite) => ({
+        roomId: invite.roomId,
+        roomName: invite.roomName,
+        description: invite.content,
+      }))
+      // 백엔드가 같은 방 초대에 알림을 중복으로 보내는 경우가 있어서, 방 번호 기준으로 하나만 남김
+      .filter((invite) => {
+        if (seenRoomIds.has(invite.roomId)) return false;
+        seenRoomIds.add(invite.roomId);
+        return true;
+      });
 
     set({ roomInvites, appointmentInvites: res.data.promiseInvitations });
   },

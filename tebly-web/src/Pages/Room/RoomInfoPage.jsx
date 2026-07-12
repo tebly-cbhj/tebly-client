@@ -91,9 +91,14 @@ export default function RoomInfoPage() {
   const promises = currentTab === 'tab1' ? room.myPromises : room.invitedPromises;
 
   async function handleLeaveRoom() {
-    await apiClient.delete(`/rooms/${roomId}/members/me`);
-    setIsSheetOpen(false);
-    navigate('/room-list');
+    try {
+      await apiClient.delete(`/rooms/${roomId}/members/me`);
+      setIsSheetOpen(false);
+      navigate('/room-list');
+    } catch (err) {
+      setIsSheetOpen(false);
+      alert(err.message || '방 나가기에 실패했어요.');
+    }
   }
 
   return (
@@ -166,7 +171,7 @@ export default function RoomInfoPage() {
           onOption1={() => {
             setIsSheetOpen(false);
             navigate('/create-room', {
-              state: { roomId: Number(roomId), name: room.name, description: room.description },
+              state: { roomId: Number(roomId), name: room.name, description: room.description, imageUrl: room.imageUrl },
             });
           }}
           onOption2={handleLeaveRoom}

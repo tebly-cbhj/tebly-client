@@ -21,7 +21,7 @@ const ProfileCircle = styled.div`
 
   border-radius: 20px;
   background: ${(props) => props.$img 
-    ? `url(${props.$img}) center/cover no-repeat` 
+    ? `url("${props.$img}") center/cover no-repeat`
     : props.theme.colors.gray500};
 `;
 

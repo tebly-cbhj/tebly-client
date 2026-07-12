@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Btn from '../common/Btn';
+import DefaultProfile from '../../assets/default/profile/basic.svg';
 
 const Container = styled.div`
   display: flex;
@@ -64,7 +65,7 @@ const Avatar = styled.div`
   height: 33px;
   border-radius: 33px;
   background: ${(props) => props.theme.colors.gray300}; 
-  background-image: ${(props) => (props.$imgUrl ? `url(${props.$imgUrl})` : 'none')};
+  background-image: ${(props) => (props.$imgUrl ? `url("${props.$imgUrl}")` : 'none')};
   background-position: 50% 50%;
   background-size: cover;
   background-repeat: no-repeat;
@@ -106,7 +107,7 @@ export default function RoomSummarySection({ roomId, name, description, profileI
         <ActionRow>
           <AvatarGroup>
             {visibleAvatars.map((imgUrl, index) => (
-              <Avatar key={index} $imgUrl={imgUrl} $isFirst={index === 0}>
+              <Avatar key={index} $imgUrl={imgUrl || DefaultProfile} $isFirst={index === 0}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (
                   <ExtraCount>+{extraCount}</ExtraCount>
                 )}

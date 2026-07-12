@@ -305,12 +305,11 @@ function toIsoDateTime(dateObj, timeStr) {
 }
 
 function getNotificationLeadMinutes(alarmTime) {
-  if (!alarmTime) return null;
-  const minutesList = alarmTime
+  if (!alarmTime) return [];
+  return alarmTime
     .split(',')
     .map((label) => ALARM_TO_MINUTES[label.trim()])
     .filter((n) => n !== undefined);
-  return minutesList.length > 0 ? Math.min(...minutesList) : null;
 }
 
 function parseDateString(dateStr) {
