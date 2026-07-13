@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
+import { useFriendStore } from '../../store/FriendStore';
 import apiClient from '../../api/client';
 import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
@@ -92,10 +93,22 @@ export default function RoomInfoPage() {
 
   const room = useRoomStore((state) => state.roomDetail);
   const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
+  const myProfile = useFriendStore((state) => state.myProfile);
+  const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
+  const [isHost, setIsHost] = useState(false);
 
   useEffect(() => {
     fetchRoomDetail(Number(roomId));
-  }, [roomId, fetchRoomDetail]);
+    fetchMyProfile();
+  }, [roomId, fetchRoomDetail, fetchMyProfile]);
+
+  useEffect(() => {
+    if (!myProfile) return;
+    apiClient.get(`/rooms/${roomId}/members`).then((res) => {
+      const me = res.data.find((m) => m.userId === myProfile.id);
+      setIsHost(me?.role === 'HOST');
+    });
+  }, [roomId, myProfile]);
 
   // TODO: GET /api/rooms/:id/unread — 안 읽은 채팅 여부 API 연동 후 교체
   const hasUnreadChat = false;
@@ -138,6 +151,7 @@ export default function RoomInfoPage() {
             description={room.description}
             profileImages={room.memberProfileImages}
             totalMemberCount={room.totalMemberCount}
+            isHost={isHost}
           />
         </SummaryWrapper>
 
@@ -179,15 +193,15 @@ export default function RoomInfoPage() {
         <ActionSheet
           visible={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          option1Text="방 수정하기"
+          option1Text={isHost ? '방 수정하기' : undefined}
           option2Text="방 나가기"
           option2Color="#E31818"
-          onOption1={() => {
+          onOption1={isHost ? () => {
             setIsSheetOpen(false);
             navigate('/create-room', {
               state: { roomId: Number(roomId), name: room.name, description: room.description, imageUrl: room.imageUrl },
             });
-          }}
+          } : undefined}
           onOption2={handleLeaveRoom}
         />
       )}

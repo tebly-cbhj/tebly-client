@@ -88,7 +88,7 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomSummarySection({ roomId, name, description, profileImages = [], totalMemberCount = 0 }) {
+export default function RoomSummarySection({ roomId, name, description, profileImages = [], totalMemberCount = 0, isHost = false }) {
   const MAX_VISIBLE = 3;
   const navigate = useNavigate();
 
@@ -115,13 +115,15 @@ export default function RoomSummarySection({ roomId, name, description, profileI
             ))}
           </AvatarGroup>
 
-          <ButtonWrapper>
-            <Btn 
-              size="small" 
-              onClick={() => navigate('/select-friend', { state: { roomId } })}
-              text="친구 초대"
-            />
-          </ButtonWrapper>
+          {isHost && (
+            <ButtonWrapper>
+              <Btn
+                size="small"
+                onClick={() => navigate('/select-friend', { state: { roomId } })}
+                text="친구 초대"
+              />
+            </ButtonWrapper>
+          )}
         </ActionRow>
       </InfoArea>
     </Container>

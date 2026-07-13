@@ -77,10 +77,14 @@ export default function ActionSheet({ visible, onClose, onOption1, onOption2, op
     <Overlay onClick={onClose}>
       <SheetContainer onClick={(e) => e.stopPropagation()}>
         <ActionGroup>
-          <ActionButton onClick={() => { setSelected('option1'); onOption1?.(); }}>
-            <ActionText $selected={selected === 'option1'}>{option1Text}</ActionText>
-          </ActionButton>
-          <Divider />
+          {option1Text && (
+            <>
+              <ActionButton onClick={() => { setSelected('option1'); onOption1?.(); }}>
+                <ActionText $selected={selected === 'option1'}>{option1Text}</ActionText>
+              </ActionButton>
+              <Divider />
+            </>
+          )}
           <ActionButton onClick={() => { setSelected('option2'); onOption2?.(); }}>
             <ActionText $selected={selected === 'option2'} $color={option2Color}>{option2Text}</ActionText>
           </ActionButton>
