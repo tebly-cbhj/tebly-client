@@ -12,7 +12,7 @@ import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 
 const Wrapper = styled.div`
   width: 100%;
-  max-width: 480px;
+  max-width: 390px;
   margin: 0 auto;
   height: 100vh;
   display: flex;

@@ -65,7 +65,16 @@ export const useScheduleStore = create((set, get) => ({
       icon: newCategory.iconId,
       isPrivate: false,
     });
-    set((state) => ({ categories: [...state.categories, res.data] }));
+    // POST 응답이 생성된 카테고리 객체가 아니라 새 categoryId(숫자)만 내려와서,
+    // 응답을 그대로 넣으면 이름/아이콘이 undefined가 됨 → 요청 값으로 직접 구성
+    const created = {
+      categoryId: res.data,
+      categoryName: newCategory.name,
+      categoryIcon: newCategory.iconId,
+      isPrivate: false,
+      isDefault: false,
+    };
+    set((state) => ({ categories: [...state.categories, created] }));
   },
 
   deleteCategory: async (categoryId) => {
