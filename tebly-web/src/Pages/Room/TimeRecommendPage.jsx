@@ -143,6 +143,14 @@ const SORT_OPTIONS = [
   { value: 'latest',     label: '늦은 시간순' },
 ];
 
+// 백엔드 sortType은 참여 인원순을 지원하지 않아서, 그 경우엔 추천순으로 요청함
+const SORT_VALUE_TO_API_TYPE = {
+  recommended: 'RECOMMENDED',
+  members: 'RECOMMENDED',
+  earliest: 'EARLIEST',
+  latest: 'LATEST',
+};
+
 // ─── 날짜 선택 시트 ─────────────────────────────────────────────
 
 const DateSheet = styled.div`
@@ -357,9 +365,9 @@ const isUpdateMode = Boolean(promiseId);
         proposeStartDate: formatDateForApi(range.start),
         proposeEndDate: formatDateForApi(range.end),
         searchStartTime: '00:00',
-        searchEndTime: '23:59',
+        searchEndTime: '23:30',
         minDuration,
-        sortType: 'EARLIEST',
+        sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
       };
       const res = isUpdateMode
         ? await apiClient.post(`/promises/${promiseId}/time-recommendations`, payload)
@@ -395,11 +403,11 @@ const isUpdateMode = Boolean(promiseId);
           proposeStartDate: formatDateForApi(dateRange.start),
           proposeEndDate: formatDateForApi(dateRange.end),
           searchStartTime: '00:00',
-          searchEndTime: '23:59',
+          searchEndTime: '23:30',
           recommendedStartTime: selectedOption.startTimeRaw,
           recommendedEndTime: selectedOption.endTimeRaw,
           minDuration,
-          sortType: 'EARLIEST',
+          sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
         });
         navigate(-1);
       } else {
@@ -410,13 +418,13 @@ const isUpdateMode = Boolean(promiseId);
           proposeStartDate: formatDateForApi(dateRange.start),
           proposeEndDate: formatDateForApi(dateRange.end),
           searchStartTime: '00:00',
-          searchEndTime: '23:59',
+          searchEndTime: '23:30',
           recommendedStartTime: selectedOption.startTimeRaw,
           recommendedEndTime: selectedOption.endTimeRaw,
           location,
           minDuration,
           notificationLeadMinutes,
-          sortType: 'EARLIEST',
+          sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
           selectedMemberIds,
         });
         navigate(`/room/${roomId}`);
@@ -436,7 +444,7 @@ const isUpdateMode = Boolean(promiseId);
         proposeStartDate: formatDateForApi(dateRange.start),
         proposeEndDate: formatDateForApi(dateRange.end),
         searchStartTime: '00:00',
-        searchEndTime: '23:59',
+        searchEndTime: '23:30',
         minDuration,
         sortType: 'RECOMMENDED',
         location,

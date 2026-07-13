@@ -121,8 +121,10 @@ export default function AlarmPage() {
           <NotiCard
             key={noti.id}
             categoryId={getCategoryIcon(noti.categoryId)}
+            type={noti.type}
             title={noti.title}
             content={noti.content}
+            senderNickname={noti.senderNickname}
             notifiedAt={formatNotifiedAt(noti.createdAt)}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
