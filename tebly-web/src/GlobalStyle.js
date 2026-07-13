@@ -5,6 +5,7 @@ export const GlobalStyle = createGlobalStyle`
     font-family: 'Pretendard Variable', sans-serif;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
   }
 
   html, body, #root {

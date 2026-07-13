@@ -6,10 +6,24 @@ import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
 import ScheduleCard from '../../components/room/ScheduleCard';
 import styled from 'styled-components';
-import { PageWrapper } from '../../PageWrapper';
 import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
 import ActionSheet from '../../components/common/ActionSheet';
+
+// PageWrapper와 같은 max-width/높이/배경이지만, HeaderWrapper가 이미
+// 자체적으로 좌우 패딩을 갖고 있어서 패딩은 제외한 버전
+const PageContainer = styled.div`
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  height: 100vh;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.colors.bg};
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
 
 const HeaderWrapper = styled.div`
   width: 100%;
@@ -102,7 +116,7 @@ export default function RoomInfoPage() {
   }
 
   return (
-    <>
+    <PageContainer>
       <HeaderWrapper>
         <Header
           title={room.name}
@@ -177,6 +191,6 @@ export default function RoomInfoPage() {
           onOption2={handleLeaveRoom}
         />
       )}
-    </>
+    </PageContainer>
   );
 }
