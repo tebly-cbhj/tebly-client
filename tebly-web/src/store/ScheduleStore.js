@@ -65,7 +65,16 @@ export const useScheduleStore = create((set, get) => ({
       icon: newCategory.iconId,
       isPrivate: false,
     });
-    set((state) => ({ categories: [...state.categories, res.data] }));
+    // POST 응답이 생성된 카테고리 객체가 아니라 새 categoryId(숫자)만 내려와서,
+    // 응답을 그대로 넣으면 이름/아이콘이 undefined가 됨 → 요청 값으로 직접 구성
+    const created = {
+      categoryId: res.data,
+      categoryName: newCategory.name,
+      categoryIcon: newCategory.iconId,
+      isPrivate: false,
+      isDefault: false,
+    };
+    set((state) => ({ categories: [...state.categories, created] }));
   },
 
   deleteCategory: async (categoryId) => {
@@ -78,21 +87,32 @@ export const useScheduleStore = create((set, get) => ({
   togglePrivate: async (categoryId) => {
     const target = get().categories.find((c) => c.categoryId === categoryId);
     if (!target) return;
-    const res = await apiClient.patch(`/schedules/categories/${categoryId}`, {
-      isPrivate: !target.isPrivate,
+    const nextIsPrivate = !target.isPrivate;
+    await apiClient.patch(`/schedules/categories/${categoryId}`, {
+      isPrivate: nextIsPrivate,
     });
+    // PATCH 응답의 data는 카테고리 객체가 아니라 categoryId(숫자)만 내려와서,
+    // 응답을 그대로 넣으면 다른 필드가 다 undefined가 됨 → 로컬에서 직접 병합
     set((state) => ({
-      categories: state.categories.map((c) => (c.categoryId === categoryId ? res.data : c)),
+      categories: state.categories.map((c) =>
+        c.categoryId === categoryId ? { ...c, isPrivate: nextIsPrivate } : c
+      ),
     }));
   },
 
   updateCategory: async (categoryId, updatedCategory) => {
-    const res = await apiClient.patch(`/schedules/categories/${categoryId}`, {
+    await apiClient.patch(`/schedules/categories/${categoryId}`, {
       name: updatedCategory.name,
       icon: updatedCategory.iconId,
     });
+    // PATCH 응답의 data는 카테고리 객체가 아니라 categoryId(숫자)만 내려와서,
+    // 응답을 그대로 넣으면 다른 필드가 다 undefined가 됨 → 로컬에서 직접 병합
     set((state) => ({
-      categories: state.categories.map((c) => (c.categoryId === categoryId ? res.data : c)),
+      categories: state.categories.map((c) =>
+        c.categoryId === categoryId
+          ? { ...c, categoryName: updatedCategory.name, categoryIcon: updatedCategory.iconId }
+          : c
+      ),
     }));
   },
 

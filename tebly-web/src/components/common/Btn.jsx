@@ -27,9 +27,10 @@ const StyledButton = styled.button`
     if (props.disabled) return props.theme.colors.primary30;
     if (props.$variant === 'gray') return props.theme.colors.gray200;
     if (props.$variant === 'white') return props.theme.colors.white;
+    if (props.$variant === 'danger') return props.theme.colors.alert;
     return props.theme.colors.primary100;
   }};
-  
+
   color: ${(props) => {
     if (props.$variant === 'gray') return props.theme.colors.gray800;
     if (props.$variant === 'white') return props.theme.colors.gray900;

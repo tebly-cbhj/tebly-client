@@ -18,6 +18,7 @@ import MoreLineIcon from '../../assets/icons/more-line.svg?react';
 
 import { CATEGORY_ICON_MAP, CATEGORY_KO } from '../../components/room/CategoryIcons';
 import apiClient from '../../api/client';
+import { useLastSavedScheduleStore } from '../../store/LastSavedScheduleStore';
 
 const CATEGORY_BG = {
   Appointment:     { bg: '#FFBEBE', outline: '#FF8989' },
@@ -177,13 +178,13 @@ const TabLabel = styled.span`
 export default function EventDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [allDay, setAllDay] = useState(false);
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const lastSaved = useLastSavedScheduleStore((state) => state);
 
   // TODO: location.state 대신 scheduleId(URL 파라미터)로 GET /api/schedules/:id 호출하여 데이터 fetch
-  // TODO: allDay 초기값을 API 응답 데이터로 초기화
   const scheduleId = location.state?.scheduleId;
-  const schedule = location.state?.schedule || {
+  const schedule = (lastSaved.scheduleId === scheduleId ? lastSaved.schedule : null)
+    || location.state?.schedule || {
     title: '미문 과제 제출',
     memo: '1,000자 내외 작성, 제출형식 pdf',
     startDate: '5월 12일 금요일',
@@ -195,6 +196,8 @@ export default function EventDetailPage() {
     alarmTime: '1시간 전 알림',
     repeat: '반복 없음',
   };
+
+  const allDay = schedule.startTime === '00:00' && schedule.endTime === '23:59';
 
   const categoryConfig = getCategoryConfig(schedule.category);
   const CategoryImg = categoryConfig.Icon;
@@ -251,7 +254,7 @@ export default function EventDetailPage() {
           <AllDayRow>
             <IconBox><ClockIcon /></IconBox>
             <AllDayLabel>종일</AllDayLabel>
-            <Toggle isOn={allDay} onToggle={() => setAllDay(!allDay)} />
+            <Toggle isOn={allDay} />
           </AllDayRow>
           {!allDay && (
             <>

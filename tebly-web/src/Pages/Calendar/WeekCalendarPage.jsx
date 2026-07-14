@@ -6,6 +6,7 @@ import { PageWrapper } from '../../PageWrapper';
 import { parseDate, parseTime, expandRepeatingSchedules } from '../../utils/DateUtils';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
+import WeekAllDayRow from '../../components/calendar/week/WeekAllDayRow';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
 import { useScheduleStore } from '../../store/ScheduleStore';
@@ -82,6 +83,14 @@ const FloatingWrapper = styled.div`
   z-index: 100;
 `;
 
+// 백엔드에 종일 여부 필드가 없어서, 시작~종료가 하루 전체(00:00~23:59)를
+// 덮는 일정을 종일 일정으로 간주함
+function isAllDayTime(timeStr) {
+  if (!timeStr) return false;
+  const { startMinutes, durationMinutes } = parseTime(timeStr);
+  return startMinutes === 0 && durationMinutes >= 1439;
+}
+
 function getWeekRangeFromDate(date) {
   const sunday = new Date(date);
   sunday.setDate(date.getDate() - date.getDay());
@@ -133,6 +142,34 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
   );
 
   const getDayIndex = (schedule) => schedule._occurrenceDate.getDay();
+
+  const allDayEventsByDay = useMemo(() => {
+    const byDay = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+
+    weekPersonal
+      .filter((schedule) => isAllDayTime(schedule.time))
+      .forEach((schedule) => {
+        byDay[getDayIndex(schedule)].push({
+          id: `${schedule.id}-${schedule._occurrenceDate.toISOString()}`,
+          category: schedule.category?.categoryIcon,
+          title: schedule.title,
+          onClick: () => handleScheduleClick(schedule, schedule._occurrenceDate),
+        });
+      });
+
+    weekGroup
+      .filter((schedule) => isAllDayTime(schedule.time))
+      .forEach((schedule) => {
+        byDay[parseDate(schedule.date).getDay()].push({
+          id: schedule.id,
+          category: categoryIconMap[schedule.category],
+          title: schedule.title,
+          onClick: () => handleScheduleClick(schedule, null),
+        });
+      });
+
+    return byDay;
+  }, [weekPersonal, weekGroup]);
 
   const monthLabel = selectedDate
     ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
@@ -230,6 +267,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
 
       <WeekHeader>
         <WeekDateCell sunday={sunday} />
+        <WeekAllDayRow eventsByDay={allDayEventsByDay} />
       </WeekHeader>
 
       <ScrollArea ref={scrollRef}>
@@ -255,8 +293,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             );
           })}
 
-          {/* 개인 일정 블록 */}
-          {weekPersonal.map((schedule) => {
+          {/* 개인 일정 블록 (종일 일정은 위쪽 종일 칩 줄에서 표시하므로 제외) */}
+          {weekPersonal.filter((schedule) => !isAllDayTime(schedule.time)).map((schedule) => {
             const { startMinutes, durationMinutes } = parseTime(schedule.time);
             const startRow = Math.floor(startMinutes / 5) + 1;
             const spanRows = Math.floor(durationMinutes / 5);
@@ -276,8 +314,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             );
           })}
 
-          {/* 그룹 일정 블록 */}
-          {weekGroup.map((schedule) => {
+          {/* 그룹 일정 블록 (종일 일정은 위쪽 종일 칩 줄에서 표시하므로 제외) */}
+          {weekGroup.filter((schedule) => !isAllDayTime(schedule.time)).map((schedule) => {
             const { startMinutes, durationMinutes } = parseTime(schedule.time);
             const startRow = Math.floor(startMinutes / 5) + 1;
             const spanRows = Math.floor(durationMinutes / 5);

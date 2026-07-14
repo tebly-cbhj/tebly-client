@@ -18,7 +18,7 @@ const ChipWrapper = styled.div`
 `;
 
 const ChipText = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.75rem;
   font-style: normal;
   font-weight: ${({ $selected }) => ($selected ? 600 : 400)};

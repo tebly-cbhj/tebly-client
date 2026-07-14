@@ -21,10 +21,11 @@ const ProfileCircle = styled.div`
   height: 2.375rem;
   border-radius: 2.375rem;
   flex-shrink: 0;
-  background: ${({ $image }) =>
-    $image
-      ? `url("${$image}") lightgray 50% / cover no-repeat, #D9D9D9`
-      : '#D9D9D9'};
+  background-color: #D9D9D9;
+  background-image: ${({ $image }) => ($image ? `url("${$image}")` : 'none')};
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;
 
 const ContentColumn = styled.div`

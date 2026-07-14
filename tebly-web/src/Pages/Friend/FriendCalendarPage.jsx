@@ -12,7 +12,7 @@ import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 
 const Wrapper = styled.div`
   width: 100%;
-  max-width: 480px;
+  max-width: 390px;
   margin: 0 auto;
   height: 100vh;
   display: flex;
@@ -62,7 +62,7 @@ const CenterArea = styled.div`
 
 const FriendName = styled.span`
   color: #000;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 140%;

@@ -61,6 +61,7 @@ export default function RoomListPage() {
             key={room.roomId}
             title={room.name}
             description={room.description}
+            imageUrl={room.imageUrl}
             profileImages={room.memberProfileImages}
             totalMemberCount={room.totalMemberCount}
             onClick={() => navigate(`/room/${room.roomId}`)}  

@@ -31,7 +31,7 @@ const Text = styled.span`
     overflow: hidden;
     text-align: center;
     text-overflow: ellipsis;
-    font-family: Pretendard;
+    font-family: 'Pretendard Variable';
     font-size: 8px;
     font-style: normal;
     font-weight: 400;

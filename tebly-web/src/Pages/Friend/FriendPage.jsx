@@ -48,7 +48,7 @@ const Title = styled.h1`
   gap: 10px;
   flex: 1 0 0;
   color: #000;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1.25rem;
   font-style: normal;
   font-weight: 600;
@@ -94,7 +94,7 @@ const SearchInput = styled.input`
   border: none;
   background: transparent;
   outline: none;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 140%;
@@ -143,7 +143,7 @@ const TextArea = styled.div`
 
 const Name = styled.span`
   color: #1a1a1a;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 600;
@@ -156,7 +156,7 @@ const Name = styled.span`
 
 const Intro = styled.span`
   color: #525252;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;
@@ -184,7 +184,7 @@ const FriendCountLabel = styled.div`
   align-self: stretch;
   flex-shrink: 0;
   color: #a3a3a3;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;

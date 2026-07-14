@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import 'pretendard/dist/web/variable/pretendardvariable.css';
 import App from './App.jsx'; // App 컴포넌트를 불러옵니다.
 
 ReactDOM.createRoot(document.getElementById('root')).render(

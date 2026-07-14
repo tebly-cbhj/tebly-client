@@ -25,7 +25,7 @@ const DateBlock = styled.div`
 `;
 
 const DateNumber = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 20px;
   font-weight: 600;
   line-height: 28px;
@@ -34,7 +34,7 @@ const DateNumber = styled.span`
 `;
 
 const DayName = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 16px;
   font-weight: 600;
   line-height: 22.4px;
@@ -70,7 +70,7 @@ const TimeInfo = styled.div`
 
 const TimeText = styled.span`
   color: ${({ $selected, theme }) => $selected ? theme.colors.primary100 : '#1A1A1A'};
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;
@@ -95,7 +95,7 @@ const CountRow = styled.div`
 `;
 
 const CountText = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 14px;
   font-weight: 400;
   line-height: 19.6px;

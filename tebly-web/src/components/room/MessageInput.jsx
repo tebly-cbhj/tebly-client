@@ -25,7 +25,7 @@ const Input = styled.input`
   border: none;
   outline: none;
   background: transparent;
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 140%;
