@@ -17,7 +17,11 @@ const TopArea = styled.div`
   height: 177px;
   flex-shrink: 0;
   align-self: stretch;
-  background: ${(props) => props.theme.colors.primary50}; 
+  background-color: ${(props) => (props.$imageUrl ? 'transparent' : props.theme.colors.primary50)};
+  background-image: ${(props) => (props.$imageUrl ? `url("${props.$imageUrl}")` : 'none')};
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;
 
 const BottomArea = styled.div`
@@ -93,14 +97,14 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomListCard({ title, description, profileImages = [], totalMemberCount = 0, onClick }) {
+export default function RoomListCard({ title, description, imageUrl, profileImages = [], totalMemberCount = 0, onClick }) {
   const MAX_VISIBLE = 3;
   const visibleAvatars = (profileImages ?? []).slice(0, MAX_VISIBLE);
   const extraCount = totalMemberCount - visibleAvatars.length;
 
   return (
     <CardWrapper onClick={onClick}>
-      <TopArea />
+      <TopArea $imageUrl={imageUrl} />
       <BottomArea>
         <Title>{title}</Title>
         <DescRow>

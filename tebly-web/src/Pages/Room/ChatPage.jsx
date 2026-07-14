@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../../components/common/Header';
@@ -12,7 +12,7 @@ import { useFriendStore } from '../../store/FriendStore';
 
 const ChatContainer = styled.div`
   width: 100%;
-  max-width: 480px;
+  max-width: 390px;
   height: 100vh;
   margin: 0 auto;
   display: flex;
@@ -40,43 +40,6 @@ const BannerText = styled.span`
   color: #525252;
   line-height: 1.4;
 `;
-
-const AppointmentCard = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: #efefef;
-  border-radius: 0.75rem;
-  margin: 0.5rem 1.25rem;
-  flex-shrink: 0;
-  cursor: pointer;
-`;
-
-const AppointmentCardLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-
-const AppointmentCardTitle = styled.span`
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #525252;
-  line-height: 1.4;
-`;
-
-const ChevronIcon = ({ up }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-    <path
-      d={up ? 'M7 15L12 9L17 15' : 'M7 9L12 15L17 9'}
-      stroke="#525252"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 const MessageList = styled.div`
   flex: 1;
@@ -118,6 +81,8 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
+  const roomDetail = useRoomStore((state) => state.roomDetail);
+  const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
   const { connect, sendMessage, fetchMessages, messagesByRoom } = useChatStore();
   const myProfile = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
@@ -125,13 +90,22 @@ export default function ChatPage() {
   const accessToken = localStorage.getItem('accessToken') || import.meta.env.VITE_ACCESS_TOKEN;
 
   const [inputValue, setInputValue] = useState('');
-  // TODO: API 연결 시 서버에서 받아온 약속 확정 여부로 대체
-  const [appointmentConfirmed, setAppointmentConfirmed] = useState(false);
-  const [cardExpanded, setCardExpanded] = useState(true);
 
   useEffect(() => {
     if (!myProfile) fetchMyProfile();
   }, [myProfile, fetchMyProfile]);
+
+  useEffect(() => {
+    fetchRoomDetail(Number(roomId));
+  }, [roomId, fetchRoomDetail]);
+
+  // 방장이 '약속 확정'을 누른 시점부터 약속 날짜(endTime)까지만 배너 노출
+  const confirmedPromise = useMemo(() => {
+    if (!roomDetail) return null;
+    const promises = [...(roomDetail.myPromises ?? []), ...(roomDetail.invitedPromises ?? [])];
+    const now = new Date();
+    return promises.find((p) => p.promiseStatus === 'CONFIRMED' && new Date(p.endTime) >= now) ?? null;
+  }, [roomDetail]);
 
   useEffect(() => {
     if (!myProfile) return;
@@ -157,18 +131,10 @@ export default function ChatPage() {
         />
       </HeaderWrapper>
 
-      {appointmentConfirmed ? (
-        <AppointmentCard onClick={() => setCardExpanded((prev) => !prev)}>
-          <AppointmentCardLeft>
-            <CalendarIcon />
-            <AppointmentCardTitle>캘박하조 1차 스터디</AppointmentCardTitle>
-          </AppointmentCardLeft>
-          <ChevronIcon up={cardExpanded} />
-        </AppointmentCard>
-      ) : (
+      {confirmedPromise && (
         <AppointmentBanner>
           <CalendarIcon />
-          <BannerText>2차_스터디 약속이 확정됐어요 !</BannerText>
+          <BannerText>{confirmedPromise.title} 약속이 확정됐어요 !</BannerText>
         </AppointmentBanner>
       )}
 

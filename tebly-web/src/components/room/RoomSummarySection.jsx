@@ -13,7 +13,11 @@ const Container = styled.div`
 const PhotoArea = styled.div`
   height: 108px;
   align-self: stretch;
-  background-color: ${(props) => props.theme.colors.primary50}; 
+  background-color: ${(props) => (props.$imageUrl ? 'transparent' : props.theme.colors.primary50)};
+  background-image: ${(props) => (props.$imageUrl ? `url("${props.$imageUrl}")` : 'none')};
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
 `;
 
 const InfoArea = styled.div`
@@ -88,7 +92,7 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomSummarySection({ roomId, name, description, profileImages = [], totalMemberCount = 0, isHost = false }) {
+export default function RoomSummarySection({ roomId, name, description, imageUrl, profileImages = [], totalMemberCount = 0, isHost = false }) {
   const MAX_VISIBLE = 3;
   const navigate = useNavigate();
 
@@ -97,7 +101,7 @@ export default function RoomSummarySection({ roomId, name, description, profileI
 
   return (
     <Container>
-      <PhotoArea />
+      <PhotoArea $imageUrl={imageUrl} />
       <InfoArea>
         <TextGroup>
           <Title>{name}</Title>
