@@ -109,6 +109,23 @@ const BtnWrapper = styled.div`
   box-sizing: border-box;
 `;
 
+const Toast = styled.div`
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: ${({ theme }) => theme.colors.gray900};
+  border-radius: 0.75rem;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.white};
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 200;
+`;
+
 const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
 const STATUS_LABEL_TO_ENUM = { '참석': 'ACCEPTED', '불참': 'REJECTED', '미응답': 'PENDING' };
 const pad = (n) => String(n).padStart(2, '0');
@@ -171,6 +188,12 @@ export default function MyAppointmentPage() {
   const [displayTime, setDisplayTime] = useState('');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  function showToast(message) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 2000);
+  }
 
   useEffect(() => {
     if (promise) {
@@ -187,7 +210,10 @@ export default function MyAppointmentPage() {
     : promise.members;
 
   async function handlePrimaryAction() {
-    if (isEditing) {
+    if (isInvited) {
+      await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
+      navigate(-1);
+    } else if (isEditing) {
       if (pendingStartTimeIso && pendingEndTimeIso) {
         await apiClient.patch(`/promises/${promiseId}`, {
           title: promise.title,
@@ -204,14 +230,18 @@ export default function MyAppointmentPage() {
       }
       setIsEditing(false);
       fetchDetail();
-    } else if (isInvited) {
-      await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
-      navigate(-1);
     } else {
-      await apiClient.patch(`/promises/${promiseId}/confirm`);
-      fetchDetail();
+      try {
+        await apiClient.patch(`/promises/${promiseId}/confirm`);
+        await fetchDetail();
+        showToast('약속이 확정되었어요!');
+      } catch (err) {
+        showToast(err.message || '약속 확정에 실패했어요.');
+      }
     }
   }
+
+  const isAlreadyConfirmed = !isEditing && !isInvited && promise.promiseStatus === 'CONFIRMED';
 
   async function handleDelete() {
     await apiClient.delete(`/promises/${promiseId}`);
@@ -316,12 +346,16 @@ export default function MyAppointmentPage() {
           ))}
         </AttendanceWrapper>
 
-        <BtnWrapper>
-          <Btn
-            text={isEditing ? '응답 저장' : isInvited ? '응답 완료' : '약속 확정'}
-            onClick={handlePrimaryAction}
-          />
-        </BtnWrapper>
+        {!isAlreadyConfirmed && (
+          <BtnWrapper>
+            <Btn
+              text={isEditing ? '응답 저장' : isInvited ? '응답 완료' : '약속 확정'}
+              onClick={handlePrimaryAction}
+            />
+          </BtnWrapper>
+        )}
+
+        <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
 
         <ActionSheet
           visible={isSheetOpen}

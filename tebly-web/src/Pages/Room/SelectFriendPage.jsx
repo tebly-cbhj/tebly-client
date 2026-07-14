@@ -74,6 +74,8 @@ const SelectFriendPage = () => {
 
   const friendsList = useFriendStore((state) => state.friends);
   const fetchFriends = useFriendStore((state) => state.fetchFriends);
+  const myProfile = useFriendStore((state) => state.myProfile);
+  const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
 
   const [roomMembers, setRoomMembers] = useState([]);
   const [selected, setSelected] = useState(
@@ -86,16 +88,21 @@ const SelectFriendPage = () => {
   }, [fetchFriends]);
 
   useEffect(() => {
-    if (currentRoomId) {
+    if (appointmentMode && !myProfile) fetchMyProfile();
+  }, [appointmentMode, myProfile, fetchMyProfile]);
+
+  useEffect(() => {
+    if (currentRoomId && (!appointmentMode || myProfile)) {
       apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
-        const members = res.data
-          .filter((m) => m.role !== 'HOST')
-          .map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+        const filtered = appointmentMode
+          ? res.data.filter((m) => m.userId !== myProfile.id)
+          : res.data.filter((m) => m.role !== 'HOST');
+        const members = filtered.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
         setRoomMembers(members);
         setSelected(members);
       });
     }
-  }, [currentRoomId]);
+  }, [currentRoomId, appointmentMode, myProfile]);
 
   const displayList = appointmentMode ? roomMembers : friendsList;
 
