@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import ToggleBtn from '../../components/more/ToggleBtn';
@@ -62,7 +62,8 @@ const ListContainer = styled.div`
 
 export default function InviteNotiPage() {
   const navigate = useNavigate();
-  const [tab, setTab] = useState('left'); // left: 방, right: 약속
+  const location = useLocation();
+  const [tab, setTab] = useState(location.state?.tab ?? 'left'); // left: 방, right: 약속
   const {
     roomInvites,
     appointmentInvites,

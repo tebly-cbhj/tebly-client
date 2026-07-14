@@ -134,7 +134,7 @@ export default function DecisionCard({ content }) {
             )}
           </TextArea>
           <BtnWrapper>
-            <Btn text="초대장 확인하기" size="small" onClick={() => navigate('/noti-invitaion')} />
+            <Btn text="초대장 확인하기" size="small" onClick={() => navigate('/noti-invitaion', { state: { tab: 'right' } })} />
           </BtnWrapper>
         </Card>
       </ContentColumn>
