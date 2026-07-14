@@ -25,6 +25,8 @@ const Block = styled.div`
 `;
 
 const Text = styled.p`
+  flex: 1;
+  min-width: 0;
   color: ${({ theme }) => theme.colors.gray900};
   font-family: 'Pretendard Variable';
   font-size: 8px;

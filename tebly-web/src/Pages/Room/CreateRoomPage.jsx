@@ -34,9 +34,11 @@ const FieldLabel = styled.span`
 `;
 
 const BtnWrapper = styled.div`
-  margin-top: 202px;
+  position: fixed;
+  left: 50%;
+  bottom: 21px;
+  transform: translateX(-50%);
   width: 350px;
-  align-self: center;
 `;
 
 const CreateRoom = () => {
@@ -89,7 +91,7 @@ const CreateRoom = () => {
       <Header
         title={editRoomId ? "방 수정하기" : "방 만들기"}
         leftIcon="back"
-        onLeft={() => navigate(-1)}
+        onLeft={() => (editRoomId ? navigate(-1) : navigate('/room-list'))}
         icons={[]}
       />
       <ContentArea>

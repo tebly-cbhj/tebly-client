@@ -33,7 +33,7 @@ const Toast = styled.div`
   left: 50%;
   transform: translateX(-50%);
   padding: 0.75rem 1.25rem;
-  background: ${({ theme }) => theme.colors.gray900};
+  background: rgba(26, 26, 26, 0.85);
   border-radius: 0.75rem;
   ${({ theme }) => theme.typography.body3};
   color: ${({ theme }) => theme.colors.white};

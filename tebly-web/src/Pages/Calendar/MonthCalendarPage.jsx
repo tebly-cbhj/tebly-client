@@ -150,6 +150,16 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
     fetchConfirmedSchedules();
   }, [fetchConfirmedSchedules]);
 
+  // openFab 플래그는 온보딩에서 넘어온 최초 진입에서만 한 번 소비되어야 한다.
+  // location.state는 뷰모드 전환(월간<->주간)으로 인한 리마운트에도 그대로 남아있어서,
+  // 지우지 않으면 매번 재마운트될 때마다 FAB 오버레이가 다시 열렸다.
+  useEffect(() => {
+    if (location.state?.openFab) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const today = useMemo(() => new Date(), []);
 
   const [currentMonthDate, setCurrentMonthDate] = useState(

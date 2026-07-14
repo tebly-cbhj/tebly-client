@@ -47,7 +47,8 @@ const ToggleText = styled.span`
   color: ${({ $selected, theme }) =>
     $selected ? theme.colors.gray900 : theme.colors.gray500};
 
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
   text-align: center;
   
   position: relative;
