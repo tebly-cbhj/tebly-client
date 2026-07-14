@@ -269,7 +269,7 @@ export default function MyAppointmentPage() {
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
-            isEditing={isEditing}
+            isEditing={isEditing && promise.isSender}
             onEditTime={() => setShowDateSheet(true)}
           />
         </CardWrapper>
