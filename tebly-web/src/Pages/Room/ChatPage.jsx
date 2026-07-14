@@ -63,6 +63,9 @@ const InputBar = styled.div`
 `;
 
 const HeaderWrapper = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
   border-bottom: 0.5px solid #dcdcdc;
   flex-shrink: 0;
 `;
