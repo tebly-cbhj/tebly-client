@@ -77,6 +77,7 @@ const SelectFriendPage = () => {
 
   const [roomMembers, setRoomMembers] = useState([]);
   const [selected, setSelected] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchFriends();
@@ -113,42 +114,51 @@ const SelectFriendPage = () => {
   };
 
   async function handleComplete() {
+    if (isSubmitting) return;
     if (appointmentMode) {
       navigate('/create-appointment', {
         state: { ...location.state, selectedMembers: selected },
       });
-    } else if (currentRoomId) {
-      if (roomName) {
-        await apiClient.patch(`/rooms/${currentRoomId}`, {
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (currentRoomId) {
+        if (roomName) {
+          await apiClient.patch(`/rooms/${currentRoomId}`, {
+            name: roomName,
+            description: roomDescription,
+            imageUrl: roomImageUrl,
+          });
+        }
+
+        const addedMembers = selected.filter((s) => !roomMembers.find((m) => m.id === s.id));
+        const removedMembers = roomMembers.filter((m) => !selected.find((s) => s.id === m.id));
+
+        if (addedMembers.length > 0) {
+          await apiClient.post(`/rooms/${currentRoomId}/members`, {
+            userIds: addedMembers.map((f) => f.id),
+          });
+        }
+        if (removedMembers.length > 0) {
+          await apiClient.delete(`/rooms/${currentRoomId}/members`, {
+            data: { userIds: removedMembers.map((f) => f.id) },
+          });
+        }
+
+        navigate(-1);
+      } else {
+        await apiClient.post('/rooms', {
           name: roomName,
           description: roomDescription,
           imageUrl: roomImageUrl,
+          memberIds: selected.map((f) => f.id),
         });
+        navigate('/room-list');
       }
-
-      const addedMembers = selected.filter((s) => !roomMembers.find((m) => m.id === s.id));
-      const removedMembers = roomMembers.filter((m) => !selected.find((s) => s.id === m.id));
-
-      if (addedMembers.length > 0) {
-        await apiClient.post(`/rooms/${currentRoomId}/members`, {
-          userIds: addedMembers.map((f) => f.id),
-        });
-      }
-      if (removedMembers.length > 0) {
-        await apiClient.delete(`/rooms/${currentRoomId}/members`, {
-          data: { userIds: removedMembers.map((f) => f.id) },
-        });
-      }
-
-      navigate(-1);
-    } else {
-      await apiClient.post('/rooms', {
-        name: roomName,
-        description: roomDescription,
-        imageUrl: roomImageUrl,
-        memberIds: selected.map((f) => f.id),
-      });
-      navigate('/room-list');
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -192,7 +202,7 @@ const SelectFriendPage = () => {
         <BtnWrapper>
           <Btn
             text="완료"
-            disabled={!isActive}
+            disabled={!isActive || isSubmitting}
             onClick={handleComplete}
           />
         </BtnWrapper>

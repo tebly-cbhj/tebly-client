@@ -101,10 +101,12 @@ export default function MorePage() {
 
   async function handleWithdraw() {
     try {
-      await apiClient.delete('/auth/withdraw');
-    } catch {
-      // 서버 탈퇴 실패해도 로컬은 로그아웃 처리함
+      const res = await apiClient.delete('/auth/withdraw');
+      console.log('회원탈퇴 응답:', res);
+    } catch (error) {
+      console.error('회원탈퇴 실패:', error);
     }
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     navigate('/onboarding');
