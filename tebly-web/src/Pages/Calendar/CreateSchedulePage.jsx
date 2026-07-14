@@ -378,6 +378,7 @@ export default function CreateSchedulePage() {
   const [timePickerTarget, setTimePickerTarget] = useState(null); // 'start' | 'end'
   const [pendingTime, setPendingTime] = useState({ hour: '09', minute: '00' });
   const [toastMessage, setToastMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   function showToast(message) {
     setToastMessage(message);
@@ -399,6 +400,7 @@ export default function CreateSchedulePage() {
   }
 
   async function handleSave() {
+    if (isSaving) return;
     if (!title.trim()) return;
     if (!startDate) {
       showToast('날짜를 선택해주세요.');
@@ -422,6 +424,7 @@ export default function CreateSchedulePage() {
       repeatUntil: repeatEnd === '날짜' && repeatEndDate ? toIsoDateTime(repeatEndDate, '23:59') : undefined,
     };
 
+    setIsSaving(true);
     try {
       if (isEditing) {
         await apiClient.patch(`/schedules/events/${scheduleId}`, payload);
@@ -445,6 +448,7 @@ export default function CreateSchedulePage() {
       navigate(-1);
     } catch {
       showToast('일정 저장에 실패했어요. 다시 시도해주세요.');
+      setIsSaving(false);
     }
   }
 
@@ -598,7 +602,7 @@ export default function CreateSchedulePage() {
       </ScrollContent>
 
       <BtnWrapper>
-        <Btn text="저장" onClick={handleSave} />
+        <Btn text="저장" onClick={handleSave} disabled={isSaving} />
       </BtnWrapper>
 
       {popupType === 'date' && (

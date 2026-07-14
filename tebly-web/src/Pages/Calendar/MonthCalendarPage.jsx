@@ -122,6 +122,12 @@ function getDateRangeKeys(startDate, endDate) {
   return dates;
 }
 
+// 서버가 /schedules 조회 시 반복 일정을 이미 "이 달에 발생하는 각 회차"로
+// startAt/endAt이 다른 별개의 row로 펼쳐서 내려준다(같은 eventId, 다른 날짜).
+// 그래서 프론트는 각 row를 그 자체의 startDate~endDate 범위로만 표시하면 되고,
+// schedule.repeat(반복 라벨 표시/수정 폼 용도)을 기준으로 다시 펼치면 안 된다 —
+// 예전엔 여기서 다시 펼쳐서, 같은 반복 일정의 회차별 사본마다 또 반복 계산을 돌리는
+// 바람에 주가 지날수록 칩이 1개→2개→3개로 누적되는 버그가 있었다.
 function expandScheduleDates(schedule) {
   const startDateText = getScheduleStartDate(schedule);
   const endDateText = schedule.endDate || startDateText;
@@ -129,34 +135,7 @@ function expandScheduleDates(schedule) {
   const startDate = parseStoreDate(startDateText);
   const endDate = parseStoreDate(endDateText);
 
-  if (!schedule.repeat) {
-    return getDateRangeKeys(startDate, endDate);
-  }
-
-  const dates = [];
-  const currentStartDate = new Date(startDate);
-  const currentEndDate = new Date(endDate);
-  const untilDate = parseStoreDate(schedule.repeat.until);
-  const interval = schedule.repeat.interval || 1;
-
-  while (currentStartDate <= untilDate) {
-    dates.push(...getDateRangeKeys(currentStartDate, currentEndDate));
-
-    if (schedule.repeat.type === 'daily') {
-      currentStartDate.setDate(currentStartDate.getDate() + interval);
-      currentEndDate.setDate(currentEndDate.getDate() + interval);
-    } else if (schedule.repeat.type === 'weekly') {
-      currentStartDate.setDate(currentStartDate.getDate() + 7 * interval);
-      currentEndDate.setDate(currentEndDate.getDate() + 7 * interval);
-    } else if (schedule.repeat.type === 'monthly') {
-      currentStartDate.setMonth(currentStartDate.getMonth() + interval);
-      currentEndDate.setMonth(currentEndDate.getMonth() + interval);
-    } else {
-      break;
-    }
-  }
-
-  return dates;
+  return getDateRangeKeys(startDate, endDate);
 }
 
 export default function MonthCalendarPage({ viewMode, onViewModeChange, selectedDate: initialSelectedDate, onDateChange }) {

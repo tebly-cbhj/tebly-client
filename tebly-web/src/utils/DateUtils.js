@@ -42,54 +42,15 @@ export const getWeekRange = () => {
   return { sunday, saturday };
 };
 
+// 서버가 /schedules 조회 시 반복 일정을 이미 "이 기간에 발생하는 각 회차"로
+// startDate가 다른 별개의 row로 펼쳐서 내려준다(같은 이벤트, 다른 날짜). 그래서
+// 여기서 schedule.repeat 기준으로 또 반복 확장을 하면 회차별 사본마다 다시 반복
+// 계산이 돌아 중복 표시된다 — 각 row는 자신의 startDate 하루에서만 표시한다.
 export const expandRepeatingSchedules = (schedules, sunday, saturday) => {
-  const result = [];
-
-  for (const schedule of schedules) {
-    const start = parseDate(schedule.startDate);
-    const until = schedule.repeat?.until ? parseDate(schedule.repeat.until) : null;
-
-    // 반복 없음 → startDate가 이번 주 범위 내인지만 확인
-    if (!schedule.repeat) {
-      if (start >= sunday && start <= saturday) {
-        result.push({ ...schedule, _occurrenceDate: start });
-      }
-      continue;
-    }
-
-    const { type, interval } = schedule.repeat;
-    let current = new Date(start);
-
-    while (true) {
-      // until 또는 saturday 초과 시 중단
-      if (until && current > until) break;
-      if (current > saturday) break;
-
-      // 이번 주 범위 내 발생일만 추가
-      if (current >= sunday) {
-        result.push({
-          ...schedule,
-          _occurrenceDate: new Date(current),
-        });
-      }
-
-      // 다음 반복일 계산
-      const next = new Date(current);
-      if (type === 'daily') {
-        next.setDate(next.getDate() + interval);
-      } else if (type === 'weekly') {
-        next.setDate(next.getDate() + 7 * interval);
-      } else if (type === 'monthly') {
-        next.setMonth(next.getMonth() + interval);
-      } else {
-        break; // 알 수 없는 타입은 중단
-      }
-
-      // 무한루프 방지: 날짜가 진행되지 않으면 중단
-      if (next <= current) break;
-      current = next;
-    }
-  }
-
-  return result;
+  return schedules
+    .filter((schedule) => {
+      const start = parseDate(schedule.startDate);
+      return start >= sunday && start <= saturday;
+    })
+    .map((schedule) => ({ ...schedule, _occurrenceDate: parseDate(schedule.startDate) }));
 };
