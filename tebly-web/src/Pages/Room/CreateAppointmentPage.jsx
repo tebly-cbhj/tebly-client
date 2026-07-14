@@ -137,6 +137,10 @@ export default function CreateAppointmentPage() {
       showToast('최소 시간을 선택해주세요.');
       return;
     }
+    if (!category) {
+      showToast('카테고리를 선택해주세요.');
+      return;
+    }
     if (selectedMembers.length === 0) {
       showToast('친구를 선택해주세요.');
       return;
@@ -160,7 +164,7 @@ export default function CreateAppointmentPage() {
 
   return (
     <PageWrapper noNav>
-      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(-1)} />
+      <Header title="약속 만들기" leftIcon="back" onLeft={() => navigate(`/room/${roomId}`)} />
       <ScrollContent>
         <ContentArea>
           <InputContainer>
@@ -284,6 +288,7 @@ export default function CreateAppointmentPage() {
       {popupType === 'category' && (
         <CategoryPopup
           selectedCategoryId={category?.categoryId}
+          defaultOnly
           onClose={() => setPopupType(null)}
           onSelect={(value) => {
             setCategory(value);

@@ -147,17 +147,22 @@ export default function EditProfilePage() {
   async function handleSave() {
     let profileImageUrl = myProfile?.profileImageUrl;
 
-    if (selectedIcon) {
-      profileImageUrl = PROFILE_ICONS.find((icon) => icon.id === selectedIcon)?.url;
-    } else if (profileImageFile) {
-      const formData = new FormData();
-      formData.append('file', profileImageFile);
-      const uploadRes = await apiClient.post('/users/me/profile-image', formData);
-      profileImageUrl = uploadRes.data.profileImageUrl;
-    }
+    try {
+      if (selectedIcon) {
+        profileImageUrl = PROFILE_ICONS.find((icon) => icon.id === selectedIcon)?.url;
+      } else if (profileImageFile) {
+        const formData = new FormData();
+        formData.append('file', profileImageFile);
+        const uploadRes = await apiClient.post('/users/me/profile-image', formData);
+        // 서버가 { profileImageUrl } 객체 대신 URL 문자열만 내려주는 경우까지 방어
+        profileImageUrl = uploadRes.data?.profileImageUrl ?? uploadRes.data;
+      }
 
-    await updateMyProfile({ nickname: name, profileImageUrl, bio });
-    navigate(-1);
+      await updateMyProfile({ nickname: name, profileImageUrl, bio });
+      navigate(-1);
+    } catch (err) {
+      alert(err.message || '프로필 저장에 실패했어요. 다시 시도해주세요.');
+    }
   }
 
   return (

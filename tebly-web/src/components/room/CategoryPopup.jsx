@@ -102,7 +102,7 @@ const ResetButtonWrapper = styled.div`
 `;
 
 const ConfirmButtonWrapper = styled.div`
-  width: 204px;
+  width: ${({ $fullWidth }) => ($fullWidth ? '336px' : '204px')};
 `;
 
 const AddPopupLayer = styled.div`
@@ -114,10 +114,12 @@ const AddPopupLayer = styled.div`
   align-items: center;
 `;
 
-export default function CategoryPopup({ selectedCategoryId, onClose, onSelect }) {
-  const categories = useScheduleStore((state) => state.categories);
+export default function CategoryPopup({ selectedCategoryId, onClose, onSelect, defaultOnly = false }) {
+  const allCategories = useScheduleStore((state) => state.categories);
   const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const addCategory = useScheduleStore((state) => state.addCategory);
+
+  const categories = defaultOnly ? allCategories.filter((c) => c.isDefault) : allCategories;
 
   const [currentCategoryId, setCurrentCategoryId] = useState(selectedCategoryId ?? null);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
@@ -164,17 +166,19 @@ export default function CategoryPopup({ selectedCategoryId, onClose, onSelect })
       </CategoryScroll>
 
       <ButtonRow>
-        <ResetButtonWrapper>
-          <Btn
-            text="추가하기"
-            size="medium"
-            variant="gray"
-            disabled={!currentCategoryId}
-            onClick={() => setIsAddPopupOpen(true)}
-          />
-        </ResetButtonWrapper>
+        {!defaultOnly && (
+          <ResetButtonWrapper>
+            <Btn
+              text="추가하기"
+              size="medium"
+              variant="gray"
+              disabled={!currentCategoryId}
+              onClick={() => setIsAddPopupOpen(true)}
+            />
+          </ResetButtonWrapper>
+        )}
 
-        <ConfirmButtonWrapper>
+        <ConfirmButtonWrapper $fullWidth={defaultOnly}>
           <Btn
             text="선택 완료"
             size="medium"

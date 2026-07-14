@@ -39,7 +39,13 @@ const FriendName = styled.span`
   color: ${(props) => props.theme.colors.gray900};
 `;
 
-export default function FriendsSelect({ friend, selected, onToggle }) {
+// 이미 초대를 보내 응답 대기 중인 친구에게 보여주는 라벨
+const InvitedLabel = styled.span`
+  ${(props) => props.theme.typography.caption1}
+  color: ${(props) => props.theme.colors.gray500};
+`;
+
+export default function FriendsSelect({ friend, selected, onToggle, alreadyInvited = false }) {
   return (
     <FriendItem>
       <FriendInfo>
@@ -51,7 +57,11 @@ export default function FriendsSelect({ friend, selected, onToggle }) {
         <FriendName>{friend.name}</FriendName>
       </FriendInfo>
 
-      <RadioBtn selected={selected} onToggle={onToggle} />
+      {alreadyInvited ? (
+        <InvitedLabel>이미 보냈어요</InvitedLabel>
+      ) : (
+        <RadioBtn selected={selected} onToggle={onToggle} />
+      )}
     </FriendItem>
   );
 }
