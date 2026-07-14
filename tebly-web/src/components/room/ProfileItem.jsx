@@ -19,7 +19,7 @@ const Avatar = styled.img`
 const Name = styled.span`
   color: #525252;
   text-align: center;
-  font-family: Pretendard, sans-serif;
+  font-family: 'Pretendard Variable', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 140%;

@@ -45,7 +45,7 @@ const Circle = styled.div`
 const DateText = styled.span`
   position: relative;
   z-index: 1;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.4rem;

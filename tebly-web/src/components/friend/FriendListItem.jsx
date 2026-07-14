@@ -43,7 +43,7 @@ const TextArea = styled.div`
 `;
 
 const Name = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 600;
@@ -56,7 +56,7 @@ const Name = styled.span`
 `;
 
 const Intro = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;

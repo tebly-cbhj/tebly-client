@@ -1,0 +1,13 @@
+{
+  "name": "Tebly",
+  "short_name": "Tebly",
+  "description": "시간표로 자유롭게 연결되다",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4ADE80",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,12 +1,27 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
 import ToggleBtn from '../../components/more/ToggleBtn';
 import NotiCard from '../../components/notification/NotiCard';
 import { useNotificationStore } from '../../store/NotificationStore';
 import { useScheduleStore } from '../../store/ScheduleStore';
+
+// PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
+// 화면 끝까지 채우도록 리스트 영역은 엣지투엣지로 유지해야 해서,
+// max-width/높이/배경만 가져온 버전
+const PageContainer = styled.div`
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  height: 100vh;
+  overflow: hidden;
+  background-color: ${(props) => props.theme.colors.bg};
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+`;
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -135,7 +150,7 @@ export default function AlarmPage() {
   }
 
   return (
-    <>
+    <PageContainer>
       <HeaderWrapper>
         <Header
           title="알림"
@@ -158,6 +173,6 @@ export default function AlarmPage() {
         {renderSection('새 알림', newNoti)}
         {renderSection('이전 알림', oldNoti)}
       </ScrollArea>
-    </>
+    </PageContainer>
   );
 }

@@ -59,7 +59,7 @@ const NavButton = styled(NavLink)`
 const NavLabel = styled.span`
   color: ${({ $selected, theme }) => $selected ? theme.colors.gray900 : theme.colors.gray500};
   text-align: center;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 12px;
   font-style: normal;
   font-weight: 400;

@@ -12,8 +12,8 @@ const Button = styled.button`
 `;
 
 const Text = styled.span`
-  color: {({ theme }) => theme.colors.gray900};
-  font-family: Pretendard;
+  color: ${({ theme }) => theme.colors.gray900};
+  font-family: 'Pretendard Variable';
   font-size: 20px;
   font-style: normal;
   font-weight: 700;

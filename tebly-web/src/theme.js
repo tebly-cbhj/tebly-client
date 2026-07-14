@@ -34,14 +34,14 @@ export const theme = {
   typography: {
     // Heading - h
     h1: `
-      font-family: Pretendard;
+      font-family: 'Pretendard Variable';
       font-size: 28px;
       font-weight: 600;
       line-height: 140%;
       letter-spacing: -0.7px;
     `,
     h2:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 24px;
         font-style: normal;
         font-weight: 600;
@@ -49,7 +49,7 @@ export const theme = {
         letter-spacing: -0.6px;
     `,
     h3:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 20px;
         font-style: normal;
         font-weight: 600;
@@ -59,7 +59,7 @@ export const theme = {
 
     // Subtitle - s
     s1:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 18px;
         font-style: normal;
         font-weight: 600;
@@ -67,7 +67,7 @@ export const theme = {
         letter-spacing: -0.45px;
     `,
     s2:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 16px;
         font-style: normal;
         font-weight: 600;
@@ -77,7 +77,7 @@ export const theme = {
 
     // Body - body
     body1:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 18px;
         font-style: normal;
         font-weight: 400;
@@ -85,7 +85,7 @@ export const theme = {
         letter-spacing: -0.45px;
     `,
     body2:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 16px;
         font-style: normal;
         font-weight: 400;
@@ -93,7 +93,7 @@ export const theme = {
         letter-spacing: -0.4px;
     `,
     body3:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 14px;
         font-style: normal;
         font-weight: 400;
@@ -103,7 +103,7 @@ export const theme = {
 
     // Button - btn
     btn1:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 16px;
         font-style: normal;
         font-weight: 600;
@@ -111,7 +111,7 @@ export const theme = {
         letter-spacing: -0.4px;
     `,
     btn2:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 16px;
         font-style: normal;
         font-weight: 400;
@@ -119,7 +119,7 @@ export const theme = {
         letter-spacing: -0.4px;
     `,
     btn3:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 12px;
         font-style: normal;
         font-weight: 600;
@@ -127,7 +127,7 @@ export const theme = {
         letter-spacing: -0.3px;
     `,
     btn4:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 12px;
         font-style: normal;
         font-weight: 400;
@@ -137,7 +137,7 @@ export const theme = {
 
     // Caption - caption
     caption1:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 13px;
         font-style: normal;
         font-weight: 400;
@@ -145,7 +145,7 @@ export const theme = {
         letter-spacing: -0.325px;
     `,
     caption2:`
-        font-family: Pretendard;
+        font-family: 'Pretendard Variable';
         font-size: 11px;
         font-style: normal;
         font-weight: 400;

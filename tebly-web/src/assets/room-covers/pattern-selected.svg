@@ -1,0 +1,16 @@
+<svg width="350" height="176" viewBox="0 0 350 176" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="350" height="176" fill="#81D0C1"/>
+<rect width="350" height="176" fill="url(#pattern0_3225_22847)"/>
+<defs>
+<pattern id="pattern0_3225_22847" patternUnits="userSpaceOnUse" patternTransform="matrix(110.992 0 0 60.5558 159.411 70.9899)" preserveAspectRatio="none" viewBox="0 0 176.178 96.1204" width="1" height="1">
+<use xlink:href="#pattern0_3225_22847_inner" transform="translate(0 -96.1204)"/>
+<use xlink:href="#pattern0_3225_22847_inner" transform="translate(88.0891 -48.0602)"/>
+<g id="pattern0_3225_22847_inner">
+<path d="M18.2725 3.54307C20.5834 0.111035 26.8473 -0.991458 29.7471 0.961039C31.0161 1.81573 31.43 3.11445 31.3008 4.5919C39.2523 7.70968 44.9826 16.3182 45.0068 25.3468C47.8301 28.5617 49.4882 32.3507 49.4883 36.1612C49.4883 46.0133 38.4099 54.0001 24.7441 54.0001C11.0784 54.0001 0 46.0133 0 36.1612C7.00306e-05 32.2401 1.75604 28.3419 4.73047 25.0685C4.86454 16.5064 10.108 8.36852 17.4805 4.99522C17.6931 4.49948 17.9564 4.01247 18.2725 3.54307Z" fill="#FEFEFE"/>
+<circle cx="18.3634" cy="24.1068" r="2.36342" fill="black"/>
+<circle cx="30.6535" cy="24.1068" r="2.36342" fill="black"/>
+<path d="M27.345 26.4702C27.345 26.9923 26.0753 27.4156 24.509 27.4156C22.9426 27.4156 21.6729 26.9923 21.6729 26.4702" stroke="black" stroke-width="0.945366" stroke-linecap="round"/>
+</g>
+<use xlink:href="#pattern0_3225_22847_inner" transform="translate(88.0891 48.0602)"/>
+</pattern></defs>
+</svg>

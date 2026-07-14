@@ -27,7 +27,7 @@ const Label = styled.span`
   transform: translateY(-50%);
   color: white;
   font-size: 16px;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 600;
   line-height: 22.4px;
 `;

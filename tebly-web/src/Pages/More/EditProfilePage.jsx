@@ -9,6 +9,30 @@ import EditProfileImageIcon from '../../assets/icons/edit-profile-image.svg?reac
 import { useFriendStore } from '../../store/FriendStore';
 import apiClient from '../../api/client';
 
+import Basic from '../../assets/default/profile/basic.svg?react';
+import BasicSelected from '../../assets/default/profile/basic-selected.svg?react';
+import BasicUrl from '../../assets/default/profile/basic-selected.svg';
+import Wink from '../../assets/default/profile/wink.svg?react';
+import WinkSelected from '../../assets/default/profile/wink-selected.svg?react';
+import WinkUrl from '../../assets/default/profile/wink-selected.svg';
+import Glasses from '../../assets/default/profile/glasses.svg?react';
+import GlassesSelected from '../../assets/default/profile/glasses-selected.svg?react';
+import GlassesUrl from '../../assets/default/profile/glasses-selected.svg';
+import Sleepy from '../../assets/default/profile/sleepy.svg?react';
+import SleepySelected from '../../assets/default/profile/sleepy-selected.svg?react';
+import SleepyUrl from '../../assets/default/profile/sleepy-selected.svg';
+import Headphone from '../../assets/default/profile/headphone.svg?react';
+import HeadphoneSelected from '../../assets/default/profile/headphone-selected.svg?react';
+import HeadphoneUrl from '../../assets/default/profile/headphone-selected.svg';
+
+const PROFILE_ICONS = [
+  { id: 'basic', Icon: Basic, SelectedIcon: BasicSelected, url: BasicUrl },
+  { id: 'wink', Icon: Wink, SelectedIcon: WinkSelected, url: WinkUrl },
+  { id: 'glasses', Icon: Glasses, SelectedIcon: GlassesSelected, url: GlassesUrl },
+  { id: 'sleepy', Icon: Sleepy, SelectedIcon: SleepySelected, url: SleepyUrl },
+  { id: 'headphone', Icon: Headphone, SelectedIcon: HeadphoneSelected, url: HeadphoneUrl },
+];
+
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -69,6 +93,19 @@ const Label = styled.span`
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
+const ProfileOptionList = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 21.667px;
+  margin-top: 20px;
+`;
+
+const IconButton = styled.div`
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+`;
+
 const SaveButtonWrapper = styled.div`
   position: fixed;
   bottom: 20px;
@@ -88,21 +125,31 @@ export default function EditProfilePage() {
 
   const [profileImagePreview, setProfileImagePreview] = useState(myProfile?.profileImageUrl ?? null);
   const [profileImageFile, setProfileImageFile] = useState(null);
+  const [selectedIcon, setSelectedIcon] = useState(null);
   const fileInputRef = useRef(null);
 
   function handleImageSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
+    setSelectedIcon(null);
     setProfileImageFile(file);
     const reader = new FileReader();
     reader.onload = () => setProfileImagePreview(reader.result);
     reader.readAsDataURL(file);
   }
 
+  function handleIconSelect(icon) {
+    setSelectedIcon(icon.id);
+    setProfileImageFile(null);
+    setProfileImagePreview(icon.url);
+  }
+
   async function handleSave() {
     let profileImageUrl = myProfile?.profileImageUrl;
 
-    if (profileImageFile) {
+    if (selectedIcon) {
+      profileImageUrl = PROFILE_ICONS.find((icon) => icon.id === selectedIcon)?.url;
+    } else if (profileImageFile) {
       const formData = new FormData();
       formData.append('file', profileImageFile);
       const uploadRes = await apiClient.post('/users/me/profile-image', formData);
@@ -138,6 +185,18 @@ export default function EditProfilePage() {
             onChange={handleImageSelect}
           />
         </ProfileImageWrapper>
+
+        {/* 기본 프로필 아이콘 선택 */}
+        <ProfileOptionList>
+          {PROFILE_ICONS.map((icon) => (
+            <IconButton key={icon.id} onClick={() => handleIconSelect(icon)}>
+              {selectedIcon === icon.id
+                ? <icon.SelectedIcon width={44} height={44} />
+                : <icon.Icon width={44} height={44} />
+              }
+            </IconButton>
+          ))}
+        </ProfileOptionList>
 
         {/* 이름 입력 */}
         <InputName>

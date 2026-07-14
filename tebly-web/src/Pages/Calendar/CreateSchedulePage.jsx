@@ -16,6 +16,7 @@ import ExpandIcon from '../../components/common/ExpandIcon';
 import TimePicker from '../../components/common/TimePicker';
 import apiClient from '../../api/client';
 import { ALARM_TO_MINUTES } from '../../store/PersonalScheduleStore';
+import { useLastSavedScheduleStore } from '../../store/LastSavedScheduleStore';
 
 import ClockIcon from '../../assets/icons/clock.svg?react';
 import PlaceIcon from '../../assets/icons/place.svg?react';
@@ -32,6 +33,23 @@ const ScrollContent = styled.div`
   flex-direction: column;
   padding-bottom: 5rem;
   &::-webkit-scrollbar { display: none; }
+`;
+
+const Toast = styled.div`
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: ${({ theme }) => theme.colors.gray900};
+  border-radius: 0.75rem;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.white};
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 200;
 `;
 
 const InputContainer = styled.div`
@@ -72,7 +90,7 @@ const AllDayContent = styled.div`
 `;
 
 const AllDayLabel = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 600;
@@ -152,7 +170,7 @@ const CancelBtn = styled.button`
   border-radius: 0.5rem;
   background: #efefef;
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 400;
   color: #525252;
   cursor: pointer;
@@ -165,7 +183,7 @@ const ConfirmBtn = styled.button`
   border-radius: 0.5rem;
   background: ${({ theme }) => theme.colors.primary100};
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 600;
   color: #fefefe;
   cursor: pointer;
@@ -206,7 +224,7 @@ const FabMenuItem = styled.button`
   padding: 0;
   cursor: pointer;
   text-align: left;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;
@@ -239,7 +257,7 @@ const RepeatEndLabel = styled.span`
   color: var(--grayscale-gray-900, #1A1A1A);
 
   /* body2 */
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;
@@ -258,7 +276,7 @@ const RepeatEndValue = styled.div`
 const RepeatEndText = styled.span`
   color: var(--grayscale-gray-800, #525252);
   /* body2 */
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: 400;
@@ -336,10 +354,13 @@ export default function CreateSchedulePage() {
   const location = useLocation();
   const { scheduleId, schedule: initialSchedule } = location.state || {};
   const isEditing = !!scheduleId;
+  const setLastSaved = useLastSavedScheduleStore((state) => state.setLastSaved);
 
   const [title, setTitle] = useState(initialSchedule?.title || '');
   const [memo, setMemo] = useState(initialSchedule?.memo || '');
-  const [allDay, setAllDay] = useState(false);
+  const [allDay, setAllDay] = useState(
+    () => initialSchedule?.startTime === '00:00' && initialSchedule?.endTime === '23:59'
+  );
   const [startDate, setStartDate] = useState(() => parseDateString(initialSchedule?.startDate));
   const [endDate, setEndDate] = useState(() => parseDateString(initialSchedule?.endDate));
   const [startTime, setStartTime] = useState(initialSchedule?.startTime || '09:00');
@@ -356,6 +377,13 @@ export default function CreateSchedulePage() {
   const [popupType, setPopupType] = useState(null);
   const [timePickerTarget, setTimePickerTarget] = useState(null); // 'start' | 'end'
   const [pendingTime, setPendingTime] = useState({ hour: '09', minute: '00' });
+  const [toastMessage, setToastMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  function showToast(message) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 2000);
+  }
 
   function openTimePicker(target) {
     const current = target === 'start' ? startTime : endTime;
@@ -372,9 +400,14 @@ export default function CreateSchedulePage() {
   }
 
   async function handleSave() {
-    if (!title.trim() || !startDate) return;
+    if (isSaving) return;
+    if (!title.trim()) return;
+    if (!startDate) {
+      showToast('날짜를 선택해주세요.');
+      return;
+    }
     if (!category?.categoryId) {
-      alert('카테고리를 선택해주세요.');
+      showToast('카테고리를 선택해주세요.');
       return;
     }
     const repeatType = REPEAT_KO_TO_TYPE[repeat];
@@ -382,8 +415,8 @@ export default function CreateSchedulePage() {
     const payload = {
       categoryId: category.categoryId,
       title,
-      startTime: toIsoDateTime(startDate, startTime),
-      endTime: toIsoDateTime(endDate || startDate, endTime),
+      startTime: toIsoDateTime(startDate, allDay ? '00:00' : startTime),
+      endTime: toIsoDateTime(endDate || startDate, allDay ? '23:59' : endTime),
       repeatType,
       notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
       location: place,
@@ -391,15 +424,31 @@ export default function CreateSchedulePage() {
       repeatUntil: repeatEnd === '날짜' && repeatEndDate ? toIsoDateTime(repeatEndDate, '23:59') : undefined,
     };
 
+    setIsSaving(true);
     try {
       if (isEditing) {
         await apiClient.patch(`/schedules/events/${scheduleId}`, payload);
+        // EventDetailPage는 location.state(수정 전 값)를 그대로 쓰고 새로 조회하지
+        // 않으므로, 방금 저장한 값을 별도 스토어로 넘겨서 상세 화면이 참고하게 함
+        setLastSaved(scheduleId, {
+          title,
+          memo,
+          startDate: startDate ? toDisplayDate(startDate) : '',
+          startTime: allDay ? '00:00' : startTime,
+          endDate: (endDate || startDate) ? toDisplayDate(endDate || startDate) : '',
+          endTime: allDay ? '23:59' : endTime,
+          place,
+          category,
+          alarmTime,
+          repeat: repeat !== '없음' ? `${repeat} 반복` : '반복 없음',
+        });
       } else {
         await apiClient.post('/schedules/events', payload);
       }
       navigate(-1);
     } catch {
-      alert('일정 저장에 실패했어요. 다시 시도해주세요.');
+      showToast('일정 저장에 실패했어요. 다시 시도해주세요.');
+      setIsSaving(false);
     }
   }
 
@@ -435,7 +484,16 @@ export default function CreateSchedulePage() {
             </AllDayContent>
           </AllDayRow>
 
-          {!allDay && (
+          {allDay ? (
+            <DateTimeRow>
+              <DateButton
+                $empty={!startDate}
+                onClick={() => setPopupType('date')}
+              >
+                {startDate ? toDisplayDate(startDate) : '날짜 선택'}
+              </DateButton>
+            </DateTimeRow>
+          ) : (
             <>
               <DateTimeRow>
                 <DateButton
@@ -544,7 +602,7 @@ export default function CreateSchedulePage() {
       </ScrollContent>
 
       <BtnWrapper>
-        <Btn text="저장" onClick={handleSave} />
+        <Btn text="저장" onClick={handleSave} disabled={isSaving} />
       </BtnWrapper>
 
       {popupType === 'date' && (
@@ -620,6 +678,8 @@ export default function CreateSchedulePage() {
           }}
         />
       )}
+
+      <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
 
     </PageWrapper>
   );

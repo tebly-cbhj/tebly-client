@@ -11,7 +11,7 @@ const Container = styled.div`
 `;
 
 const Label = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-style: normal;
   font-weight: ${({ $selected }) => $selected ? 600 : 400};

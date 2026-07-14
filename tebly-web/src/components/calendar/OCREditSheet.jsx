@@ -115,7 +115,7 @@ const InlineField = styled.input`
   background: transparent;
   width: 100%;
   padding: 0;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: ${({ $isTitle }) => ($isTitle ? '1.5rem' : '1rem')};
   font-weight: ${({ $isTitle }) => ($isTitle ? '600' : '400')};
   line-height: 140%;
@@ -165,7 +165,7 @@ const AllDayContent = styled.div`
 `;
 
 const AllDayLabel = styled.span`
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-weight: 600;
   line-height: 140%;
@@ -249,7 +249,7 @@ const FabMenuItem = styled.button`
   padding: 0;
   cursor: pointer;
   text-align: left;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 140%;
@@ -269,7 +269,7 @@ const RepeatEndRow = styled.div`
 
 const RepeatEndLabel = styled.span`
   color: #1A1A1A;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-weight: 400;
   line-height: 140%;
@@ -284,7 +284,7 @@ const RepeatEndValue = styled.div`
 
 const RepeatEndText = styled.span`
   color: #525252;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-size: 1rem;
   font-weight: 400;
   line-height: 140%;
@@ -335,7 +335,7 @@ const CancelBtn = styled.button`
   border-radius: 0.5rem;
   background: #efefef;
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 400;
   color: #525252;
   cursor: pointer;
@@ -348,7 +348,7 @@ const ConfirmBtn = styled.button`
   border-radius: 0.5rem;
   background: ${({ theme }) => theme.colors.primary100};
   font-size: 1rem;
-  font-family: Pretendard;
+  font-family: 'Pretendard Variable';
   font-weight: 600;
   color: #fefefe;
   cursor: pointer;
