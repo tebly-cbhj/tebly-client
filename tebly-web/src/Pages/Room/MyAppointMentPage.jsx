@@ -210,7 +210,10 @@ export default function MyAppointmentPage() {
     : promise.members;
 
   async function handlePrimaryAction() {
-    if (isEditing) {
+    if (isInvited) {
+      await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
+      navigate(-1);
+    } else if (isEditing) {
       if (pendingStartTimeIso && pendingEndTimeIso) {
         await apiClient.patch(`/promises/${promiseId}`, {
           title: promise.title,
@@ -227,9 +230,6 @@ export default function MyAppointmentPage() {
       }
       setIsEditing(false);
       fetchDetail();
-    } else if (isInvited) {
-      await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
-      navigate(-1);
     } else {
       try {
         await apiClient.patch(`/promises/${promiseId}/confirm`);
