@@ -212,7 +212,8 @@ export default function MyAppointmentPage() {
   async function handlePrimaryAction() {
     if (isInvited) {
       await apiClient.patch(`/promises/${promiseId}/invitations/me`, { status: myResponse });
-      navigate(-1);
+      showToast('저장을 완료했어요.');
+      setTimeout(() => navigate(-1), 700);
     } else if (isEditing) {
       if (pendingStartTimeIso && pendingEndTimeIso) {
         await apiClient.patch(`/promises/${promiseId}`, {
@@ -341,7 +342,9 @@ export default function MyAppointmentPage() {
               key={member.promiseMemberId}
               name={member.nickname}
               src={member.profileImageUrl}
-              onClick={() => setSelectedMember(member)}
+              onClick={() => {
+                if (member.status === 'PENDING') setSelectedMember(member);
+              }}
             />
           ))}
         </AttendanceWrapper>

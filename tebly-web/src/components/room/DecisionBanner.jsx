@@ -10,6 +10,7 @@ const Container = styled.div`
   border-radius: 8px;
   background: var(--primary-color-primary10, #EFFFFB);
   box-sizing: border-box;
+  margin-top: 0.75rem;
 `;
 
 const IconWrapper = styled.div`
