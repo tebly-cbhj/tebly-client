@@ -13,12 +13,13 @@ const Overlay = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: center;
   z-index: 9999;
 `;
 
 const Sheet = styled.div`
   display: inline-flex;
-  width: 100%;
+  max-width: 390px;
   box-sizing: border-box;
   padding: 12px 20px 44px 20px;
   flex-direction: column;

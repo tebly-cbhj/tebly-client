@@ -10,6 +10,9 @@ const AttendeeWrapper = styled.div`
 const ProfileImage = styled.img`
   width: 40px;
   height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
   filter: ${({ $available }) => ($available ? 'none' : 'grayscale(100%)')};
 `;
 

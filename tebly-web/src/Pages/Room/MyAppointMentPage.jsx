@@ -395,6 +395,7 @@ export default function MyAppointmentPage() {
             leftBtnText="시간 수정"
             rightBtnText="시간 추천"
             singleSelect
+            disablePast
             onLeftBtn={({ start }) => {
               setPendingDate(start);
               setShowDateSheet(false);

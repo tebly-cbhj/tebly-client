@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
@@ -33,6 +33,13 @@ const CardList = styled.div`
   gap: 0.75rem;
   padding-bottom: 6rem;
   margin-top: 0.875rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const BottomArea = styled.div`
@@ -71,7 +78,7 @@ const MagicWandBtn = styled.button`
   }
 
   svg {
-    width: 1.5rem; /* 24px */
+    width: 2.5rem;
     height: auto;
     aspect-ratio: 24 / 41.875;
   }
@@ -264,6 +271,168 @@ const ConfirmBtn = styled.button`
   cursor: pointer;
 `;
 
+// ─── 시간 조정 다이얼 (선택한 추천 시간의 시작/종료를 원형으로 드래그해 미세 조정) ──
+
+const DIAL_SIZE = 220;
+const DIAL_CENTER = DIAL_SIZE / 2;
+const RING_RADIUS = 92;
+const RING_WIDTH = 26;
+const LABEL_RADIUS = 60;
+const HANDLE_R = 10;
+const HANDLE_TOUCH_R = 24;
+const TIME_STEP_MINUTES = 30;
+const DEFAULT_MIN_GAP_MINUTES = 30;
+const BOUND_PADDING_MINUTES = 0;
+const MINUTES_PER_DAY = 24 * 60;
+
+function minutesToAngle(minutes) {
+  return (minutes / MINUTES_PER_DAY) * 360;
+}
+
+function angleToMinutes(angle) {
+  const normalized = ((angle % 360) + 360) % 360;
+  return (normalized / 360) * MINUTES_PER_DAY;
+}
+
+function snapMinutes(minutes) {
+  const snapped = Math.round(minutes / TIME_STEP_MINUTES) * TIME_STEP_MINUTES;
+  return ((snapped % MINUTES_PER_DAY) + MINUTES_PER_DAY) % MINUTES_PER_DAY;
+}
+
+// 시계 방향, 12시 방향을 0도로 하는 각도를 다이얼 중심 기준 좌표로 변환
+function polarPoint(radius, angleDeg) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return {
+    x: DIAL_CENTER + radius * Math.sin(rad),
+    y: DIAL_CENTER - radius * Math.cos(rad),
+  };
+}
+
+function describeArc(radius, startAngle, endAngle) {
+  const start = polarPoint(radius, startAngle);
+  const end = polarPoint(radius, endAngle);
+  const diff = ((endAngle - startAngle) % 360 + 360) % 360;
+  const largeArcFlag = diff > 180 ? 1 : 0;
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
+}
+
+function formatHourTickLabel(hour24) {
+  if (hour24 === 0) return '12am';
+  if (hour24 === 6) return '6am';
+  if (hour24 === 12) return '12pm';
+  if (hour24 === 18) return '6pm';
+  return `${hour24 % 12 === 0 ? 12 : hour24 % 12}`;
+}
+
+function splitMinutesForDisplay(totalMinutes) {
+  return {
+    period: totalMinutes < 720 ? '오전' : '오후',
+    hour: Math.floor(totalMinutes / 60),
+    minute: totalMinutes % 60,
+  };
+}
+
+function formatDurationLabel(startMinutes, endMinutes) {
+  let diff = endMinutes - startMinutes;
+  if (diff < 0) diff += MINUTES_PER_DAY;
+  return `${Math.floor(diff / 60)}시간 ${String(diff % 60).padStart(2, '0')}분`;
+}
+
+// ─── 시간 조정 바텀시트 ─────────────────────────────────────────
+
+const TimeAdjustSheet = styled.div`
+  width: 100%;
+  max-width: 24.375rem;
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 2rem 2rem 0 0;
+  box-sizing: border-box;
+  padding: 0.75rem 1.25rem 2.125rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 101;
+`;
+
+const TimeAdjustDragHandle = styled(Handle)`
+  margin: 0 0 1.5rem;
+`;
+
+const DurationLabel = styled.span`
+  ${({ theme }) => theme.typography.body1};
+  color: ${({ theme }) => theme.colors.gray800};
+`;
+
+const DurationValue = styled.span`
+  ${({ theme }) => theme.typography.h2};
+  color: ${({ theme }) => theme.colors.gray900};
+  margin-top: 0.25rem;
+`;
+
+const DialWrapper = styled.div`
+  position: relative;
+  width: ${DIAL_SIZE / 16}rem;
+  height: ${DIAL_SIZE / 16}rem;
+  margin: 2rem 0;
+  touch-action: none;
+`;
+
+const DialTrack = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 288px;
+  background: var(--grayscale-gray-200, #EFEFEF);
+`;
+
+const HourLabel = styled.text`
+  font-family: 'Pretendard Variable';
+  font-size: 14px;
+  fill: ${({ $emphasis, theme }) => ($emphasis ? theme.colors.gray900 : '#CCCCCC')};
+  text-anchor: middle;
+  dominant-baseline: middle;
+`;
+
+const DialHandle = styled.circle`
+  fill: ${({ theme }) => theme.colors.white};
+  stroke: rgba(0, 0, 0, 0.08);
+  stroke-width: 1;
+  cursor: grab;
+`;
+
+const TimeSummaryRow = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 3.25rem;
+  margin-bottom: 2rem;
+`;
+
+const TimeSummaryCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const TimeSummaryValue = styled.div`
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+`;
+
+const PeriodText = styled.span`
+  ${({ theme }) => theme.typography.body1};
+  color: ${({ theme }) => theme.colors.gray800};
+`;
+
+const TimeValueText = styled.span`
+  font-family: 'Pretendard Variable';
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 140%;
+  color: ${({ theme }) => theme.colors.primary100};
+`;
+
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 const DAY_NAMES = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
 
@@ -299,10 +468,20 @@ function toAttendee(member) {
   return { id: member.userId, name: member.nickname, profileImage: member.profileImageUrl };
 }
 
+function pad(n) {
+  return String(n).padStart(2, '0');
+}
+
+// 서버가 내려주는 startTime/endTime은 타임존 표시가 없는 로컬시간 문자열이라,
+// toISOString()으로 UTC 변환해서 보내면 서버가 이걸 다시 로컬시간처럼 파싱해 날짜가 하루 밀린다.
+// 그래서 저장할 때도 항상 이 포맷(타임존 없는 로컬시간 문자열)을 그대로 맞춰서 보낸다.
+function toLocalDateTimeString(date) {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
 function toOptionViewModel(rec, index) {
   const start = new Date(rec.startTime);
   const end = new Date(rec.endTime);
-  const pad = (n) => String(n).padStart(2, '0');
   return {
     id: index,
     date: start.getDate(),
@@ -314,6 +493,9 @@ function toOptionViewModel(rec, index) {
     unavailableAttendees: rec.unavailableMembers.map(toAttendee),
     startTimeRaw: rec.startTime,
     endTimeRaw: rec.endTime,
+    // 시간 조정 다이얼의 드래그 가능 범위 계산용 — 사용자가 저장해도 절대 덮어쓰지 않음
+    originalStartTimeRaw: rec.startTime,
+    originalEndTimeRaw: rec.endTime,
   };
 }
 
@@ -323,6 +505,7 @@ export default function TimeRecommendPage() {
   const navigate = useNavigate();
   const routerLocation = useLocation();
   const today = new Date();
+  const todayMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
   const {
     roomId,
@@ -344,6 +527,15 @@ const isUpdateMode = Boolean(promiseId);
   const [attendeePopupOption, setAttendeePopupOption] = useState(null);
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [timeAdjustOption, setTimeAdjustOption] = useState(null);
+  const [draftStart, setDraftStart] = useState(0);
+  const [draftEnd, setDraftEnd] = useState(0);
+  const [boundStart, setBoundStart] = useState(0);
+  const [boundEnd, setBoundEnd] = useState(MINUTES_PER_DAY);
+  const [draggingHandle, setDraggingHandle] = useState(null);
+  const dialRef = useRef(null);
+  const minGapMinutes = minDuration || DEFAULT_MIN_GAP_MINUTES;
 
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortValue, setSortValue] = useState('recommended');
@@ -403,8 +595,10 @@ const isUpdateMode = Boolean(promiseId);
           proposeEndDate: formatDateForApi(dateRange.end),
           searchStartTime: '00:00',
           searchEndTime: '23:30',
-          recommendedStartTime: selectedOption.startTimeRaw,
-          recommendedEndTime: selectedOption.endTimeRaw,
+          recommendedStartTime: selectedOption.originalStartTimeRaw,
+          recommendedEndTime: selectedOption.originalEndTimeRaw,
+          selectedStartTime: selectedOption.startTimeRaw,
+          selectedEndTime: selectedOption.endTimeRaw,
           minDuration,
           sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
         });
@@ -418,8 +612,10 @@ const isUpdateMode = Boolean(promiseId);
           proposeEndDate: formatDateForApi(dateRange.end),
           searchStartTime: '00:00',
           searchEndTime: '23:30',
-          recommendedStartTime: selectedOption.startTimeRaw,
-          recommendedEndTime: selectedOption.endTimeRaw,
+          recommendedStartTime: selectedOption.originalStartTimeRaw,
+          recommendedEndTime: selectedOption.originalEndTimeRaw,
+          selectedStartTime: selectedOption.startTimeRaw,
+          selectedEndTime: selectedOption.endTimeRaw,
           location,
           minDuration,
           notificationLeadMinutes,
@@ -432,6 +628,97 @@ const isUpdateMode = Boolean(promiseId);
       setIsLoading(false);
     }
   };
+
+  function openTimeAdjust(option) {
+    const start = new Date(option.startTimeRaw);
+    const end = new Date(option.endTimeRaw);
+    setDraftStart(start.getHours() * 60 + start.getMinutes());
+    setDraftEnd(end.getHours() * 60 + end.getMinutes());
+
+    // 드래그 가능 범위는 항상 서버가 처음 추천해준 시간(originalStartTimeRaw/EndTimeRaw) 기준으로 계산한다.
+    // 이전에 저장한 값(startTimeRaw/endTimeRaw) 기준으로 계산하면, 저장할 때마다 그 값을 기준으로
+    // 다시 패딩이 잡혀서 열 때마다 범위가 점점 좁아지는(래칫) 버그가 있었다.
+    const originalStart = new Date(option.originalStartTimeRaw);
+    const originalEnd = new Date(option.originalEndTimeRaw);
+    const originalStartMinutes = originalStart.getHours() * 60 + originalStart.getMinutes();
+    const originalEndMinutes = originalEnd.getHours() * 60 + originalEnd.getMinutes();
+
+    setBoundStart(Math.max(0, originalStartMinutes - BOUND_PADDING_MINUTES));
+    setBoundEnd(Math.min(MINUTES_PER_DAY - TIME_STEP_MINUTES, originalEndMinutes + BOUND_PADDING_MINUTES));
+    setTimeAdjustOption(option);
+  }
+
+  function closeTimeAdjust() {
+    setTimeAdjustOption(null);
+    setDraggingHandle(null);
+  }
+
+  function angleFromPointerEvent(e) {
+    const rect = dialRef.current.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const point = e.touches ? e.touches[0] : e;
+    const dx = point.clientX - cx;
+    const dy = point.clientY - cy;
+    let deg = (Math.atan2(dx, -dy) * 180) / Math.PI;
+    if (deg < 0) deg += 360;
+    return deg;
+  }
+
+  useEffect(() => {
+    if (!draggingHandle) return undefined;
+
+    function handleMove(e) {
+      e.preventDefault();
+      const minutes = snapMinutes(angleToMinutes(angleFromPointerEvent(e)));
+
+      if (draggingHandle === 'start') {
+        const upper = Math.max(boundStart, draftEnd - minGapMinutes);
+        setDraftStart(Math.min(Math.max(minutes, boundStart), upper));
+      } else {
+        const lower = Math.min(boundEnd, draftStart + minGapMinutes);
+        setDraftEnd(Math.max(Math.min(minutes, boundEnd), lower));
+      }
+    }
+
+    function handleUp() {
+      setDraggingHandle(null);
+    }
+
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleUp);
+    };
+  }, [draggingHandle, draftStart, draftEnd, boundStart, boundEnd, minGapMinutes]);
+
+  function handleTimeAdjustSave() {
+    const optionId = timeAdjustOption.id;
+
+    setOptions((prev) => prev.map((o) => {
+      if (o.id !== optionId) return o;
+
+      const start = new Date(o.startTimeRaw);
+      start.setHours(Math.floor(draftStart / 60), draftStart % 60, 0, 0);
+      const end = new Date(o.endTimeRaw);
+      end.setHours(Math.floor(draftEnd / 60), draftEnd % 60, 0, 0);
+
+      return {
+        ...o,
+        startTimeRaw: toLocalDateTimeString(start),
+        endTimeRaw: toLocalDateTimeString(end),
+        timeRange: `${pad(start.getHours())}:${pad(start.getMinutes())}~${pad(end.getHours())}:${pad(end.getMinutes())}`,
+      };
+    }));
+
+    closeTimeAdjust();
+  }
 
   const handleDecisionHelper = async () => {
     setIsLoading(true);
@@ -481,6 +768,7 @@ const isUpdateMode = Boolean(promiseId);
   const getCellState = (day, type) => {
     if (type !== 'current') return 'disabled';
     const cellMs = new Date(viewYear, viewMonth - 1, day).getTime();
+    if (cellMs < todayMs) return 'disabled';
     const startMs = toMs(startDate);
     const endMs = toMs(endDate);
     const effectiveEndMs = endMs ?? toMs(hoverDate);
@@ -533,7 +821,11 @@ const isUpdateMode = Boolean(promiseId);
             memberCount={option.memberCount}
             totalCount={option.totalCount}
             selected={selectedId === option.id}
-            onClick={() => setSelectedId(option.id)}
+            onClick={() => {
+              setSelectedId(option.id);
+              openTimeAdjust(option);
+            }}
+            onAttendeeClick={() => setAttendeePopupOption(option)}
           />
         ))}
       </CardList>
@@ -561,6 +853,145 @@ const isUpdateMode = Boolean(promiseId);
           unavailableAttendees={attendeePopupOption.unavailableAttendees}
           onClose={() => setAttendeePopupOption(null)}
         />
+      )}
+
+      {timeAdjustOption && (
+        <>
+          <Dim onClick={closeTimeAdjust} />
+          <TimeAdjustSheet
+            style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TimeAdjustDragHandle />
+
+            <DurationLabel>총 약속 시간</DurationLabel>
+            <DurationValue>{formatDurationLabel(draftStart, draftEnd)}</DurationValue>
+
+            <DialWrapper ref={dialRef}>
+              <DialTrack />
+              <svg
+                width={DIAL_SIZE}
+                height={DIAL_SIZE}
+                viewBox={`0 0 ${DIAL_SIZE} ${DIAL_SIZE}`}
+                style={{ touchAction: 'none', position: 'relative', zIndex: 1, display: 'block' }}
+              >
+                <circle
+                  cx={DIAL_CENTER}
+                  cy={DIAL_CENTER}
+                  r={RING_RADIUS}
+                  stroke="#EFEFEF"
+                  strokeWidth={RING_WIDTH}
+                  fill="none"
+                />
+                <path
+                  d={describeArc(
+                    RING_RADIUS,
+                    minutesToAngle(Math.min(boundStart, boundEnd)),
+                    minutesToAngle(Math.max(boundStart, boundEnd))
+                  )}
+                  stroke="#DCDCDC"
+                  strokeWidth={RING_WIDTH}
+                  fill="none"
+                />
+                <path
+                  d={describeArc(RING_RADIUS, minutesToAngle(draftStart), minutesToAngle(draftEnd))}
+                  stroke="#81D0C1"
+                  strokeWidth={RING_WIDTH}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+
+                <defs>
+                  <mask id="dialTickMask" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="220">
+                    <path d="M110 0C170.751 0 220 49.2487 220 110C220 170.751 170.751 220 110 220C49.2487 220 0 170.751 0 110C0 49.2487 49.2487 0 110 0ZM110 10C54.7715 10 10 54.7715 10 110C10 165.228 54.7715 210 110 210C165.228 210 210 165.228 210 110C210 54.7715 165.228 10 110 10Z" fill="#CCCCCC" />
+                  </mask>
+                </defs>
+                <g mask="url(#dialTickMask)">
+                  <rect x="109" y="-63" width="2" height="347" fill="#CCCCCC" />
+                  <rect x="153.939" y="-57.3467" width="2" height="347" transform="rotate(15 153.939 -57.3467)" fill="#CCCCCC" />
+                  <rect x="195.885" y="-40.2559" width="2" height="347" transform="rotate(30 195.885 -40.2559)" fill="#CCCCCC" />
+                  <rect x="231.977" y="-11.8896" width="2" height="347" transform="rotate(45 231.977 -11.8896)" fill="#CCCCCC" />
+                  <rect x="259.756" y="22.8838" width="2" height="347" transform="rotate(60 259.756 22.8838)" fill="#CCCCCC" />
+                  <rect x="277.33" y="64.6289" width="2" height="347" transform="rotate(75 277.33 64.6289)" fill="#CCCCCC" />
+                  <rect x="-57.8477" y="66.5605" width="2" height="347" transform="rotate(-75 -57.8477 66.5605)" fill="#CCCCCC" />
+                  <rect x="-40.7559" y="24.6162" width="2" height="347" transform="rotate(-60 -40.7559 24.6162)" fill="#CCCCCC" />
+                  <rect x="-13.3906" y="-11.4756" width="2" height="347" transform="rotate(-45 -13.3906 -11.4756)" fill="#CCCCCC" />
+                  <rect x="22.3848" y="-39.2559" width="2" height="347" transform="rotate(-30 22.3848 -39.2559)" fill="#CCCCCC" />
+                  <rect x="64.1289" y="-56.8291" width="2" height="347" transform="rotate(-15 64.1289 -56.8291)" fill="#CCCCCC" />
+                </g>
+
+                {Array.from({ length: 12 }, (_, i) => {
+                  const hour = i * 2;
+                  const pos = polarPoint(LABEL_RADIUS, hour * 15);
+                  const isQuarter = hour === 0 || hour === 6 || hour === 12 || hour === 18;
+                  return (
+                    <HourLabel key={`label-${hour}`} x={pos.x} y={pos.y} $emphasis={isQuarter}>
+                      {formatHourTickLabel(hour)}
+                    </HourLabel>
+                  );
+                })}
+
+                <g
+                  onMouseDown={() => setDraggingHandle('start')}
+                  onTouchStart={() => setDraggingHandle('start')}
+                  style={{ cursor: 'grab' }}
+                >
+                  <circle
+                    cx={polarPoint(RING_RADIUS, minutesToAngle(draftStart)).x}
+                    cy={polarPoint(RING_RADIUS, minutesToAngle(draftStart)).y}
+                    r={HANDLE_TOUCH_R}
+                    fill="transparent"
+                  />
+                  <DialHandle
+                    cx={polarPoint(RING_RADIUS, minutesToAngle(draftStart)).x}
+                    cy={polarPoint(RING_RADIUS, minutesToAngle(draftStart)).y}
+                    r={HANDLE_R}
+                  />
+                </g>
+                <g
+                  onMouseDown={() => setDraggingHandle('end')}
+                  onTouchStart={() => setDraggingHandle('end')}
+                  style={{ cursor: 'grab' }}
+                >
+                  <circle
+                    cx={polarPoint(RING_RADIUS, minutesToAngle(draftEnd)).x}
+                    cy={polarPoint(RING_RADIUS, minutesToAngle(draftEnd)).y}
+                    r={HANDLE_TOUCH_R}
+                    fill="transparent"
+                  />
+                  <DialHandle
+                    cx={polarPoint(RING_RADIUS, minutesToAngle(draftEnd)).x}
+                    cy={polarPoint(RING_RADIUS, minutesToAngle(draftEnd)).y}
+                    r={HANDLE_R}
+                  />
+                </g>
+              </svg>
+            </DialWrapper>
+
+            <TimeSummaryRow>
+              <TimeSummaryCol>
+                <DurationLabel>시작 시간</DurationLabel>
+                <TimeSummaryValue>
+                  <PeriodText>{splitMinutesForDisplay(draftStart).period}</PeriodText>
+                  <TimeValueText>
+                    {pad(splitMinutesForDisplay(draftStart).hour)}:{pad(splitMinutesForDisplay(draftStart).minute)}
+                  </TimeValueText>
+                </TimeSummaryValue>
+              </TimeSummaryCol>
+              <TimeSummaryCol>
+                <DurationLabel>종료 시간</DurationLabel>
+                <TimeSummaryValue>
+                  <PeriodText>{splitMinutesForDisplay(draftEnd).period}</PeriodText>
+                  <TimeValueText>
+                    {pad(splitMinutesForDisplay(draftEnd).hour)}:{pad(splitMinutesForDisplay(draftEnd).minute)}
+                  </TimeValueText>
+                </TimeSummaryValue>
+              </TimeSummaryCol>
+            </TimeSummaryRow>
+
+            <Btn text="저장" onClick={handleTimeAdjustSave} />
+          </TimeAdjustSheet>
+        </>
       )}
 
       {isDateSheetOpen && (

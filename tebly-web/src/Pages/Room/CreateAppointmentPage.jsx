@@ -309,6 +309,7 @@ export default function CreateAppointmentPage() {
 
       {popupType === 'date' && (
         <DatePopup
+          disablePast
           onClose={() => setPopupType(null)}
           onReset={() => {
             setDate('');
