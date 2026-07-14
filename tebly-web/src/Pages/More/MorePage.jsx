@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
 import Header2 from '../../components/common/Header2';
 import SectionCard from '../../components/more/SectionCard';
 import SelectRow from '../../components/room/SelectRow';
+import ConfirmPopup from '../../components/common/ConfirmPopup';
 import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 import BellLineIcon from '../../assets/icons/bell-line.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
@@ -81,6 +82,8 @@ export default function MorePage() {
   const navigate = useNavigate();
   const user = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
 
   useEffect(() => {
     fetchMyProfile();
@@ -175,17 +178,41 @@ export default function MorePage() {
             state="empty"
             right_icon={true}
             color="alert"
-            onClick={handleLogout}
+            onClick={() => setShowLogoutConfirm(true)}
           />
           <SelectRow
             text_empty="회원탈퇴"
             state="empty"
             right_icon={true}
             color="gray500"
-            onClick={handleWithdraw}
+            onClick={() => setShowWithdrawConfirm(true)}
           />
         </SectionCard>
       </ContentWrapper>
+
+      <ConfirmPopup
+        visible={showLogoutConfirm}
+        title="로그아웃을 하시겠습니까?"
+        confirmText="로그아웃"
+        danger
+        onCancel={() => setShowLogoutConfirm(false)}
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          handleLogout();
+        }}
+      />
+
+      <ConfirmPopup
+        visible={showWithdrawConfirm}
+        title="회원탈퇴를 하시겠습니까?"
+        confirmText="탈퇴"
+        danger
+        onCancel={() => setShowWithdrawConfirm(false)}
+        onConfirm={() => {
+          setShowWithdrawConfirm(false);
+          handleWithdraw();
+        }}
+      />
     </PageWrapper>
   );
 }

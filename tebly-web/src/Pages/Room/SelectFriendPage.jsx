@@ -76,7 +76,9 @@ const SelectFriendPage = () => {
   const fetchFriends = useFriendStore((state) => state.fetchFriends);
 
   const [roomMembers, setRoomMembers] = useState([]);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState(
+    !appointmentMode && !currentRoomId ? (location.state?.selectedMembers ?? []) : []
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -112,6 +114,22 @@ const SelectFriendPage = () => {
   const handleRemove = (friendId) => {
     setSelected((prev) => prev.filter((f) => f.id !== friendId));
   };
+
+  function handleBack() {
+    if (!appointmentMode && !currentRoomId) {
+      // 새 방 만들기 흐름 — 입력값을 그대로 실어서 방 만들기 화면으로 복귀
+      navigate('/create-room', {
+        state: {
+          name: roomName,
+          description: roomDescription,
+          imageUrl: roomImageUrl,
+          selectedMembers: selected,
+        },
+      });
+      return;
+    }
+    navigate(-1);
+  }
 
   async function handleComplete() {
     if (isSubmitting) return;
@@ -167,7 +185,7 @@ const SelectFriendPage = () => {
       <Header
               title="친구 선택"
               leftIcon="back"
-              onLeft={() => navigate(-1)}
+              onLeft={handleBack}
               icons={[]}
             />
       <ContentArea>

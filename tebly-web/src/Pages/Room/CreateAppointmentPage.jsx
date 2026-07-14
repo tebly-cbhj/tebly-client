@@ -73,6 +73,23 @@ const BtnWrapper = styled.div`
   width: 350px;
 `;
 
+const Toast = styled.div`
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: ${({ theme }) => theme.colors.gray900};
+  border-radius: 0.75rem;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.white};
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 200;
+`;
+
 function getNotificationLeadMinutes(alarmTime) {
   if (!alarmTime) return [];
   return alarmTime
@@ -100,6 +117,46 @@ export default function CreateAppointmentPage() {
 
   const [editingField, setEditingField] = useState(null);
   const [popupType, setPopupType] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  function showToast(message) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 2000);
+  }
+
+  function handleNext() {
+    if (!appointmentName.trim()) {
+      showToast('약속 이름을 입력해주세요.');
+      return;
+    }
+    if (!dateRange?.start || !dateRange?.end) {
+      showToast('약속 기간을 선택해주세요.');
+      return;
+    }
+    if (!minDurationMinutes) {
+      showToast('최소 시간을 선택해주세요.');
+      return;
+    }
+    if (selectedMembers.length === 0) {
+      showToast('친구를 선택해주세요.');
+      return;
+    }
+
+    navigate('/time-recommend', {
+      state: {
+        roomId,
+        title: appointmentName,
+        comment: memo,
+        categoryId: category?.categoryId,
+        location,
+        proposeStartDate: dateRange?.start,
+        proposeEndDate: dateRange?.end,
+        minDuration: minDurationMinutes,
+        notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
+        selectedMemberIds: selectedMembers.map((m) => m.id),
+      },
+    });
+  }
 
   return (
     <PageWrapper noNav>
@@ -205,24 +262,10 @@ export default function CreateAppointmentPage() {
       </ScrollContent>
 
       <BtnWrapper>
-        <Btn
-          text="다음"
-          onClick={() => navigate('/time-recommend', {
-            state: {
-              roomId,
-              title: appointmentName,
-              comment: memo,
-              categoryId: category?.categoryId,
-              location,
-              proposeStartDate: dateRange?.start,
-              proposeEndDate: dateRange?.end,
-              minDuration: minDurationMinutes,
-              notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
-              selectedMemberIds: selectedMembers.map((m) => m.id),
-            }
-          })}
-        />
+        <Btn text="다음" onClick={handleNext} />
       </BtnWrapper>
+
+      <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
 
       {popupType === 'minTime' && (
         <MinTimePickerPopup
