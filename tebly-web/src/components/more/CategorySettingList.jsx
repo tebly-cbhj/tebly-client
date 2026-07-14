@@ -21,8 +21,8 @@ const CategoryInfo = styled.div`
 `;
 
 const IconWrapper = styled.div`
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
 `;
 
@@ -66,7 +66,7 @@ export default function CategorySettingList({ iconId, name, isPrivate, onButtonC
     >
       <CategoryInfo>
         <IconWrapper>
-          {Icon && <Icon width={52} height={52} />}
+          {Icon && <Icon width={50} height={50} />}
         </IconWrapper>
         <CategoryName>{name}</CategoryName>
       </CategoryInfo>
