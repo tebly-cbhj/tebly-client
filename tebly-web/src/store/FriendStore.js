@@ -19,6 +19,11 @@ export const useFriendStore = create((set) => ({
     await apiClient.post('/friends/requests/code', { inviteCode });
   },
 
+  previewFriendByCode: async (code) => {
+    const res = await apiClient.get('/friends/preview', { params: { code } });
+    return res.data;
+  },
+
   updateMyProfile: async ({ nickname, profileImageUrl, bio }) => {
     const res = await apiClient.patch('/users/me', { nickname, profileImageUrl, bio });
     set({ myProfile: res.data });

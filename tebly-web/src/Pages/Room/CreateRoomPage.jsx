@@ -45,6 +45,7 @@ const CreateRoom = () => {
   const [roomName, setRoomName] = useState(location.state?.name ?? "");
   const [description, setDescription] = useState(location.state?.description ?? "");
   const [imageUrl, setImageUrl] = useState(location.state?.imageUrl ?? null);
+  const selectedMembers = location.state?.selectedMembers ?? [];
   const [sheetVisible, setSheetVisible] = useState(false);
   const [showCoverPicker, setShowCoverPicker] = useState(false);
   const isActive = roomName.trim() !== "" && description.trim() !== "";
@@ -78,7 +79,7 @@ const CreateRoom = () => {
         alert('방 정보 수정에 실패했어요. 다시 시도해주세요.');
       }
     } else {
-      navigate('/select-friend', { state: { roomName, description, imageUrl } });
+      navigate('/select-friend', { state: { roomName, description, imageUrl, selectedMembers } });
     }
   }
 

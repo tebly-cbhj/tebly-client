@@ -427,7 +427,7 @@ const isUpdateMode = Boolean(promiseId);
           sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
           selectedMemberIds,
         });
-        navigate(`/room/${roomId}`);
+        navigate(`/room/${roomId}`, { replace: true });
       }
     } finally {
       setIsLoading(false);
@@ -451,7 +451,7 @@ const isUpdateMode = Boolean(promiseId);
         notificationLeadMinutes,
         selectedMemberIds,
       });
-      navigate(`/room/${roomId}/chat`);
+      navigate(`/room/${roomId}/chat`, { replace: true });
     } finally {
       setIsLoading(false);
     }

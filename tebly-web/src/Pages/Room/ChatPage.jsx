@@ -143,7 +143,7 @@ export default function ChatPage() {
 
       <MessageList>
         {messages.map((msg) =>
-          msg.text?.startsWith('[결정이]') ? (
+          msg.senderName === '결정이' ? (
             <div key={msg.id}>
               <DecisionBanner />
               <DecisionCard content={msg.text} />

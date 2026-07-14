@@ -1,58 +1,73 @@
 import { create } from 'zustand';
 import apiClient from '../api/client';
 
+const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+function toKoreanDateStr(isoDateTime) {
+  const d = new Date(isoDateTime);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}.${m}.${day} (${DAY_KO[d.getDay()]})`;
+}
+
+function toTimeStr(isoDateTime) {
+  const d = new Date(isoDateTime);
+  const h = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${min}`;
+}
+
+// 방 약속 목록 API(RoomPromiseResponse)엔 카테고리 정보가 없어서 비워둠(Other로 표시됨)
+function mapPromiseToSchedule(promise, roomId) {
+  return {
+    id: promise.promiseId,
+    roomId,
+    title: promise.title,
+    date: toKoreanDateStr(promise.startTime),
+    time: `${toTimeStr(promise.startTime)} - ${toTimeStr(promise.endTime)}`,
+    location: promise.location || '',
+    category: 'Other',
+    alarmTime: '',
+    memo: '',
+    repeat: null,
+    confirmed: promise.promiseStatus === 'CONFIRMED',
+    createdByMe: promise.isSender,
+    myStatus: promise.myStatus,
+  };
+}
+
 export const useScheduleStore = create((set, get) => ({
-  schedules: [
-    {
-      id: 1,
-      roomId: 1,
-      title: '떡볶이 모임',
-      date: '2026.05.12 (화)',
-      time: '18:00 - 20:00',
-      location: '엽기떡볶이 신촌점',
-      category: 'Appointment',
-      alarmTime: '30분 전',
-      memberIds: [1, 2, 3, 4, 5],
-      acceptedIds: [1, 2],
-      confirmed: true,
-      createdByMe: true,
-      myStatus: null,
-    },
-    {
-      id: 2,
-      roomId: 1,
-      title: '카페 모임',
-      date: '2026.05.15 (금)',
-      time: '14:00 - 16:00',
-      location: '스타벅스 강남점',
-      category: 'Club',
-      alarmTime: '1시간 전',
-      memberIds: [1, 2, 3, 4, 5],
-      acceptedIds: [1, 2, 3, 4],
-      confirmed: true,
-      createdByMe: false,
-      myStatus: 'accepted',
-    },
-    {
-      id: 3,
-      roomId: 2,
-      title: '한강 자전거',
-      date: '2026.06.16 (화)',
-      time: '14:00 - 16:00',
-      location: '이촌 한강공원',
-      category: 'Leisure',
-      alarmTime: '1시간 전',
-      memberIds: [2],
-      acceptedIds: [2],
-      confirmed: true,
-      createdByMe: false,
-      myStatus: 'pending',
-    },
-  ],
+  schedules: [],
 
   categories: [],
 
   alarmOptions: ['1일 전', '1시간 전', '30분 전', '15분 전'],
+
+  // 캘린더에 뜨는 "확정된 방 약속" — 방 목록 전체를 돌면서 각 방의 약속을 모아옴
+  // (약속 전체를 한번에 주는 API가 없어서 방 개수만큼 요청이 나감)
+  fetchConfirmedSchedules: async () => {
+    const roomsRes = await apiClient.get('/rooms');
+    const roomDetails = await Promise.all(
+      roomsRes.data.map((room) =>
+        apiClient.get(`/rooms/${room.roomId}`).then((res) => ({ roomId: room.roomId, detail: res.data }))
+      )
+    );
+
+    const schedules = roomDetails.flatMap(({ roomId, detail }) => {
+      const promises = [...(detail.myPromises || []), ...(detail.invitedPromises || [])];
+      const seen = new Set();
+      return promises
+        .filter((p) => {
+          if (p.promiseStatus !== 'CONFIRMED' || seen.has(p.promiseId)) return false;
+          seen.add(p.promiseId);
+          return true;
+        })
+        .map((p) => mapPromiseToSchedule(p, roomId));
+    });
+
+    set({ schedules });
+  },
 
   fetchCategories: async () => {
     const res = await apiClient.get('/schedules/categories');
@@ -115,24 +130,4 @@ export const useScheduleStore = create((set, get) => ({
       ),
     }));
   },
-
-  addSchedule: (roomId, newSchedule) =>
-    set((state) => ({
-      schedules: [
-        ...state.schedules,
-        { id: Date.now(), roomId, ...newSchedule },
-      ],
-    })),
-
-  deleteSchedule: (scheduleId) =>
-    set((state) => ({
-      schedules: state.schedules.filter((s) => s.id !== scheduleId),
-    })),
-
-  confirmSchedule: (scheduleId) =>
-    set((state) => ({
-      schedules: state.schedules.map((s) =>
-        s.id === scheduleId ? { ...s, confirmed: true } : s
-      ),
-    })),
 }));
