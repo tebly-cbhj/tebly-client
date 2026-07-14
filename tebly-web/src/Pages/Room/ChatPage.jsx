@@ -143,7 +143,7 @@ export default function ChatPage() {
 
       <MessageList>
         {messages.map((msg) =>
-          msg.senderName === '결정이' ? (
+          msg.text?.includes('결정이가 약속 초대장을 전달했어요') ? (
             <div key={msg.id}>
               <DecisionBanner />
               <DecisionCard content={msg.text} />
