@@ -111,9 +111,14 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     useShallow((state) => state.schedules)
   );
   const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
+  const fetchConfirmedSchedules = useScheduleStore((state) => state.fetchConfirmedSchedules);
   const groupSchedules = useScheduleStore(
     useShallow((state) => state.schedules.filter((s) => s.confirmed))
   );
+
+  useEffect(() => {
+    fetchConfirmedSchedules();
+  }, [fetchConfirmedSchedules]);
 
   const { sunday, saturday } = useMemo(() => {
     const base = selectedDate
