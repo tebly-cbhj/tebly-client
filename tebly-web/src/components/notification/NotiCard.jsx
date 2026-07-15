@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { CATEGORY_ICONS } from '../room/CategoryIcons';
+import DefaultProfile from '../../assets/default/profile/basic.svg';
 
 const Card = styled.div`
   display: flex;
@@ -17,6 +18,14 @@ const Card = styled.div`
 const IconWrapper = styled.div`
   width: 48px;
   height: 48px;
+  flex-shrink: 0;
+`;
+
+const ProfileImage = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
   flex-shrink: 0;
 `;
 
@@ -53,6 +62,8 @@ export default function NotiCard({
   title,
   content,
   senderNickname,
+  senderProfileImageUrl,
+  scheduleName,
   notifiedAt,
   isRead = false,
 }) {
@@ -61,14 +72,21 @@ export default function NotiCard({
 
   return (
     <Card $isRead={isRead} onClick={onClick}>
-      <IconWrapper>
-        {Icon && <Icon width={48} height={48} />}
-      </IconWrapper>
+      {type === 'POKE' ? (
+        <ProfileImage src={senderProfileImageUrl || DefaultProfile} alt="" />
+      ) : (
+        <IconWrapper>
+          {Icon && <Icon width={48} height={48} />}
+        </IconWrapper>
+      )}
 
       <TextContainer>
         <MessageText>
           {type === 'POKE' && senderNickname ? (
-            <><BoldText>{senderNickname}</BoldText>님이 나를 콕 찔렀어요</>
+            <>
+              <BoldText>{senderNickname}</BoldText>님이 나를 콕 찔렀어요.{' '}
+              <BoldText>{scheduleName}</BoldText>약속을 확인해보러 가요.
+            </>
           ) : (
             <><BoldText>{title}</BoldText> {content}</>
           )}

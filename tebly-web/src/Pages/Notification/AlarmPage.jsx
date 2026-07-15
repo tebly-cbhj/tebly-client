@@ -7,6 +7,15 @@ import NotiCard from '../../components/notification/NotiCard';
 import { useNotificationStore } from '../../store/NotificationStore';
 import { useScheduleStore } from '../../store/ScheduleStore';
 
+// 서버의 notifications createdAt이 타임존 표시 없이(예: "2026-07-15T15:45:52") 오는데,
+// 실제로는 UTC 시각을 그대로 찍어서 내려주는 버그가 있음(한국시간으로 착각하면 9시간 어긋남).
+// 백엔드 수정 전까지 UTC로 간주해서 파싱하는 임시 조치 — 백엔드가 고치면 이 함수도 원복할 것.
+function parseServerDate(dateStr) {
+  if (!dateStr) return new Date(NaN);
+  const hasTimezone = /[Zz]|[+-]\d{2}:?\d{2}$/.test(dateStr);
+  return new Date(hasTimezone ? dateStr : `${dateStr}Z`);
+}
+
 // PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
 // 화면 끝까지 채우도록 리스트 영역은 엣지투엣지로 유지해야 해서,
 // max-width/높이/배경만 가져온 버전
@@ -97,29 +106,30 @@ export default function AlarmPage() {
 
   const now = new Date();
   const newNoti = currentList.filter(
-    (n) => now - new Date(n.createdAt) < 1000 * 60 * 60 * 24
+    (n) => now - parseServerDate(n.createdAt) < 1000 * 60 * 60 * 24
   );
   const oldNoti = currentList.filter(
-    (n) => now - new Date(n.createdAt) >= 1000 * 60 * 60 * 24
+    (n) => now - parseServerDate(n.createdAt) >= 1000 * 60 * 60 * 24
   );
 
   function formatNotifiedAt(date) {
-    const diff = now - new Date(date);
+    const diff = now - parseServerDate(date);
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
 
     if (minutes < 60) return `${minutes}분 전`;
     if (hours < 24) return `${hours}시간 전`;
 
-    const d = new Date(date);
+    const d = parseServerDate(date);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   }
 
   function handleNotiClick(noti) {
     markAsRead(noti.id);
     if (noti.roomId) {
+      // roomId가 있으면 scheduleId는 사실 약속(promise) ID를 재사용해서 담고 있음(redirectPath: "/promises/{scheduleId}"로 확인함)
       navigate('/my-appointments', {
-        state: { scheduleId: noti.scheduleId, roomId: noti.roomId },
+        state: { promiseId: noti.scheduleId, roomId: noti.roomId, isInvited: true },
       });
     } else if (noti.scheduleId) {
       // 개인 일정 단건 조회 API가 없어서 상세로 바로 못 감 — 캘린더 홈으로 이동
@@ -140,6 +150,8 @@ export default function AlarmPage() {
             title={noti.title}
             content={noti.content}
             senderNickname={noti.senderNickname}
+            senderProfileImageUrl={noti.senderProfileImageUrl}
+            scheduleName={noti.scheduleName}
             notifiedAt={formatNotifiedAt(noti.createdAt)}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
