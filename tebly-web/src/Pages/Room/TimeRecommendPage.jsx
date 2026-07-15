@@ -278,7 +278,7 @@ const DIAL_CENTER = DIAL_SIZE / 2;
 // 링 두께가 바뀌면 반지름도 항상 같은 비율로 같이 커지고 작아지게 함
 const RING_WIDTH = 30;
 const RADIUS_TO_WIDTH_RATIO = 120 / 34;
-const RING_RADIUS = RING_WIDTH * RADIUS_TO_WIDTH_RATIO;
+const RING_RADIUS = RING_WIDTH * RADIUS_TO_WIDTH_RATIO + 4;
 const RING_INNER_RADIUS = RING_RADIUS - RING_WIDTH / 2;
 const TICK_RING_GAP = 8;
 const TICK_LENGTH = 8;
@@ -351,8 +351,6 @@ function formatDurationLabel(startMinutes, endMinutes) {
 const TimeAdjustSheet = styled.div`
   width: 100%;
   max-width: 24.375rem;
-  max-height: 80vh;
-  overflow-y: auto;
   background: ${({ theme }) => theme.colors.white};
   border-radius: 2rem 2rem 0 0;
   box-sizing: border-box;
@@ -380,8 +378,8 @@ const DurationValue = styled.span`
 
 const DialWrapper = styled.div`
   position: relative;
-  width: min(${DIAL_SIZE / 16}rem, 85vw, 45vh);
-  height: min(${DIAL_SIZE / 16}rem, 85vw, 45vh);
+  width: ${DIAL_SIZE / 16}rem;
+  height: ${DIAL_SIZE / 16}rem;
   margin: 2rem 0;
   touch-action: none;
 `;
