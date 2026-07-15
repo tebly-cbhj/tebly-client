@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import { useNotificationStore } from '../../store/NotificationStore';
 import { PageWrapper } from '../../PageWrapper';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
@@ -145,10 +146,14 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
   const fetchConfirmedSchedules = useScheduleStore((state) => state.fetchConfirmedSchedules);
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
   const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
+  const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     fetchConfirmedSchedules();
-  }, [fetchConfirmedSchedules]);
+    fetchNotifications();
+  }, [fetchConfirmedSchedules, fetchNotifications]);
 
   // openFab 플래그는 온보딩에서 넘어온 최초 진입에서만 한 번 소비되어야 한다.
   // location.state는 뷰모드 전환(월간<->주간)으로 인한 리마운트에도 그대로 남아있어서,
@@ -260,8 +265,8 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           monthLabel={formatMonthLabel(currentMonthDate)}
           viewMode={viewMode}
           onViewModeChange={onViewModeChange}
-          hasUnreadNotification={false}
-          onNotificationClick={() => navigate('/noti-invitaion')}
+          hasUnreadNotification={hasUnreadNotification}
+          onNotificationClick={() => navigate('/alarm')}
           onDateChange={(date) => {
             setCurrentMonthDate(new Date(date.year, date.month - 1, date.day));
             setSelectedDate(new Date(date.year, date.month - 1, date.day));

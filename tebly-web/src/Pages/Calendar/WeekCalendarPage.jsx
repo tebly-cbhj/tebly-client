@@ -11,6 +11,7 @@ import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
 import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import { useNotificationStore } from '../../store/NotificationStore';
 import CalendarFab from '../../components/calendar/CalendarFab';
 
 const WeekHeader = styled.div`
@@ -115,10 +116,14 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
   const groupSchedules = useScheduleStore(
     useShallow((state) => state.schedules.filter((s) => s.confirmed))
   );
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
+  const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     fetchConfirmedSchedules();
-  }, [fetchConfirmedSchedules]);
+    fetchNotifications();
+  }, [fetchConfirmedSchedules, fetchNotifications]);
 
   const { sunday, saturday } = useMemo(() => {
     const base = selectedDate
@@ -262,8 +267,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
         monthLabel={monthLabel}
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
-        hasUnreadNotification={false} // TODO: 알림 존재 여부 상태 바인딩 및 알림 API 연동
-        onNotificationClick={() => navigate('/noti-invitaion')} // TODO: 알림 페이지 navigate 연동
+        hasUnreadNotification={hasUnreadNotification}
+        onNotificationClick={() => navigate('/alarm')}
         onDateChange={(date) => {
           onDateChange?.(date);
           // TODO: 선택된 날짜 기준으로 해당 주 일정 API 호출 연동
