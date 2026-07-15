@@ -172,7 +172,7 @@ export default function RoomInfoPage() {
         <Header
           title={room.name}
           leftIcon="back"
-          onLeft={() => navigate(-1)}
+          onLeft={() => navigate('/room-list')}
           icons={[hasUnreadChat ? 'bubble-noti' : 'bubble', 'more']}
           onIconClick={(icon) => {
             if (icon === 'bubble' || icon === 'bubble-noti') navigate(`/room/${roomId}/chat`);
