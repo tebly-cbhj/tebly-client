@@ -275,7 +275,7 @@ const ConfirmBtn = styled.button`
 
 const DIAL_SIZE = 350;
 const DIAL_CENTER = DIAL_SIZE / 2;
-const RING_RADIUS = 92;
+const RING_RADIUS = 140;
 const RING_WIDTH = 26;
 const RING_INNER_RADIUS = RING_RADIUS - RING_WIDTH / 2;
 const TICK_RING_GAP = 8;
