@@ -85,6 +85,7 @@ const MemberCount = styled.div`
   gap: 0.25rem;
   align-self: stretch;
   margin-top: -0.5rem;
+  cursor: pointer;
 `;
 
 const CountRow = styled.div`
@@ -140,7 +141,7 @@ function MemberIcon() {
   );
 }
 
-export default function TimeOptionCard({ date, dayOfWeek, timeRange, memberCount, totalCount, selected = false, onClick }) {
+export default function TimeOptionCard({ date, dayOfWeek, timeRange, memberCount, totalCount, selected = false, onClick, onAttendeeClick }) {
   return (
     <Card $selected={selected} onClick={onClick}>
       <DateBlock>
@@ -155,7 +156,13 @@ export default function TimeOptionCard({ date, dayOfWeek, timeRange, memberCount
           <ClockIcon selected={selected} />
           <TimeText $selected={selected}>{timeRange}</TimeText>
         </TimeInfo>
-        <MemberCount>
+        <MemberCount
+          onClick={(e) => {
+            if (!onAttendeeClick) return;
+            e.stopPropagation();
+            onAttendeeClick();
+          }}
+        >
           <CountRow>
             <MemberIcon />
             <CountText>{memberCount}/{totalCount}</CountText>

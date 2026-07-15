@@ -71,8 +71,10 @@ export default function DatePopup({
   onLeftBtn,
   onRightBtn,
   singleSelect = false,
+  disablePast = false,
 }) {
   const today = new Date();
+  const todayMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
 
   const [viewYear, setViewYear] = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth() + 1);
@@ -158,6 +160,8 @@ export default function DatePopup({
     if (type !== 'current') return 'disabled';
 
     const cellMs = new Date(viewYear, viewMonth - 1, day).getTime();
+
+    if (disablePast && cellMs < todayMs) return 'disabled';
     const startMs = toMs(startDate);
     const endMs = toMs(endDate);
     const hoverMs = toMs(hoverDate);

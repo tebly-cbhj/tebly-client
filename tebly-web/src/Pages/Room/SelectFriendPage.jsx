@@ -7,8 +7,25 @@ import Searchfield from "../../components/common/Searchfield";
 import FriendsSelect from "../../components/room/FriendsSelect";
 import Badge from "../../components/common/Badge";
 import Btn from "../../components/common/Btn";
+import ConfirmPopup from "../../components/common/ConfirmPopup";
 import { useFriendStore } from '../../store/FriendStore';
 import Header from "../../components/common/Header";
+
+// 같은 방에 이미 보낸(아직 수락 전인) 초대를 브라우저에 기억해서 중복 전송을 막는다.
+// 서버가 방 멤버 목록에 응답 대기 중인 초대까지 내려주지 않아서, 프론트에서만 추적 가능.
+function getSentInviteIds(roomId) {
+  try {
+    return JSON.parse(localStorage.getItem(`sentRoomInvites:${roomId}`)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function addSentInviteIds(roomId, ids) {
+  if (!ids.length) return;
+  const merged = Array.from(new Set([...getSentInviteIds(roomId), ...ids]));
+  localStorage.setItem(`sentRoomInvites:${roomId}`, JSON.stringify(merged));
+}
 
 
 const ContentArea = styled.div`
@@ -71,6 +88,9 @@ const SelectFriendPage = () => {
   const roomName = location.state?.roomName;
   const roomDescription = location.state?.description;
   const roomImageUrl = location.state?.imageUrl;
+  // 방 멤버를 실제로 초대/추방하는 화면인지 (약속 참석자 선택과는 구분해야 함 —
+  // 약속 참석자 선택은 이미 방에 있는 멤버 중 골라내는 것이라 "추방"이나 "중복 초대" 개념이 없음)
+  const isRoomInviteFlow = !appointmentMode && !!currentRoomId;
 
   const friendsList = useFriendStore((state) => state.friends);
   const fetchFriends = useFriendStore((state) => state.fetchFriends);
@@ -82,6 +102,8 @@ const SelectFriendPage = () => {
     !appointmentMode && !currentRoomId ? (location.state?.selectedMembers ?? []) : []
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sentInviteIds, setSentInviteIds] = useState([]);
+  const [pendingRemoveFriend, setPendingRemoveFriend] = useState(null);
 
   useEffect(() => {
     fetchFriends();
@@ -104,23 +126,53 @@ const SelectFriendPage = () => {
     }
   }, [currentRoomId, appointmentMode, myProfile]);
 
+  useEffect(() => {
+    if (isRoomInviteFlow) {
+      setSentInviteIds(getSentInviteIds(currentRoomId));
+    }
+  }, [isRoomInviteFlow, currentRoomId]);
+
   const displayList = appointmentMode ? roomMembers : friendsList;
 
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
 
   const isActive = selected.length > 0;
 
+  const isExistingMember = (friendId) => roomMembers.some((m) => m.id === friendId);
+
   const handleToggle = (friend) => {
+    const isSelected = !!selected.find((f) => f.id === friend.id);
+
+    if (isRoomInviteFlow) {
+      if (isSelected && isExistingMember(friend.id)) {
+        // 이미 방에 있는 멤버를 체크 해제하는 건 곧 추방이라 확인을 받는다
+        setPendingRemoveFriend(friend);
+        return;
+      }
+      if (!isSelected && sentInviteIds.includes(friend.id)) {
+        // 이미 초대를 보내 응답 대기 중인 친구는 다시 선택할 수 없음
+        return;
+      }
+    }
+
     setSelected((prev) =>
-      prev.find((f) => f.id === friend.id)
-        ? prev.filter((f) => f.id !== friend.id)
-        : [...prev, friend]
+      isSelected ? prev.filter((f) => f.id !== friend.id) : [...prev, friend]
     );
   };
 
   const handleRemove = (friendId) => {
+    if (isRoomInviteFlow && isExistingMember(friendId)) {
+      const friend = selected.find((f) => f.id === friendId);
+      setPendingRemoveFriend(friend ?? { id: friendId, name: '이 친구' });
+      return;
+    }
     setSelected((prev) => prev.filter((f) => f.id !== friendId));
   };
+
+  function confirmRemoveMember() {
+    setSelected((prev) => prev.filter((f) => f.id !== pendingRemoveFriend.id));
+    setPendingRemoveFriend(null);
+  }
 
   function handleBack() {
     if (!appointmentMode && !currentRoomId) {
@@ -165,6 +217,7 @@ const SelectFriendPage = () => {
           await apiClient.post(`/rooms/${currentRoomId}/members`, {
             userIds: addedMembers.map((f) => f.id),
           });
+          addSentInviteIds(currentRoomId, addedMembers.map((f) => f.id));
         }
         if (removedMembers.length > 0) {
           await apiClient.delete(`/rooms/${currentRoomId}/members`, {
@@ -208,6 +261,11 @@ const SelectFriendPage = () => {
                   friend={friend}
                   selected={!!selected.find((f) => f.id === friend.id)}
                   onToggle={() => handleToggle(friend)}
+                  alreadyInvited={
+                    isRoomInviteFlow &&
+                    !isExistingMember(friend.id) &&
+                    sentInviteIds.includes(friend.id)
+                  }
                 />
             ))}
         </FriendsWrapper>
@@ -232,6 +290,15 @@ const SelectFriendPage = () => {
           />
         </BtnWrapper>
       </SelectListContainer>
+
+      <ConfirmPopup
+        visible={!!pendingRemoveFriend}
+        title={`${pendingRemoveFriend?.name}님을\n방에서 추방할까요?`}
+        confirmText="추방"
+        danger
+        onCancel={() => setPendingRemoveFriend(null)}
+        onConfirm={confirmRemoveMember}
+      />
     </PageWrapper>
   );
 };
