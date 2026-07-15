@@ -10,6 +10,8 @@ import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 import BellLineIcon from '../../assets/icons/bell-line.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
+import { useInviteStore } from '../../store/InviteStore';
+import { useNotificationStore } from '../../store/NotificationStore';
 import apiClient from '../../api/client';
 
 const ContentWrapper = styled.div`
@@ -82,12 +84,22 @@ export default function MorePage() {
   const navigate = useNavigate();
   const user = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
+  const roomInvites = useInviteStore((state) => state.roomInvites);
+  const appointmentInvites = useInviteStore((state) => state.appointmentInvites);
+  const fetchInvitations = useInviteStore((state) => state.fetchInvitations);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
 
+  const hasUnreadInvite = roomInvites.length + appointmentInvites.length > 0;
+  const hasUnreadNotification = notifications.some((n) => !n.isRead);
+
   useEffect(() => {
     fetchMyProfile();
-  }, [fetchMyProfile]);
+    fetchInvitations();
+    fetchNotifications();
+  }, [fetchMyProfile, fetchInvitations, fetchNotifications]);
 
   if (!user) return null; // TODO: 로딩 스피너로 교체
 
@@ -119,11 +131,11 @@ export default function MorePage() {
     <PageWrapper>
       <Header2
         title="더보기"
-        icons={['letter', 'bell']} // TODO: 알림/메시지 여부에 따라 'letter-noti', 'bell-noti'로 변경
+        icons={[hasUnreadInvite ? 'letter-noti' : 'letter', hasUnreadNotification ? 'bell-noti' : 'bell']}
         onIconClick={(icon) => {
           if (icon === 'letter' || icon === 'letter-noti') navigate('/noti-invitaion');
-          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm'); // TODO: 알림 페이지 navigate 연동
-        }} 
+          if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm');
+        }}
       />
 
       <ContentWrapper>

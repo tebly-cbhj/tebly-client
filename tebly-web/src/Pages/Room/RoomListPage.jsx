@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
 import RoomListCard from '../../components/room/RoomListCard';
 import { useRoomStore } from '../../store/RoomStore';
+import { useInviteStore } from '../../store/InviteStore';
+import { useNotificationStore } from '../../store/NotificationStore';
 import AddBtn from '../../components/common/AddBtn';
 import Header2 from '../../components/common/Header2'
 
@@ -39,17 +41,27 @@ const FloatingWrapper = styled.div`
 export default function RoomListPage() {
   const rooms = useRoomStore((state) => state.rooms);
   const fetchRooms = useRoomStore((state) => state.fetchRooms);
+  const roomInvites = useInviteStore((state) => state.roomInvites);
+  const appointmentInvites = useInviteStore((state) => state.appointmentInvites);
+  const fetchInvitations = useInviteStore((state) => state.fetchInvitations);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
   const navigate = useNavigate();
+
+  const hasUnreadInvite = roomInvites.length + appointmentInvites.length > 0;
+  const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     fetchRooms();
-  }, [fetchRooms]);
+    fetchInvitations();
+    fetchNotifications();
+  }, [fetchRooms, fetchInvitations, fetchNotifications]);
 
   return (
     <PageWrapper>
       <Header2
         title="방"
-        icons={['letter', 'bell']}
+        icons={[hasUnreadInvite ? 'letter-noti' : 'letter', hasUnreadNotification ? 'bell-noti' : 'bell']}
         onIconClick={(icon) => {
           if (icon === 'letter' || icon === 'letter-noti') navigate('/noti-invitaion');
           if (icon === 'bell' || icon === 'bell-noti') navigate('/alarm');
