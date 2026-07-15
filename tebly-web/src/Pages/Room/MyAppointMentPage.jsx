@@ -269,8 +269,11 @@ export default function MyAppointmentPage() {
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
-            isEditing={isEditing && promise.isSender}
-            onEditTime={() => setShowDateSheet(true)}
+            isEditing={promise.isSender}
+            onEditTime={() => {
+              setIsEditing(true);
+              setShowDateSheet(true);
+            }}
           />
         </CardWrapper>
 
@@ -352,7 +355,11 @@ export default function MyAppointmentPage() {
         {!isAlreadyConfirmed && (
           <BtnWrapper>
             <Btn
-              text={isEditing ? '응답 저장' : isInvited ? '응답 완료' : '약속 확정'}
+              text={
+                isEditing
+                  ? (isInvited ? '응답 저장' : '변경사항 저장')
+                  : (isInvited ? '응답 완료' : '약속 확정')
+              }
               onClick={handlePrimaryAction}
             />
           </BtnWrapper>
