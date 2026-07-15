@@ -117,9 +117,15 @@ const SelectFriendPage = () => {
     if (currentRoomId && (!appointmentMode || myProfile)) {
       apiClient.get(`/rooms/${currentRoomId}/members`).then((res) => {
         const filtered = appointmentMode
-          ? res.data.filter((m) => m.userId !== myProfile.id)
-          : res.data.filter((m) => m.role !== 'HOST');
-        const members = filtered.map((m) => ({ id: m.userId, name: m.nickname, profileImage: m.profileImage }));
+          ? res.data.filter((m) => m.status === 'ACCEPTED' && m.userId !== myProfile.id)
+          : res.data.filter((m) => m.role !== 'HOST' && (m.status === 'ACCEPTED' || m.status === 'PENDING'));
+        const members = filtered.map((m) => ({
+          id: m.userId,
+          name: m.nickname,
+          profileImage: m.profileImage,
+          role: m.role,
+          status: m.status,
+        }));
         setRoomMembers(members);
         setSelected(members);
       });
