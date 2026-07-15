@@ -1,18 +1,6 @@
 import styled from 'styled-components';
 import { NavLink, useLocation } from 'react-router-dom';
 
-const HIDDEN_PATHS = [
-  '/calendar/create',
-  '/calendar/event-detail',
-  '/ocr-loading',
-  '/ocr-result',
-  '/ocr-edit',
-];
-
-const HIDDEN_PATTERNS = [
-  /^\/friends\/.+/,
-];
-
 import CalendarLine from '../../assets/icons/calendar-line.svg?react';
 import CalendarFill from '../../assets/icons/calendar-fill.svg?react';
 import FriendsGray from '../../assets/icons/friends-gray.svg?react';
@@ -31,7 +19,7 @@ const NAV_ITEMS = [
 
 const NavContainer = styled.nav`
   width: 100%;
-  max-width: 480px;
+  max-width: 390px;
   padding: 8px 24px 28px 24px;
   display: flex;
   justify-content: space-between;
@@ -68,7 +56,10 @@ const NavLabel = styled.span`
 
 export default function BottomNavBar() {
   const { pathname } = useLocation();
-  if (HIDDEN_PATHS.includes(pathname) || HIDDEN_PATTERNS.some((p) => p.test(pathname))) return null;
+  // TeblyApp(RN 웹뷰) 안에서는 네이티브 하단 탭바가 이미 있어서 웹 네비바는 숨김.
+  // 탭 루트 경로(캘린더/친구/방/더보기)에서만 보여줌 — 하위 화면에서는 숨김.
+  if (typeof window !== 'undefined' && window.ReactNativeWebView) return null;
+  if (!NAV_ITEMS.some((item) => item.to === pathname)) return null;
 
   return (
     <NavContainer>
