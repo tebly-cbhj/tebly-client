@@ -34,6 +34,7 @@ import ProfileSetupPage from './Pages/Onboarding/ProfileSetupPage';
 import ScheduleRegisterPage from './Pages/Onboarding/ScheduleRegisterPage';
 import InviteNotiPage from './Pages/Notification/InviteNotiPage';
 import AlarmPage from './Pages/Notification/AlarmPage';
+import BottomNavBar from './components/common/BottomNavBar';
 
 function RootGate() {
   const accessToken = localStorage.getItem('accessToken');
@@ -100,6 +101,7 @@ function Layout() {
         <Route path='/noti-invitaion' element={<InviteNotiPage />} />
         <Route path='/alarm' element={<AlarmPage />} />
       </Routes>
+      <BottomNavBar />
     </>
   );
 }
