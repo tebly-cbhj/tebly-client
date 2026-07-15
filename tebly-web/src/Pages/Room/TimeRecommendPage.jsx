@@ -284,7 +284,7 @@ const TICK_LABEL_GAP = 16;
 const TICK_OUTER_RADIUS = RING_INNER_RADIUS - TICK_RING_GAP;
 const TICK_INNER_RADIUS = TICK_OUTER_RADIUS - TICK_LENGTH;
 const LABEL_RADIUS = TICK_INNER_RADIUS - TICK_LABEL_GAP;
-const HANDLE_R = 10;
+const HANDLE_R = 12;
 const HANDLE_TOUCH_R = 24;
 const TIME_STEP_MINUTES = 30;
 const DEFAULT_MIN_GAP_MINUTES = 30;
@@ -942,7 +942,9 @@ const isUpdateMode = Boolean(promiseId);
 
                 {Array.from({ length: 12 }, (_, i) => {
                   const hour = i * 2;
-                  const pos = polarPoint(LABEL_RADIUS, hour * 15);
+                  // 6am/6pm은 원의 정확히 좌우(가로) 위치라 텍스트 폭이 그대로 링 쪽 간격을 잠식해서, 그때만 조금 더 안쪽으로 밀어줌
+                  const isHorizontal = hour === 6 || hour === 18;
+                  const pos = polarPoint(isHorizontal ? LABEL_RADIUS - 8 : LABEL_RADIUS, hour * 15);
                   const isQuarter = hour === 0 || hour === 6 || hour === 12 || hour === 18;
                   return (
                     <HourLabel key={`label-${hour}`} x={pos.x} y={pos.y} $emphasis={isQuarter}>

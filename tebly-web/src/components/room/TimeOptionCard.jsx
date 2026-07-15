@@ -156,14 +156,14 @@ export default function TimeOptionCard({ date, dayOfWeek, timeRange, memberCount
           <ClockIcon selected={selected} />
           <TimeText $selected={selected}>{timeRange}</TimeText>
         </TimeInfo>
-        <MemberCount
-          onClick={(e) => {
-            if (!onAttendeeClick) return;
-            e.stopPropagation();
-            onAttendeeClick();
-          }}
-        >
-          <CountRow>
+        <MemberCount>
+          <CountRow
+            onClick={(e) => {
+              if (!onAttendeeClick) return;
+              e.stopPropagation();
+              onAttendeeClick();
+            }}
+          >
             <MemberIcon />
             <CountText>{memberCount}/{totalCount}</CountText>
           </CountRow>
