@@ -273,11 +273,13 @@ const ConfirmBtn = styled.button`
 
 // ─── 시간 조정 다이얼 (선택한 추천 시간의 시작/종료를 원형으로 드래그해 미세 조정) ──
 
-const DIAL_SIZE = 220;
+const DIAL_SIZE = 288;
 const DIAL_CENTER = DIAL_SIZE / 2;
 const RING_RADIUS = 92;
-const RING_WIDTH = 26;
+const RING_WIDTH = 34;
 const LABEL_RADIUS = 60;
+const TICK_OUTER_RADIUS = RING_RADIUS - RING_WIDTH / 2 - 3;
+const TICK_INNER_RADIUS = TICK_OUTER_RADIUS - 8;
 const HANDLE_R = 10;
 const HANDLE_TOUCH_R = 24;
 const TIME_STEP_MINUTES = 30;
@@ -380,8 +382,22 @@ const DialTrack = styled.div`
   position: absolute;
   inset: 0;
   z-index: 0;
-  border-radius: 288px;
+  border-radius: 50%;
   background: var(--grayscale-gray-200, #EFEFEF);
+  -webkit-mask: radial-gradient(
+    circle,
+    transparent ${RING_RADIUS - RING_WIDTH / 2}px,
+    #000 ${RING_RADIUS - RING_WIDTH / 2}px,
+    #000 ${RING_RADIUS + RING_WIDTH / 2}px,
+    transparent ${RING_RADIUS + RING_WIDTH / 2}px
+  );
+  mask: radial-gradient(
+    circle,
+    transparent ${RING_RADIUS - RING_WIDTH / 2}px,
+    #000 ${RING_RADIUS - RING_WIDTH / 2}px,
+    #000 ${RING_RADIUS + RING_WIDTH / 2}px,
+    transparent ${RING_RADIUS + RING_WIDTH / 2}px
+  );
 `;
 
 const HourLabel = styled.text`
@@ -901,24 +917,24 @@ const isUpdateMode = Boolean(promiseId);
                   fill="none"
                 />
 
-                <defs>
-                  <mask id="dialTickMask" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="220">
-                    <path d="M110 0C170.751 0 220 49.2487 220 110C220 170.751 170.751 220 110 220C49.2487 220 0 170.751 0 110C0 49.2487 49.2487 0 110 0ZM110 10C54.7715 10 10 54.7715 10 110C10 165.228 54.7715 210 110 210C165.228 210 210 165.228 210 110C210 54.7715 165.228 10 110 10Z" fill="#CCCCCC" />
-                  </mask>
-                </defs>
-                <g mask="url(#dialTickMask)">
-                  <rect x="109" y="-63" width="2" height="347" fill="#CCCCCC" />
-                  <rect x="153.939" y="-57.3467" width="2" height="347" transform="rotate(15 153.939 -57.3467)" fill="#CCCCCC" />
-                  <rect x="195.885" y="-40.2559" width="2" height="347" transform="rotate(30 195.885 -40.2559)" fill="#CCCCCC" />
-                  <rect x="231.977" y="-11.8896" width="2" height="347" transform="rotate(45 231.977 -11.8896)" fill="#CCCCCC" />
-                  <rect x="259.756" y="22.8838" width="2" height="347" transform="rotate(60 259.756 22.8838)" fill="#CCCCCC" />
-                  <rect x="277.33" y="64.6289" width="2" height="347" transform="rotate(75 277.33 64.6289)" fill="#CCCCCC" />
-                  <rect x="-57.8477" y="66.5605" width="2" height="347" transform="rotate(-75 -57.8477 66.5605)" fill="#CCCCCC" />
-                  <rect x="-40.7559" y="24.6162" width="2" height="347" transform="rotate(-60 -40.7559 24.6162)" fill="#CCCCCC" />
-                  <rect x="-13.3906" y="-11.4756" width="2" height="347" transform="rotate(-45 -13.3906 -11.4756)" fill="#CCCCCC" />
-                  <rect x="22.3848" y="-39.2559" width="2" height="347" transform="rotate(-30 22.3848 -39.2559)" fill="#CCCCCC" />
-                  <rect x="64.1289" y="-56.8291" width="2" height="347" transform="rotate(-15 64.1289 -56.8291)" fill="#CCCCCC" />
-                </g>
+                {Array.from({ length: 24 }, (_, hour) => {
+                  const angle = hour * 15;
+                  const outer = polarPoint(TICK_OUTER_RADIUS, angle);
+                  const inner = polarPoint(TICK_INNER_RADIUS, angle);
+                  const isQuarter = hour % 6 === 0;
+                  return (
+                    <line
+                      key={`tick-${hour}`}
+                      x1={inner.x}
+                      y1={inner.y}
+                      x2={outer.x}
+                      y2={outer.y}
+                      stroke={isQuarter ? '#999999' : '#CCCCCC'}
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                    />
+                  );
+                })}
 
                 {Array.from({ length: 12 }, (_, i) => {
                   const hour = i * 2;
