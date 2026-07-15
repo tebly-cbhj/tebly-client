@@ -273,13 +273,17 @@ const ConfirmBtn = styled.button`
 
 // ─── 시간 조정 다이얼 (선택한 추천 시간의 시작/종료를 원형으로 드래그해 미세 조정) ──
 
-const DIAL_SIZE = 288;
+const DIAL_SIZE = 300;
 const DIAL_CENTER = DIAL_SIZE / 2;
 const RING_RADIUS = 92;
-const RING_WIDTH = 34;
-const LABEL_RADIUS = 60;
-const TICK_OUTER_RADIUS = RING_RADIUS - RING_WIDTH / 2 - 3;
-const TICK_INNER_RADIUS = TICK_OUTER_RADIUS - 8;
+const RING_WIDTH = 26;
+const RING_INNER_RADIUS = RING_RADIUS - RING_WIDTH / 2;
+const TICK_RING_GAP = 8;
+const TICK_LENGTH = 8;
+const TICK_LABEL_GAP = 8;
+const TICK_OUTER_RADIUS = RING_INNER_RADIUS - TICK_RING_GAP;
+const TICK_INNER_RADIUS = TICK_OUTER_RADIUS - TICK_LENGTH;
+const LABEL_RADIUS = TICK_INNER_RADIUS - TICK_LABEL_GAP;
 const HANDLE_R = 10;
 const HANDLE_TOUCH_R = 24;
 const TIME_STEP_MINUTES = 30;
