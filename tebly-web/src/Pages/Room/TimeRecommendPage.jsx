@@ -558,6 +558,7 @@ const isUpdateMode = Boolean(promiseId);
   const [draggingHandle, setDraggingHandle] = useState(null);
   const dialRef = useRef(null);
   const minGapMinutes = minDuration || DEFAULT_MIN_GAP_MINUTES;
+  const fetchRequestIdRef = useRef(0);
 
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortValue, setSortValue] = useState('recommended');
@@ -571,7 +572,8 @@ const isUpdateMode = Boolean(promiseId);
   const [hoverDate, setHoverDate] = useState(null);
   const [phase, setPhase] = useState('start');
 
-  async function fetchRecommendations(range) {
+  async function fetchRecommendations(range, sortValueOverride = sortValue) {
+    const requestId = ++fetchRequestIdRef.current;
     setIsLoading(true);
     try {
       const payload = {
@@ -580,14 +582,19 @@ const isUpdateMode = Boolean(promiseId);
         searchStartTime: '00:00',
         searchEndTime: '23:30',
         minDuration,
-        sortType: SORT_VALUE_TO_API_TYPE[sortValue] ?? 'RECOMMENDED',
+        sortType: SORT_VALUE_TO_API_TYPE[sortValueOverride] ?? 'RECOMMENDED',
       };
       const res = isUpdateMode
         ? await apiClient.post(`/promises/${promiseId}/time-recommendations`, payload)
         : await apiClient.post(`/rooms/${roomId}/promise-time-recommendations`, { ...payload, selectedMemberIds });
+
+      // 늦게 도착한 옛날 요청의 응답이 최신 결과를 덮어쓰지 않게 방지
+      if (requestId !== fetchRequestIdRef.current) return;
       setOptions(res.data.map(toOptionViewModel));
+      setSelectedId(null);
+      closeTimeAdjust();
     } finally {
-      setIsLoading(false);
+      if (requestId === fetchRequestIdRef.current) setIsLoading(false);
     }
   }
 
@@ -597,12 +604,20 @@ const isUpdateMode = Boolean(promiseId);
     }
   }, []);
 
+  function handleSortSelect(value) {
+    setSortValue(value);
+    setIsSortOpen(false);
+    // "참여 인원순"은 서버에 대응하는 정렬이 없어서 재요청 없이 프론트에서만 재배열함
+    if (value !== 'members') {
+      fetchRecommendations(dateRange, value);
+    }
+  }
+
   const sortedOptions = useMemo(() => {
-    const list = [...options];
-    if (sortValue === 'members') return list.sort((a, b) => b.memberCount - a.memberCount);
-    if (sortValue === 'earliest') return list.sort((a, b) => new Date(a.startTimeRaw) - new Date(b.startTimeRaw));
-    if (sortValue === 'latest') return list.sort((a, b) => new Date(b.startTimeRaw) - new Date(a.startTimeRaw));
-    return list;
+    if (sortValue === 'members') {
+      return [...options].sort((a, b) => b.memberCount - a.memberCount);
+    }
+    return options;
   }, [options, sortValue]);
 
   const handleConfirm = async () => {
@@ -1082,7 +1097,7 @@ const isUpdateMode = Boolean(promiseId);
                   <OptionItem
                     text={option.label}
                     selected={sortValue === option.value}
-                    onClick={() => { setSortValue(option.value); setIsSortOpen(false); }}
+                    onClick={() => handleSortSelect(option.value)}
                   />
                 </div>
               ))}
