@@ -22,6 +22,7 @@ function toTimeStr(isoDateTime) {
 function mapPromiseToSchedule(promise, roomId) {
   return {
     id: promise.promiseId,
+    sourceType: 'PROMISE',
     roomId,
     title: promise.title,
     date: toKoreanDateStr(promise.startTime),

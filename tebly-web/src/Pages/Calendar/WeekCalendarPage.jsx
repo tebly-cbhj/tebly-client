@@ -214,6 +214,10 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             : (categoryIconMap[schedule.category] || schedule.category || 'Other'),
           alarmTime: schedule.alarmTime || '',
           repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
+          sourceType: schedule.sourceType,
+          occurrenceStart: schedule.occurrenceStart,
+          occurrenceEnd: schedule.occurrenceEnd,
+          repeatType: schedule.repeatType,
         },
       },
     });
