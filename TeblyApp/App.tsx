@@ -5,14 +5,15 @@ import { WebView } from 'react-native-webview';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import { theme } from './src/theme';
 import BottomNavBar from './src/components/BottomNavBar';
+import SplashScreen from './src/components/SplashScreen';
 import { ThemeProvider } from 'styled-components/native';
 
 const WEB_URL = __DEV__
   ? 'http://172.30.1.82:5173/'
-  : 'https://tebly-client.vercel.app';
+  : 'https://tebly.org';
 
 // 구글이 웹뷰 안에서의 로그인을 막아서, 구글 로그인만 인앱 브라우저로 열어야 함
-const OAUTH_REDIRECT_URL = 'https://tebly-client.vercel.app/login/callback';
+const OAUTH_REDIRECT_URL = 'https://tebly.org/login/callback';
 
 const NAVBAR_VISIBLE_PATHS = ['/', '/room-list', '/calendar/event-detail', '/more', '/friends'];
 
@@ -27,6 +28,7 @@ export default function App() {
   const [hasError, setHasError] = useState(false);
   const [currentPath, setCurrentPath] = useState('/');
   const [webViewSource, setWebViewSource] = useState(WEB_URL);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -45,7 +47,7 @@ export default function App() {
   }
 
   function handleShouldStartLoad(request) {
-    if (request.url.includes('accounts.google.com')) {
+    if (request.url.includes('/oauth2/authorization/google')) {
       InAppBrowser.openAuth(request.url, OAUTH_REDIRECT_URL, {
         showTitle: false,
         enableUrlBarHiding: true,
@@ -100,6 +102,11 @@ export default function App() {
             <BottomNavBar onTabPress={navigateWebView} currentPath={currentPath} />
           )}
         </SafeAreaView>
+
+        {/* 3. 시작화면 (SafeAreaView 밖에서 화면 전체를 덮어야 해서 여기 위치, 웹뷰가 뒤에서 로딩되는 동안 앞에 표시) */}
+        {showSplash && (
+          <SplashScreen onFinish={() => setShowSplash(false)} />
+        )}
       </ThemeProvider>
     </SafeAreaProvider>
   );

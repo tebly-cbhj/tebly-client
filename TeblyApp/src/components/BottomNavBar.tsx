@@ -39,7 +39,7 @@ const TabText = styled.Text<{ isActive: boolean }>`
   line-height: 12px;
   align-self: stretch;
   color: ${(props) =>
-    props.isActive ? props.theme.colors.red100 : props.theme.colors.gray900};
+    props.isActive ? props.theme.colors.primary100 : props.theme.colors.gray900};
 `;
 
 // 메뉴 아이콘 + 경로 설정
@@ -68,7 +68,7 @@ export default function BottomNavBar({ onTabPress, currentPath }) {
             <CurrentIcon
               width={24}
               height={24}
-              color={isActive ? theme.colors.red100 : theme.colors.gray900}
+              color={isActive ? theme.colors.primary100 : theme.colors.gray900}
             />
 
             <TabText isActive={isActive}>
