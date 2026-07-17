@@ -198,6 +198,10 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           category: schedule.originalCategory,
           alarmTime: schedule.alarmTime,
           repeat: schedule.repeat,
+          sourceType: schedule.sourceType,
+          occurrenceStart: schedule.occurrenceStart,
+          occurrenceEnd: schedule.occurrenceEnd,
+          repeatType: schedule.repeatType,
         },
       },
     });
@@ -216,6 +220,10 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
       return scheduleDates.map((date) => ({
         id: `${schedule.id}-${date}`,
         scheduleId: schedule.id,
+        sourceType: schedule.sourceType,
+        occurrenceStart: schedule.occurrenceStart,
+        occurrenceEnd: schedule.occurrenceEnd,
+        repeatType: schedule.repeatType,
         date,
         category: normalizeCategory(schedule.category),
         originalCategory: schedule.category,

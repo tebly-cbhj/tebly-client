@@ -26,6 +26,11 @@ function toTimeStr(isoDateTime) {
 function mapEventDto(event) {
   return {
     id: event.eventId,
+    sourceType: 'PERSONAL',
+    // 반복 일정 단일 회차 삭제(DELETE /schedules/events/{id}/occurrences)에 필요한 원본 값
+    occurrenceStart: event.startAt,
+    occurrenceEnd: event.endAt,
+    repeatType: event.repeatType,
     title: event.title,
     startDate: toKoreanDateStr(event.startAt),
     endDate: toKoreanDateStr(event.endAt),

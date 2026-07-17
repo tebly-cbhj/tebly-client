@@ -175,10 +175,15 @@ const TabLabel = styled.span`
   color: ${({ $active, theme }) => $active ? theme.colors.gray900 : theme.colors.gray500};
 `;
 
+function getErrorMessage(error, fallback) {
+  return error.response?.data?.message || error.message || fallback;
+}
+
 export default function EventDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showDeleteScopeSheet, setShowDeleteScopeSheet] = useState(false);
   const lastSaved = useLastSavedScheduleStore((state) => state);
 
   // TODO: location.state 대신 scheduleId(URL 파라미터)로 GET /api/schedules/:id 호출하여 데이터 fetch
@@ -198,12 +203,43 @@ export default function EventDetailPage() {
   };
 
   const allDay = schedule.startTime === '00:00' && schedule.endTime === '23:59';
+  const isRepeating = schedule.repeatType && schedule.repeatType !== 'NONE';
+  // 방 약속은 이 페이지의 개인 일정 삭제 API 대상이 아님(scheduleId가 promiseId일 수 있음)
+  const isPersonal = !schedule.sourceType || schedule.sourceType === 'PERSONAL';
 
   const categoryConfig = getCategoryConfig(schedule.category);
   const CategoryImg = categoryConfig.Icon;
 
-  async function handleDelete() {
+  function handleDeleteOptionClick() {
     setShowActionSheet(false);
+    if (isPersonal && isRepeating) {
+      setShowDeleteScopeSheet(true);
+      return;
+    }
+    deleteEntireSchedule();
+  }
+
+  async function deleteCurrentOccurrence() {
+    setShowDeleteScopeSheet(false);
+    if (!isPersonal) return;
+    if (!scheduleId || !schedule.occurrenceStart) {
+      alert('삭제할 반복 일정의 회차를 확인할 수 없어요.');
+      return;
+    }
+    try {
+      await apiClient.delete(`/schedules/events/${scheduleId}/occurrences`, {
+        params: { occurrenceStart: schedule.occurrenceStart },
+      });
+      navigate(-1);
+    } catch (error) {
+      alert(getErrorMessage(error, '일정 삭제에 실패했어요. 다시 시도해주세요.'));
+    }
+  }
+
+  async function deleteEntireSchedule() {
+    setShowActionSheet(false);
+    setShowDeleteScopeSheet(false);
+    if (!isPersonal) return;
     if (!scheduleId) {
       navigate(-1);
       return;
@@ -211,8 +247,8 @@ export default function EventDetailPage() {
     try {
       await apiClient.delete(`/schedules/events/${scheduleId}`);
       navigate(-1);
-    } catch {
-      alert('일정 삭제에 실패했어요. 다시 시도해주세요.');
+    } catch (error) {
+      alert(getErrorMessage(error, '일정 삭제에 실패했어요. 다시 시도해주세요.'));
     }
   }
 
@@ -236,7 +272,17 @@ export default function EventDetailPage() {
           setShowActionSheet(false);
           navigate('/calendar/create', { state: { scheduleId, schedule } });
         }}
-        onOption2={handleDelete}
+        onOption2={handleDeleteOptionClick}
+      />
+
+      <ActionSheet
+        visible={showDeleteScopeSheet}
+        onClose={() => setShowDeleteScopeSheet(false)}
+        option1Text="지금 일정만 삭제"
+        option2Text="전체 일정 삭제"
+        option2Color="#FF4646"
+        onOption1={deleteCurrentOccurrence}
+        onOption2={deleteEntireSchedule}
       />
 
       <ScrollContent>
