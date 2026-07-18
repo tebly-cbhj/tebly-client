@@ -28,6 +28,7 @@ import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   flex: 1;
 `;
 
@@ -74,6 +75,7 @@ const ChipArea = styled.div`
   display: inline-flex;
   gap: 0.5rem;
   overflow-x: auto;
+  min-width: 0;
   &::-webkit-scrollbar { display: none; }
   margin-left: auto;
 `;
