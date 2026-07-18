@@ -50,10 +50,11 @@ const MyResponseRow = styled.div`
 
 const AttendanceRow = styled.div`
   display: flex;
-  width: 21.875rem;
+  width: 100%;
   padding: 1.25rem 0;
   align-items: center;
   justify-content: space-between;
+  box-sizing: border-box;
 `;
 
 const IconWrapper = styled.div`

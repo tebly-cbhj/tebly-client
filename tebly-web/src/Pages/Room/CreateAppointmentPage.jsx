@@ -24,6 +24,7 @@ import ClockIcon from '../../assets/icons/clock.svg?react';
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   margin-top: 8px;
 `;
 const ScrollContent = styled.div`
