@@ -15,6 +15,13 @@ const ContentWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const ToggleBtnWrapper = styled.div`

@@ -85,7 +85,7 @@ const LeftSection = styled.div`
 
 const AttendanceWrapper = styled.div`
   margin-top: 4px;
-  display: inline-flex;
+  display: flex;
   padding: 8px 20px;
   align-items: flex-start;
   gap: 16px;

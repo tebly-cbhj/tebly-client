@@ -44,7 +44,6 @@ const Header = styled.div`
 const Title = styled.h1`
   display: flex;
   height: 32px;
-  padding-left: 12px;
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
