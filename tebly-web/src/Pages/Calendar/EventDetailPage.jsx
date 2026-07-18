@@ -332,7 +332,6 @@ export default function EventDetailPage() {
               : (CATEGORY_KO[schedule.category] ?? schedule.category)
           }
           state={schedule.category ? 'selected' : 'empty'}
-          right_icon
         />
 
         <SelectRow
@@ -340,7 +339,6 @@ export default function EventDetailPage() {
           text_empty="알림 없음"
           text_selected={schedule.alarmTime}
           state={schedule.alarmTime ? 'selected' : 'empty'}
-          right_icon
         />
 
         <SelectRow
@@ -348,7 +346,6 @@ export default function EventDetailPage() {
           text_empty="반복 없음"
           text_selected={schedule.repeat}
           state={schedule.repeat ? 'selected' : 'empty'}
-          right_icon
         />
       </ScrollContent>
     </PageWrapper>
