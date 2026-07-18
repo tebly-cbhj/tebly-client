@@ -269,7 +269,7 @@ export default function MyAppointmentPage() {
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
-            isEditing={promise.isSender}
+            isEditing={promise.isSender && promise.promiseStatus !== 'CONFIRMED'}
             onEditTime={() => {
               setIsEditing(true);
               setShowDateSheet(true);
@@ -370,7 +370,7 @@ export default function MyAppointmentPage() {
         <ActionSheet
           visible={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          option1Text="수정"
+          option1Text={promise.promiseStatus !== 'CONFIRMED' ? '수정' : undefined}
           option2Text="일정 삭제"
           option2Color="#E31818"
           onOption1={() => { setIsSheetOpen(false); setIsEditing(true); }}
