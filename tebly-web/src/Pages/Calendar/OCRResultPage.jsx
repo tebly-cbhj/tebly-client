@@ -73,7 +73,7 @@ const CardListContainer = styled.div`
 const BottomBtnWrapper = styled.div`
   padding: 12px 20px 34px 20px;
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   box-sizing: border-box;
 `;
 

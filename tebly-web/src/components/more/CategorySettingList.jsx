@@ -7,7 +7,7 @@ import { CATEGORY_ICONS } from '../room/CategoryIcons';
 const Row = styled.div`
   display: flex;
   width: 100%;
-  padding: 8px 20px;
+  padding: 8px 0;
   align-items: center;
   gap: 8px;
   box-sizing: border-box;

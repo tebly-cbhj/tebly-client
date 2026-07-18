@@ -22,7 +22,7 @@ const ChatOuter = styled.div`
 
 const ChatContainer = styled.div`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   height: 100vh;
   margin: 0 auto;
   display: flex;

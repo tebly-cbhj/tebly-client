@@ -3,7 +3,7 @@ import EditSmallIcon from '../../assets/icons/edit-small.svg?react';
 
 const Container = styled.div`
   display: flex;
-  width: 390px;
+  width: 100%;
   padding: 0 20px;
   align-items: center;
   gap: 16px;

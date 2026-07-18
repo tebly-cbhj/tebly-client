@@ -48,7 +48,7 @@ const Overlay = styled.div`
 const BottomSheet = styled.div`
   display: inline-flex;
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   padding: 12px 20px 35.5px 20px;
   flex-direction: column;
   align-items: center;

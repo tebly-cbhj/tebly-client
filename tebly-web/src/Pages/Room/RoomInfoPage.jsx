@@ -19,7 +19,7 @@ import RoomMemberSheet from '../../components/room/RoomMemberSheet';
 // 자체적으로 좌우 패딩을 갖고 있어서 패딩은 제외한 버전
 const PageContainer = styled.div`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   margin: 0 auto;
   height: 100vh;
   overflow: hidden;
@@ -81,8 +81,7 @@ const CardList = styled.div`
 `;
 
 const SummaryWrapper = styled.div`
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
   flex-shrink: 0;
 `;
 
