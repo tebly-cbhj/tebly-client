@@ -18,12 +18,18 @@ const StyledButton = styled.button`
 
   border-radius: ${(props) => props.$size === 'large' ? '16px' : '8px'};
 
-  ${(props) =>
-    props.theme.typography[props.$size === 'small' ? 'btn3' : 'btn2']};
+  ${(props) => {
+    const isSmall = props.$size === 'small';
+    const key = props.disabled
+      ? (isSmall ? 'btn4' : 'btn2')
+      : (isSmall ? 'btn3' : 'btn1');
+    return props.theme.typography[key];
+  }};
 
   padding: ${(props) => props.$size === 'small' ? '8px 12px' : '16px 10px'};
   
   background-color: ${(props) => {
+    if (props.$variant === 'primary50') return props.theme.colors.primary50;
     if (props.disabled) return props.theme.colors.primary30;
     if (props.$variant === 'gray') return props.theme.colors.gray200;
     if (props.$variant === 'white') return props.theme.colors.white;

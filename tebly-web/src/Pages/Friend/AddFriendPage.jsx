@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import DigitSlot from '../../components/friend/DigitSlot';
 import CopyIcon from '../../assets/icons/copy.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
+import Btn from '../../components/common/Btn';
 
 const CODE_LENGTH = 6;
 
@@ -181,23 +182,6 @@ const BottomArea = styled.div`
   flex-shrink: 0;
 `;
 
-const SubmitBtn = styled.button`
-  width: 100%;
-  padding: 16px 10px;
-  background: ${({ theme }) => theme.colors.primary50};
-  border-radius: 16px;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-`;
-
-const SubmitBtnText = styled.span`
-  ${({ theme }) => theme.typography.h3};
-  color: ${({ theme }) => theme.colors.gray900};
-`;
-
 const ProfileCard = styled.div`
   width: 100%;
   max-width: 440px;
@@ -207,16 +191,15 @@ const ProfileCard = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 20px 20px 24px;
-  gap: 0;
+  gap: 12px;
   box-sizing: border-box;
 `;
 
 const ProfileImgWrap = styled.div`
-  width: 120px;
-  height: 120px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 12px;
 
   img {
     width: 100%;
@@ -226,20 +209,20 @@ const ProfileImgWrap = styled.div`
 `;
 
 const FriendName = styled.span`
-  ${({ theme }) => theme.typography.h2};
+  ${({ theme }) => theme.typography.s2};
   color: ${({ theme }) => theme.colors.gray900};
-  margin-bottom: 8px;
+  text-align: center;
 `;
 
 const FriendIntro = styled.span`
-  ${({ theme }) => theme.typography.body2};
-  color: ${({ theme }) => theme.colors.gray800};
-  margin-bottom: 20px;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray900};
   text-align: center;
 `;
 
 const AddFriendBtn = styled.button`
   width: 100%;
+  height: 48px;
   padding: 16px 10px;
   background: ${({ theme }) => theme.colors.primary100};
   border-radius: 16px;
@@ -247,11 +230,12 @@ const AddFriendBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
   cursor: pointer;
 `;
 
 const AddFriendBtnText = styled.span`
-  ${({ theme }) => theme.typography.h3};
+  ${({ theme }) => theme.typography.btn1};
   color: ${({ theme }) => theme.colors.white};
 `;
 
@@ -323,7 +307,7 @@ export default function AddFriendPage() {
       const friend = await previewFriendByCode(code);
       setFoundFriend(friend);
     } catch (err) {
-      showError(err.message || '존재하지 않는 코드예요');
+      showError(err.response?.data?.message || '사용자를 찾을 수 없습니다');
     } finally {
       setIsSubmitting(false);
     }
@@ -398,8 +382,8 @@ export default function AddFriendPage() {
                 {foundFriend.profileImageUrl ? (
                   <img src={foundFriend.profileImageUrl} alt={foundFriend.nickname} />
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
-                    <circle cx="60" cy="60" r="60" fill="#DCDCDC" />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60" fill="none">
+                    <circle cx="30" cy="30" r="30" fill="#DCDCDC" />
                   </svg>
                 )}
               </ProfileImgWrap>
@@ -420,9 +404,12 @@ export default function AddFriendPage() {
       </ContentArea>
 
       <BottomArea>
-        <SubmitBtn type="button" onClick={handleSubmit} disabled={code.length < CODE_LENGTH || isSubmitting}>
-          <SubmitBtnText>{isSubmitting ? '조회하는 중...' : '입력 완료'}</SubmitBtnText>
-        </SubmitBtn>
+        <Btn
+          text={isSubmitting ? '조회하는 중...' : '입력 완료'}
+          onClick={handleSubmit}
+          disabled={code.length < CODE_LENGTH || isSubmitting}
+          variant={code.length === CODE_LENGTH ? 'primary' : 'primary50'}
+        />
       </BottomArea>
 
     </Wrapper>

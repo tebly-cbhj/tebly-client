@@ -219,6 +219,7 @@ export default function ProfileSetupPage() {
         <Btn
           text="다음"
           disabled={!canNext}
+          variant={canNext ? 'primary' : 'primary50'}
           onClick={handleNext}
         />
       </BtnWrapper>

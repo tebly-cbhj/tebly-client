@@ -62,6 +62,7 @@ const ActionRow = styled.div`
 const AvatarGroup = styled.div`
   display: flex;
   align-items: center;
+  cursor: pointer;
 `;
 
 const Avatar = styled.div`
@@ -92,7 +93,7 @@ const ExtraCount = styled.div`
   justify-content: center;
 `;
 
-export default function RoomSummarySection({ roomId, name, description, imageUrl, profileImages = [], totalMemberCount = 0, isHost = false }) {
+export default function RoomSummarySection({ roomId, name, description, imageUrl, profileImages = [], totalMemberCount = 0, isHost = false, onAvatarGroupClick }) {
   const MAX_VISIBLE = 3;
   const navigate = useNavigate();
 
@@ -109,7 +110,7 @@ export default function RoomSummarySection({ roomId, name, description, imageUrl
         </TextGroup>
 
         <ActionRow>
-          <AvatarGroup>
+          <AvatarGroup onClick={onAvatarGroupClick}>
             {visibleAvatars.map((imgUrl, index) => (
               <Avatar key={index} $imgUrl={imgUrl || DefaultProfile} $isFirst={index === 0}>
                 {index === visibleAvatars.length - 1 && extraCount > 0 && (

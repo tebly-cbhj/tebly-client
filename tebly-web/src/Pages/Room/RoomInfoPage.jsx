@@ -11,6 +11,7 @@ import AddBtn from '../../components/common/AddBtn';
 import Header from '../../components/common/Header';
 import ActionSheet from '../../components/common/ActionSheet';
 import ConfirmPopup from '../../components/common/ConfirmPopup';
+import RoomMemberSheet from '../../components/room/RoomMemberSheet';
 
 // PageWrapper와 같은 max-width/높이/배경이지만, HeaderWrapper가 이미
 // 자체적으로 좌우 패딩을 갖고 있어서 패딩은 제외한 버전
@@ -85,7 +86,7 @@ const SummaryWrapper = styled.div`
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px;
+  bottom: 108px;
   right: 20px;
   z-index: 100;
 `;
@@ -126,6 +127,8 @@ export default function RoomInfoPage() {
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
   const [isHost, setIsHost] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [members, setMembers] = useState([]);
+  const [showMemberSheet, setShowMemberSheet] = useState(false);
 
   function showToast(message) {
     setToastMessage(message);
@@ -142,6 +145,7 @@ export default function RoomInfoPage() {
     apiClient.get(`/rooms/${roomId}/members`).then((res) => {
       const me = res.data.find((m) => m.userId === myProfile.id);
       setIsHost(me?.role === 'HOST');
+      setMembers(res.data);
     });
   }, [roomId, myProfile]);
 
@@ -201,6 +205,7 @@ export default function RoomInfoPage() {
             profileImages={room.memberProfileImages}
             totalMemberCount={room.totalMemberCount}
             isHost={isHost}
+            onAvatarGroupClick={() => setShowMemberSheet(true)}
           />
         </SummaryWrapper>
 
@@ -268,6 +273,13 @@ export default function RoomInfoPage() {
       />
 
       <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
+
+      {showMemberSheet && (
+        <RoomMemberSheet
+          onClose={() => setShowMemberSheet(false)}
+          members={members}
+        />
+      )}
     </PageContainer>
   );
 }
