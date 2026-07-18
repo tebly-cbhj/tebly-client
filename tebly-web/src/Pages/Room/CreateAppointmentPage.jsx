@@ -34,7 +34,6 @@ const ScrollContent = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   padding-bottom: 90px;
 
   &::-webkit-scrollbar {
@@ -44,7 +43,7 @@ const ScrollContent = styled.div`
 const InputContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 8px 20px;
+  padding: 8px 0;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
@@ -60,7 +59,7 @@ const Label = styled.span`
 const SelectRowContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 0 20px;
+  padding: 0;
   flex-direction: column;
   align-items: flex-start;
   box-sizing: border-box;
@@ -193,7 +192,7 @@ export default function CreateAppointmentPage() {
           <SelectRowContainer>
             <SelectRow
               LeftIcon={PlaceIcon}
-              text_empty="약속 장소"
+              text_empty="장소 입력"
               text_selected={location}
               state={
                 editingField === 'location'
@@ -213,6 +212,7 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={DateIcon}
+              right_icon
               text_empty="약속 기간 설정"
               text_selected={date}
               state={date ? 'selected' : 'empty'}
@@ -221,6 +221,7 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={ClockIcon}
+              right_icon
               text_empty="최소 시간 설정"
               text_selected={minTime}
               state={minTime ? 'selected' : 'empty'}
@@ -229,7 +230,8 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={CategoryIcon}
-              text_empty="카테고리"
+              right_icon
+              text_empty="카테고리 선택"
               text_selected={category?.categoryName}
               state={category ? 'selected' : 'empty'}
               onClick={() => setPopupType('category')}
@@ -237,6 +239,7 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={BellIcon}
+              right_icon
               text_empty="알림 설정"
               text_selected={alarmTime}
               state={alarmTime ? 'selected' : 'empty'}
@@ -245,6 +248,7 @@ export default function CreateAppointmentPage() {
 
             <SelectRow
               LeftIcon={FriendsIcon}
+              right_icon
               text_empty="친구 선택"
               text_selected={selectedMembers.length > 0 ? `${selectedMembers.length}명 선택됨` : ''}
               state={selectedMembers.length > 0 ? 'selected' : 'empty'}
