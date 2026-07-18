@@ -91,6 +91,7 @@ const AttendanceWrapper = styled.div`
   gap: 16px;
   overflow-x: auto;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   transform: translateZ(0);
   touch-action: pan-x;
