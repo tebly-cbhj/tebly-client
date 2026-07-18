@@ -79,7 +79,7 @@ const categoryIconMap = {
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 20px;
+  bottom: 108px;
   right: 20px;
   z-index: 100;
 `;

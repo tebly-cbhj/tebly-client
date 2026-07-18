@@ -32,7 +32,7 @@ const WeekDivider = styled.div`
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 5rem;
+  bottom: 108px;
   right: 1.25rem;
   z-index: 100;
 `;
