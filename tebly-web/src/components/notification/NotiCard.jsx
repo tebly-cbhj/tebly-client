@@ -55,6 +55,14 @@ const TimeText = styled.span`
   color: ${({ theme }) => theme.colors.gray500};
 `;
 
+// 백엔드가 주는 문장(content)엔 "n분"이 그대로 박혀있어서(12시간 전도 720분으로 뜸),
+// 자연스러운 단위로 보여주려면 timeLeftMinutes(순수 숫자)로 직접 조합해야 함
+function formatTimeLeft(minutes) {
+  if (minutes < 60) return `${minutes}분`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}시간`;
+  return `${Math.floor(minutes / 1440)}일`;
+}
+
 export default function NotiCard({
   onClick,
   categoryId,
@@ -64,6 +72,7 @@ export default function NotiCard({
   senderNickname,
   senderProfileImageUrl,
   scheduleName,
+  timeLeftMinutes,
   notifiedAt,
   isRead = false,
 }) {
@@ -87,6 +96,8 @@ export default function NotiCard({
               <BoldText>{senderNickname}</BoldText>님이 나를 콕 찔렀어요.{' '}
               <BoldText>{scheduleName}</BoldText>약속을 확인해보러 가요.
             </>
+          ) : type === 'REMINDER' && timeLeftMinutes != null ? (
+            <><BoldText>{title}</BoldText>까지 {formatTimeLeft(timeLeftMinutes)} 남았어요!</>
           ) : (
             <><BoldText>{title}</BoldText> {content}</>
           )}
