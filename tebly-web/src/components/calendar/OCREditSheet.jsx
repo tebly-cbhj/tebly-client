@@ -452,14 +452,21 @@ export default function OCREditSheet({ scheduleId, onClose }) {
     onClose();
   }
 
+  // X버튼/바깥 탭으로 닫을 때도 수정 내용이 저장되도록 함 — 제목을 지워서 빈칸이면
+  // handleSave가 저장을 거부하니(빈 제목 방지), 그때는 그냥 닫기만 함
+  function handleCloseOrSave() {
+    if (title.trim()) handleSave();
+    else onClose();
+  }
+
   return (
     <>
-      <Overlay onClick={onClose}>
+      <Overlay onClick={handleCloseOrSave}>
         <Sheet onClick={(e) => e.stopPropagation()}>
           <DragHandle />
 
           <SheetHeader>
-            <CloseBtn onClick={onClose}>
+            <CloseBtn onClick={handleCloseOrSave}>
               <CloseIcon />
             </CloseBtn>
             <SaveBtn onClick={handleSave}>저장</SaveBtn>
