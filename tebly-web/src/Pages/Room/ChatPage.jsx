@@ -55,6 +55,25 @@ const NoticeTitle = styled.span`
   white-space: nowrap;
 `;
 
+const NoticeToggleButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+`;
+
+const NoticeDetailGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+`;
+
 const NoticeDate = styled.span`
   ${({ theme }) => theme.typography.body3};
   color: ${({ theme }) => theme.colors.gray800};
@@ -121,13 +140,15 @@ const HeaderWrapper = styled.div`
   flex-shrink: 0;
 `;
 
-const CalendarIcon = () => (
+const CalendarIcon = ({ color = '#1A1A1A' }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path d="M3 10H21V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V10Z" stroke="#34BAA0" strokeWidth="2" />
-    <path d="M3 7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V10H3V7Z" stroke="#34BAA0" strokeWidth="2" />
-    <path d="M8 3V7" stroke="#34BAA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M16 3V7" stroke="#34BAA0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M8 14.7143L9.86667 17L15 13" stroke="#34BAA0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M3 10H21V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V10Z" stroke={color} strokeWidth="2" />
+    <path d="M3 7C3 5.89543 3.89543 5 5 5H19C20.1046 5 21 5.89543 21 7V10H3V7Z" stroke={color} strokeWidth="2" />
+    <path d="M8 3V7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M16 3V7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="7.5" y="13.5" width="1" height="1" rx="0.5" fill={color} stroke={color} />
+    <rect x="11.5" y="13.5" width="1" height="1" rx="0.5" fill={color} stroke={color} />
+    <rect x="15.5" y="13.5" width="1" height="1" rx="0.5" fill={color} stroke={color} />
   </svg>
 );
 
@@ -144,6 +165,7 @@ export default function ChatPage() {
   const accessToken = localStorage.getItem('accessToken') || import.meta.env.VITE_ACCESS_TOKEN;
 
   const [inputValue, setInputValue] = useState('');
+  const [isNoticeExpanded, setIsNoticeExpanded] = useState(true);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -200,22 +222,36 @@ export default function ChatPage() {
           }
         >
           <NoticeHeaderRow>
-            <CalendarIcon />
+            <CalendarIcon color={isNoticeExpanded ? '#1A1A1A' : '#34BAA0'} />
             <NoticeTitle>{confirmedPromise.title}</NoticeTitle>
-            <ChevronDownIcon style={{ transform: 'rotate(180deg)', flexShrink: 0 }} />
+            <NoticeToggleButton
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsNoticeExpanded((prev) => !prev);
+              }}
+            >
+              <ChevronDownIcon
+                style={{ transform: isNoticeExpanded ? 'rotate(180deg)' : 'none', flexShrink: 0 }}
+              />
+            </NoticeToggleButton>
           </NoticeHeaderRow>
 
-          <NoticeDate>{formatShortDateLabel(confirmedPromise.startTime)}</NoticeDate>
+          {isNoticeExpanded && (
+            <NoticeDetailGroup>
+              <NoticeDate>{formatShortDateLabel(confirmedPromise.startTime)}</NoticeDate>
 
-          <NoticeInfoRow>
-            <NoticeLocation>{confirmedPromise.location}</NoticeLocation>
-            <NoticeMemberCount>
-              <MemberIcon />
-              <NoticeMemberCountText>
-                {confirmedPromise.acceptedCount}/{confirmedPromise.totalMemberCount}
-              </NoticeMemberCountText>
-            </NoticeMemberCount>
-          </NoticeInfoRow>
+              <NoticeInfoRow>
+                <NoticeLocation>{confirmedPromise.location}</NoticeLocation>
+                <NoticeMemberCount>
+                  <MemberIcon />
+                  <NoticeMemberCountText>
+                    {confirmedPromise.acceptedCount}/{confirmedPromise.totalMemberCount}
+                  </NoticeMemberCountText>
+                </NoticeMemberCount>
+              </NoticeInfoRow>
+            </NoticeDetailGroup>
+          )}
         </NoticeCard>
       )}
 
