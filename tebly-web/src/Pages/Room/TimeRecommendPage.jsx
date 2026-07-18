@@ -380,7 +380,6 @@ const DialWrapper = styled.div`
   position: relative;
   width: ${DIAL_SIZE / 16}rem;
   height: ${DIAL_SIZE / 16}rem;
-  margin: 2rem 0;
   touch-action: none;
 `;
 
@@ -426,7 +425,7 @@ const TimeSummaryRow = styled.div`
   width: 100%;
   justify-content: center;
   gap: 3.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
 `;
 
 const TimeSummaryCol = styled.div`

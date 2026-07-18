@@ -30,6 +30,7 @@ const Label = styled.span`
   font-family: 'Pretendard Variable';
   font-weight: 600;
   line-height: 22.4px;
+  white-space: nowrap;
 `;
 
 export default function ButtonDelete({ onClick }) {

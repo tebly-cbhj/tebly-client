@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useFriendStore } from '../../store/FriendStore';
 import FriendListItemSwipe from '../../components/friend/FriendListItemSwipe';
 import IconAddFriend from '../../components/friend/IconAddFriend';
+import ConfirmPopup from '../../components/common/ConfirmPopup';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -43,7 +44,6 @@ const Header = styled.div`
 const Title = styled.h1`
   display: flex;
   height: 32px;
-  padding-left: 12px;
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
@@ -206,6 +206,13 @@ export default function FriendPage() {
   const fetchFriends = useFriendStore((s) => s.fetchFriends);
   const toggleFavorite = useFriendStore((s) => s.toggleFavorite);
   const deleteFriend = useFriendStore((s) => s.deleteFriend);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+
+  function handleConfirmDelete() {
+    const targetId = deleteTargetId;
+    setDeleteTargetId(null);
+    deleteFriend(targetId).catch(() => alert('친구 삭제에 실패했어요. 다시 시도해주세요.'));
+  }
 
   useEffect(() => {
     fetchMyProfile();
@@ -282,11 +289,20 @@ export default function FriendPage() {
             profileImage={friend.profileImage}
             isFavorite={friend.isFavorite}
             onToggleFavorite={() => toggleFavorite(friend.id)}
-            onDelete={() => deleteFriend(friend.id).catch(() => alert('친구 삭제에 실패했어요. 다시 시도해주세요.'))}
+            onDelete={() => setDeleteTargetId(friend.id)}
             onClick={() => navigate(`/friends/${friend.id}`)}
           />
         ))}
       </FriendList>
+
+      <ConfirmPopup
+        visible={!!deleteTargetId}
+        title="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        danger
+        onCancel={() => setDeleteTargetId(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </Wrapper>
   );
 }

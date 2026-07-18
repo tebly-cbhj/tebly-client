@@ -9,6 +9,8 @@ import DecisionCard from '../../components/room/DecisionCard';
 import { useRoomStore } from '../../store/RoomStore';
 import { useChatStore } from '../../store/ChatStore';
 import { useFriendStore } from '../../store/FriendStore';
+import MemberIcon from '../../assets/icons/member.svg?react';
+import ChevronDownIcon from '../../assets/icons/chevron-down.svg?react';
 
 const ChatContainer = styled.div`
   width: 100%;
@@ -22,24 +24,73 @@ const ChatContainer = styled.div`
   position: relative;
 `;
 
-const AppointmentBanner = styled.div`
+const NoticeCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  margin: 0.5rem 1.25rem;
+  border-radius: 12px;
+  background: ${({ theme }) => theme.colors.bg};
+  box-sizing: border-box;
+  flex-shrink: 0;
+  cursor: pointer;
+`;
+
+const NoticeHeaderRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #effffb;
-  border-radius: 0.5rem;
-  margin: 0.5rem 1.25rem;
+  width: 100%;
+`;
+
+const NoticeTitle = styled.span`
+  flex: 1;
+  min-width: 0;
+  ${({ theme }) => theme.typography.s2};
+  color: ${({ theme }) => theme.colors.gray900};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const NoticeDate = styled.span`
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray800};
+`;
+
+const NoticeInfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const NoticeLocation = styled.span`
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray800};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const NoticeMemberCount = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
 `;
 
-const BannerText = styled.span`
-  font-family: 'Pretendard Variable', sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: #525252;
-  line-height: 1.4;
+const NoticeMemberCountText = styled.span`
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray800};
 `;
+
+function formatShortDateLabel(isoDateTime) {
+  const d = new Date(isoDateTime);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
 
 const MessageList = styled.div`
   flex: 1;
@@ -141,10 +192,31 @@ export default function ChatPage() {
       </HeaderWrapper>
 
       {confirmedPromise && (
-        <AppointmentBanner>
-          <CalendarIcon />
-          <BannerText>{confirmedPromise.title} 약속이 확정됐어요 !</BannerText>
-        </AppointmentBanner>
+        <NoticeCard
+          onClick={() =>
+            navigate('/my-appointments', {
+              state: { promiseId: confirmedPromise.promiseId, roomId: Number(roomId) },
+            })
+          }
+        >
+          <NoticeHeaderRow>
+            <CalendarIcon />
+            <NoticeTitle>{confirmedPromise.title}</NoticeTitle>
+            <ChevronDownIcon style={{ transform: 'rotate(180deg)', flexShrink: 0 }} />
+          </NoticeHeaderRow>
+
+          <NoticeDate>{formatShortDateLabel(confirmedPromise.startTime)}</NoticeDate>
+
+          <NoticeInfoRow>
+            <NoticeLocation>{confirmedPromise.location}</NoticeLocation>
+            <NoticeMemberCount>
+              <MemberIcon />
+              <NoticeMemberCountText>
+                {confirmedPromise.acceptedCount}/{confirmedPromise.totalMemberCount}
+              </NoticeMemberCountText>
+            </NoticeMemberCount>
+          </NoticeInfoRow>
+        </NoticeCard>
       )}
 
       <MessageList>
