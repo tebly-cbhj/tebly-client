@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { PageWrapper } from '../../PageWrapper';
@@ -144,15 +144,14 @@ const SortDivider = styled.div`
 
 const SORT_OPTIONS = [
   { value: 'recommended', label: '추천순' },
-  { value: 'members',     label: '참여 인원순' },
+  { value: 'longest',     label: '여유시간순' },
   { value: 'earliest',   label: '빠른 시간순' },
   { value: 'latest',     label: '늦은 시간순' },
 ];
 
-// 백엔드 sortType은 참여 인원순을 지원하지 않아서, 그 경우엔 추천순으로 요청함
 const SORT_VALUE_TO_API_TYPE = {
   recommended: 'RECOMMENDED',
-  members: 'RECOMMENDED',
+  longest: 'LONGEST',
   earliest: 'EARLIEST',
   latest: 'LATEST',
 };
@@ -606,18 +605,8 @@ const isUpdateMode = Boolean(promiseId);
   function handleSortSelect(value) {
     setSortValue(value);
     setIsSortOpen(false);
-    // "참여 인원순"은 서버에 대응하는 정렬이 없어서 재요청 없이 프론트에서만 재배열함
-    if (value !== 'members') {
-      fetchRecommendations(dateRange, value);
-    }
+    fetchRecommendations(dateRange, value);
   }
-
-  const sortedOptions = useMemo(() => {
-    if (sortValue === 'members') {
-      return [...options].sort((a, b) => b.memberCount - a.memberCount);
-    }
-    return options;
-  }, [options, sortValue]);
 
   const handleConfirm = async () => {
     const selectedOption = options.find((o) => o.id === selectedId);
@@ -848,7 +837,7 @@ const isUpdateMode = Boolean(promiseId);
       </FilterBar>
 
       <CardList>
-        {sortedOptions.map((option) => (
+        {options.map((option) => (
           <TimeOptionCard
             key={option.id}
             date={option.date}

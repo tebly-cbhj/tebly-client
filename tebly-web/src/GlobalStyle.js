@@ -19,6 +19,12 @@ export const GlobalStyle = createGlobalStyle`
     color: ${(props) => props.theme.colors.gray900};
   }
 
+  /* 채팅 화면은 배경이 흰색이라, ChatPage가 마운트되어있는 동안엔
+     body[data-chat-page]를 붙여서 body 배경도 같이 흰색으로 맞춤 */
+  body[data-chat-page] {
+    background-color: ${(props) => props.theme.colors.white};
+  }
+
   a[href^="tel"],
   a[href^="sms"],
   a[href^="mailto"],
