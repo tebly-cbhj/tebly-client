@@ -155,7 +155,7 @@ export default function MorePage() {
                 <EditSmallIcon width={24} height={24} />
               </EditIcon>
             </NameRow>
-            {/* TODO: 백엔드에 자기소개 필드 추가되면 <Bio> 복구 */}
+            {user.bio && <Bio>{user.bio}</Bio>}
           </ProfileInfo>
         </ProfileCard>
 
