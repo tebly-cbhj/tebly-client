@@ -6,6 +6,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
+  flex-shrink: 0;
   cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 `;
 
