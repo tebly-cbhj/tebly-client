@@ -19,6 +19,24 @@ function parseServerDate(dateStr, isPoke) {
   return new Date(isPoke ? `${dateStr}Z` : dateStr);
 }
 
+// timeLeftMinutes가 서버에서 매번 "지금 시각 기준"으로 새로 계산돼서 내려오는 것 같아서
+// (볼 때마다 줄어들다가 0/음수까지 감), 처음 본 순간 값을 브라우저에 저장해두고 그 이후로는
+// 계속 그 값만 보여주는 임시 조치 — 백엔드가 생성 시점에 값을 고정해서 주면 이 함수도 원복할 것.
+function getFixedTimeLeft(notiId, liveMinutes) {
+  if (liveMinutes == null) return liveMinutes;
+  let cache;
+  try {
+    cache = JSON.parse(localStorage.getItem('notiTimeLeftCache')) || {};
+  } catch {
+    cache = {};
+  }
+  if (cache[notiId] == null) {
+    cache[notiId] = liveMinutes;
+    localStorage.setItem('notiTimeLeftCache', JSON.stringify(cache));
+  }
+  return cache[notiId];
+}
+
 // PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
 // 화면 끝까지 채우도록 리스트 영역은 엣지투엣지로 유지해야 해서,
 // max-width/높이/배경만 가져온 버전
@@ -206,7 +224,7 @@ export default function AlarmPage() {
             senderNickname={noti.senderNickname}
             senderProfileImageUrl={noti.senderProfileImageUrl}
             scheduleName={noti.scheduleName}
-            timeLeftMinutes={noti.timeLeftMinutes}
+            timeLeftMinutes={getFixedTimeLeft(noti.id, noti.timeLeftMinutes)}
             notifiedAt={formatNotifiedAt(noti.createdAt, noti.type === 'POKE')}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
