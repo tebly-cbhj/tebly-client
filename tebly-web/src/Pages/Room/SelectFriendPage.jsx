@@ -83,6 +83,23 @@ const BtnWrapper = styled.div`
   align-self: center;
 `;
 
+const Toast = styled.div`
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: rgba(26, 26, 26, 0.85);
+  border-radius: 0.75rem;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.white};
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 200;
+`;
+
 const SelectFriendPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -109,6 +126,12 @@ const SelectFriendPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sentInviteIds, setSentInviteIds] = useState([]);
   const [pendingRemoveFriend, setPendingRemoveFriend] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  function showToast(message) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 2000);
+  }
 
   useEffect(() => {
     fetchFriends();
@@ -229,9 +252,14 @@ const SelectFriendPage = () => {
           addSentInviteIds(currentRoomId, addedMembers.map((f) => f.id));
         }
         if (removedMembers.length > 0) {
-          await apiClient.delete(`/rooms/${currentRoomId}/members`, {
-            data: { userIds: removedMembers.map((f) => f.id) },
-          });
+          try {
+            await apiClient.delete(`/rooms/${currentRoomId}/members`, {
+              data: { userIds: removedMembers.map((f) => f.id) },
+            });
+          } catch (err) {
+            showToast(err.response?.data?.message || '멤버를 추방할 수 없어요.');
+            return;
+          }
         }
 
         navigate(-1);
@@ -308,6 +336,8 @@ const SelectFriendPage = () => {
         onCancel={() => setPendingRemoveFriend(null)}
         onConfirm={confirmRemoveMember}
       />
+
+      <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
     </PageWrapper>
   );
 };
