@@ -206,6 +206,8 @@ export default function MyAppointmentPage() {
   if (!promise) return null; // TODO: 로딩 스피너로 교체
 
   const categoryIcon = categories.find((c) => c.categoryId === promise.myCategoryId)?.categoryIcon;
+  const isExpired = new Date(promise.endTime) < new Date();
+  const isLocked = promise.promiseStatus === 'CONFIRMED' || isExpired;
   const filteredMembers = selectedChip
     ? promise.members.filter((m) => m.status === STATUS_LABEL_TO_ENUM[selectedChip])
     : promise.members;
@@ -272,7 +274,7 @@ export default function MyAppointmentPage() {
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
-            isEditing={promise.isSender && promise.promiseStatus !== 'CONFIRMED'}
+            isEditing={promise.isSender && !isLocked}
             onEditTime={() => {
               setIsEditing(true);
               setShowDateSheet(true);
@@ -373,7 +375,7 @@ export default function MyAppointmentPage() {
         <ActionSheet
           visible={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          option1Text={promise.promiseStatus !== 'CONFIRMED' ? '수정' : undefined}
+          option1Text={!isLocked ? '수정' : undefined}
           option2Text="일정 삭제"
           option2Color="#E31818"
           onOption1={() => { setIsSheetOpen(false); setIsEditing(true); }}
