@@ -4,7 +4,7 @@ import Toggle from '../common/Toggle';
 const Row = styled.div`
   display: flex;
   width: 100%;
-  padding: 12px 20px;
+  padding: 12px 0;
   align-items: center;
   gap: 8px;
   box-sizing: border-box;

@@ -147,8 +147,6 @@ const SelectFriendPage = () => {
 
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
 
-  const isActive = selected.length > 0;
-
   const isExistingMember = (friendId) => roomMembers.some((m) => m.id === friendId);
 
   const handleToggle = (friend) => {
@@ -296,7 +294,7 @@ const SelectFriendPage = () => {
         <BtnWrapper>
           <Btn
             text="완료"
-            disabled={!isActive || isSubmitting}
+            disabled={isSubmitting}
             onClick={handleComplete}
           />
         </BtnWrapper>
