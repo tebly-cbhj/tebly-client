@@ -95,7 +95,9 @@ const MY_STATUS_LABEL = { ACCEPTED: '참석', REJECTED: '불참', PENDING: '미�
 
 function getChipLabel(promise, isInvitedTab) {
   if (promise.promiseStatus === 'CANCELED') return PROMISE_STATUS_LABEL.CANCELED;
-  if (new Date(promise.endTime) < new Date()) return '완료';
+  if (new Date(promise.endTime) < new Date()) {
+    return promise.promiseStatus === 'CONFIRMED' ? '완료' : '만료';
+  }
   return isInvitedTab ? MY_STATUS_LABEL[promise.myStatus] : PROMISE_STATUS_LABEL[promise.promiseStatus];
 }
 
@@ -103,7 +105,9 @@ function formatPromiseDate(promise) {
   const start = new Date(promise.startTime);
   const end = new Date(promise.endTime);
   const pad = (n) => String(n).padStart(2, '0');
-  const dateLabel = promise.proposeStartDate.replaceAll('-', '.');
+  // 제안했던 기간(proposeStartDate)이 아니라 실제 잡힌 시각(startTime)의 날짜를 보여줘야
+  // "완료" 판단 기준(endTime)이랑 화면에 보이는 날짜가 서로 어긋나지 않음
+  const dateLabel = `${start.getFullYear()}.${pad(start.getMonth() + 1)}.${pad(start.getDate())}`;
   const startLabel = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
   const endLabel = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
   return `${dateLabel} ${startLabel}~${endLabel}`;
