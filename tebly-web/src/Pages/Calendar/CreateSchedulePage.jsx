@@ -15,7 +15,7 @@ import RepeatEndDatePopup from '../../components/room/RepeatEndDatePopup';
 import ExpandIcon from '../../components/common/ExpandIcon';
 import TimePicker from '../../components/common/TimePicker';
 import apiClient from '../../api/client';
-import { ALARM_TO_MINUTES, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
+import { ALARM_TO_MINUTES, REPEAT_TYPE_TO_KO, REPEAT_KO_TO_TYPE } from '../../store/PersonalScheduleStore';
 import { useLastSavedScheduleStore } from '../../store/LastSavedScheduleStore';
 
 import ClockIcon from '../../assets/icons/clock.svg?react';
@@ -314,7 +314,6 @@ function toDisplayDate(dateObj) {
   return `${dateObj.month}월 ${dateObj.day}일 ${DAY_FULL[d.getDay()]}`;
 }
 
-const REPEAT_KO_TO_TYPE = { 없음: 'NONE', 매일: 'DAILY', 매주: 'WEEKLY', 매월: 'MONTHLY', 매년: 'YEARLY' };
 
 function toIsoDateTime(dateObj, timeStr) {
   const pad = (n) => String(n).padStart(2, '0');

@@ -9,6 +9,7 @@ export const MINUTES_TO_ALARM = Object.fromEntries(
 );
 
 export const REPEAT_TYPE_TO_KO = { daily: '매일', weekly: '매주', monthly: '매월', yearly: '매년' };
+export const REPEAT_KO_TO_TYPE = { 없음: 'NONE', 매일: 'DAILY', 매주: 'WEEKLY', 매월: 'MONTHLY', 매년: 'YEARLY' };
 
 function toKoreanDateStr(isoDateTime) {
   const d = new Date(isoDateTime);

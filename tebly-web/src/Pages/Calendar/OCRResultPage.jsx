@@ -8,6 +8,7 @@ import { PageWrapper } from '../../PageWrapper';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 import { useOCRScheduleStore } from '../../store/OCRScheduleStore';
+import { REPEAT_KO_TO_TYPE } from '../../store/PersonalScheduleStore';
 import apiClient from '../../api/client';
 import OCREditSheet from '../../components/calendar/OCREditSheet';
 
@@ -115,7 +116,7 @@ export default function OCRResultPage() {
         title: s.title,
         startTime: toIsoDateTime(s.startDate, s.startTime),
         endTime: toIsoDateTime(s.endDate ?? s.startDate, s.endTime),
-        repeatType: 'NONE',
+        repeatType: REPEAT_KO_TO_TYPE[s.repeat] || 'NONE',
       })),
     };
 

@@ -30,6 +30,7 @@ const NavContainer = styled.nav`
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 200;
 `;
 
 const NavButton = styled(NavLink)`
