@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useScheduleStore } from '../../store/ScheduleStore';
-import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 import { useNotificationStore } from '../../store/NotificationStore';
 import { PageWrapper } from '../../PageWrapper';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
@@ -232,7 +232,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         memo: schedule.memo || '',
         place: schedule.location || '',
         alarmTime: schedule.alarmTime || '',
-        repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
+        repeat: schedule.repeat ? `${REPEAT_TYPE_TO_KO[schedule.repeat.type] || schedule.repeat.type} 반복` : '반복 없음',
       }));
     });
   }, [confirmedSchedules, personalSchedules]);

@@ -6,6 +6,7 @@ import ToggleBtn from '../../components/more/ToggleBtn';
 import NotiCard from '../../components/notification/NotiCard';
 import { useNotificationStore } from '../../store/NotificationStore';
 import { useScheduleStore } from '../../store/ScheduleStore';
+import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 
 // 서버의 notifications createdAt이 타임존 표시 없이(예: "2026-07-15T15:45:52") 오는데,
 // 실제로는 UTC 시각을 그대로 찍어서 내려주는 버그가 있음(한국시간으로 착각하면 9시간 어긋남).
@@ -90,6 +91,7 @@ export default function AlarmPage() {
   const markAsRead = useNotificationStore((state) => state.markAsRead);
   const categories = useScheduleStore((state) => state.categories);
   const fetchCategories = useScheduleStore((state) => state.fetchCategories);
+  const fetchPersonalSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
 
   useEffect(() => {
     fetchNotifications();
@@ -124,17 +126,67 @@ export default function AlarmPage() {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   }
 
-  function handleNotiClick(noti) {
+  async function handleNotiClick(noti) {
     markAsRead(noti.id);
     if (noti.roomId) {
       // roomId가 있으면 scheduleId는 사실 약속(promise) ID를 재사용해서 담고 있음(redirectPath: "/promises/{scheduleId}"로 확인함)
       navigate('/my-appointments', {
         state: { promiseId: noti.scheduleId, roomId: noti.roomId, isInvited: true },
       });
-    } else if (noti.scheduleId) {
-      // 개인 일정 단건 조회 API가 없어서 상세로 바로 못 감 — 캘린더 홈으로 이동
-      navigate('/');
+      return;
     }
+
+    if (!noti.scheduleId) return;
+
+    // 개인 일정 단건 조회 API가 없어서, 알림이 발생한 달의 목록을 다시 불러와서
+    // scheduleId가 일치하는 회차를 찾아 상세로 이동(반복 일정이면 알림 시각과 가장 가까운 회차를 선택)
+    const notifiedDate = parseServerDate(noti.createdAt);
+    const y = notifiedDate.getFullYear();
+    const m = String(notifiedDate.getMonth() + 1).padStart(2, '0');
+    await fetchPersonalSchedules('monthly', `${y}-${m}-01`);
+
+    const matches = usePersonalScheduleStore
+      .getState()
+      .schedules.filter((s) => s.id === noti.scheduleId);
+
+    if (matches.length === 0) {
+      navigate('/');
+      return;
+    }
+
+    const match = matches.length === 1
+      ? matches[0]
+      : matches.reduce((closest, s) =>
+          Math.abs(new Date(s.occurrenceStart) - notifiedDate) <
+            Math.abs(new Date(closest.occurrenceStart) - notifiedDate)
+            ? s
+            : closest
+        );
+
+    const [startTime, endTime] = match.time ? match.time.split(' - ') : ['', ''];
+    navigate('/calendar/event-detail', {
+      state: {
+        scheduleId: match.id,
+        schedule: {
+          title: match.title,
+          memo: match.memo,
+          startDate: match.startDate,
+          startTime,
+          endDate: match.endDate,
+          endTime,
+          place: match.location,
+          category: match.category,
+          alarmTime: match.alarmTime,
+          repeat: match.repeat
+            ? `${REPEAT_TYPE_TO_KO[match.repeat.type] || match.repeat.type} 반복`
+            : '반복 없음',
+          sourceType: match.sourceType,
+          occurrenceStart: match.occurrenceStart,
+          occurrenceEnd: match.occurrenceEnd,
+          repeatType: match.repeatType,
+        },
+      },
+    });
   }
 
   function renderSection(title, list) {
