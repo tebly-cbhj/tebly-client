@@ -10,7 +10,7 @@ import WeekAllDayRow from '../../components/calendar/week/WeekAllDayRow';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
 import { useScheduleStore } from '../../store/ScheduleStore';
-import { usePersonalScheduleStore } from '../../store/PersonalScheduleStore';
+import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 import { useNotificationStore } from '../../store/NotificationStore';
 import CalendarFab from '../../components/calendar/CalendarFab';
 
@@ -213,7 +213,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             ? schedule.category
             : (categoryIconMap[schedule.category] || schedule.category || 'Other'),
           alarmTime: schedule.alarmTime || '',
-          repeat: schedule.repeat ? `${schedule.repeat.type} 반복` : '반복 없음',
+          repeat: schedule.repeat ? `${REPEAT_TYPE_TO_KO[schedule.repeat.type] || schedule.repeat.type} 반복` : '반복 없음',
           sourceType: schedule.sourceType,
           occurrenceStart: schedule.occurrenceStart,
           occurrenceEnd: schedule.occurrenceEnd,

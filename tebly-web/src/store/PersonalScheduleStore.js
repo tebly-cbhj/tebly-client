@@ -8,6 +8,8 @@ export const MINUTES_TO_ALARM = Object.fromEntries(
   Object.entries(ALARM_TO_MINUTES).map(([label, minutes]) => [minutes, label])
 );
 
+export const REPEAT_TYPE_TO_KO = { daily: '매일', weekly: '매주', monthly: '매월', yearly: '매년' };
+
 function toKoreanDateStr(isoDateTime) {
   const d = new Date(isoDateTime);
   const y = d.getFullYear();
