@@ -83,6 +83,9 @@ export default function App() {
               source={{ uri: webViewSource }}
               style={{ flex: 1 }}
               onShouldStartLoadWithRequest={handleShouldStartLoad}
+              // onMessage가 하나라도 있어야 웹 쪽에 window.ReactNativeWebView가 제대로 주입됨
+              // (없으면 웹이 "네이티브 앱 안에서 열렸는지"를 못 알아채서 웹 자체 하단바가 같이 뜸)
+              onMessage={() => {}}
               onNavigationStateChange={(navState) => {
                 setCanGoBack(navState.canGoBack);
                 setCurrentPath(getPathname(navState.url));

@@ -9,12 +9,14 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 
 // 서버의 notifications createdAt이 타임존 표시 없이(예: "2026-07-15T15:45:52") 오는데,
-// 실제로는 UTC 시각을 그대로 찍어서 내려주는 버그가 있음(한국시간으로 착각하면 9시간 어긋남).
-// 백엔드 수정 전까지 UTC로 간주해서 파싱하는 임시 조치 — 백엔드가 고치면 이 함수도 원복할 것.
-function parseServerDate(dateStr) {
+// 콕찌르기 알림의 createdAt만 아직 UTC 시각을 그대로 찍어서 내려주는 버그가 남아있음
+// (일정 알림 쪽은 백엔드가 고쳐서 정상적인 한국시간으로 옴). 콕찌르기만 UTC로 간주해서
+// 보정 파싱 — 콕찌르기 쪽도 백엔드가 마저 고치면 이 함수도 원복할 것.
+function parseServerDate(dateStr, isPoke) {
   if (!dateStr) return new Date(NaN);
   const hasTimezone = /[Zz]|[+-]\d{2}:?\d{2}$/.test(dateStr);
-  return new Date(hasTimezone ? dateStr : `${dateStr}Z`);
+  if (hasTimezone) return new Date(dateStr);
+  return new Date(isPoke ? `${dateStr}Z` : dateStr);
 }
 
 // PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
@@ -108,21 +110,21 @@ export default function AlarmPage() {
 
   const now = new Date();
   const newNoti = currentList.filter(
-    (n) => now - parseServerDate(n.createdAt) < 1000 * 60 * 60 * 24
+    (n) => now - parseServerDate(n.createdAt, n.type === 'POKE') < 1000 * 60 * 60 * 24
   );
   const oldNoti = currentList.filter(
-    (n) => now - parseServerDate(n.createdAt) >= 1000 * 60 * 60 * 24
+    (n) => now - parseServerDate(n.createdAt, n.type === 'POKE') >= 1000 * 60 * 60 * 24
   );
 
-  function formatNotifiedAt(date) {
-    const diff = now - parseServerDate(date);
+  function formatNotifiedAt(date, isPoke) {
+    const diff = now - parseServerDate(date, isPoke);
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
 
     if (minutes < 60) return `${minutes}분 전`;
     if (hours < 24) return `${hours}시간 전`;
 
-    const d = parseServerDate(date);
+    const d = parseServerDate(date, isPoke);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   }
 
@@ -140,7 +142,7 @@ export default function AlarmPage() {
 
     // 개인 일정 단건 조회 API가 없어서, 알림이 발생한 달의 목록을 다시 불러와서
     // scheduleId가 일치하는 회차를 찾아 상세로 이동(반복 일정이면 알림 시각과 가장 가까운 회차를 선택)
-    const notifiedDate = parseServerDate(noti.createdAt);
+    const notifiedDate = parseServerDate(noti.createdAt, noti.type === 'POKE');
     const y = notifiedDate.getFullYear();
     const m = String(notifiedDate.getMonth() + 1).padStart(2, '0');
     await fetchPersonalSchedules('monthly', `${y}-${m}-01`);
@@ -204,7 +206,7 @@ export default function AlarmPage() {
             senderNickname={noti.senderNickname}
             senderProfileImageUrl={noti.senderProfileImageUrl}
             scheduleName={noti.scheduleName}
-            notifiedAt={formatNotifiedAt(noti.createdAt)}
+            notifiedAt={formatNotifiedAt(noti.createdAt, noti.type === 'POKE')}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
           />
