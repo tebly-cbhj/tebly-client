@@ -18,7 +18,8 @@ function toTimeStr(isoDateTime) {
   return `${h}:${min}`;
 }
 
-// 방 약속 목록 API(RoomPromiseResponse)엔 카테고리 정보가 없어서 비워둠(Other로 표시됨)
+// RoomPromiseResponse엔 카테고리가 myCategoryId(id)로만 내려오고 전체 카테고리 객체가
+// 없어서, 화면에서 categories 목록으로 직접 찾아 써야 함(category는 못 찾을 때의 fallback)
 function mapPromiseToSchedule(promise, roomId) {
   return {
     id: promise.promiseId,
@@ -28,6 +29,7 @@ function mapPromiseToSchedule(promise, roomId) {
     date: toKoreanDateStr(promise.startTime),
     time: `${toTimeStr(promise.startTime)} - ${toTimeStr(promise.endTime)}`,
     location: promise.location || '',
+    categoryId: promise.myCategoryId,
     category: 'Other',
     alarmTime: '',
     memo: '',
@@ -64,7 +66,9 @@ export const useScheduleStore = create((set, get) => ({
       return promises
         .filter((p) => {
           const key = String(p.promiseId);
-          if (p.promiseStatus !== 'CONFIRMED' || seen.has(key)) return false;
+          // 확정된 약속이라도 내가 참석(ACCEPTED)으로 응답한 것만 캘린더에 보여줘야 함
+          // (미응답/불참인데도 뜨는 버그가 있었음)
+          if (p.promiseStatus !== 'CONFIRMED' || p.myStatus !== 'ACCEPTED' || seen.has(key)) return false;
           seen.add(key);
           return true;
         })

@@ -77,6 +77,12 @@ const categoryIconMap = {
   '기타': 'Other',
 };
 
+// 방 약속(schedule.categoryId만 있음)은 카테고리 목록에서 직접 찾아야 함
+function resolveGroupCategory(schedule, categories) {
+  const found = categories.find((c) => c.categoryId === schedule.categoryId);
+  return found?.categoryIcon || 'Other';
+}
+
 const FloatingWrapper = styled.div`
   position: fixed;
   bottom: 108px;
@@ -116,14 +122,17 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
   const groupSchedules = useScheduleStore(
     useShallow((state) => state.schedules.filter((s) => s.confirmed))
   );
+  const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const notifications = useNotificationStore((state) => state.notifications);
   const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
   const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     fetchConfirmedSchedules();
+    fetchCategories();
     fetchNotifications();
-  }, [fetchConfirmedSchedules, fetchNotifications]);
+  }, [fetchConfirmedSchedules, fetchCategories, fetchNotifications]);
 
   const { sunday, saturday } = useMemo(() => {
     const base = selectedDate
@@ -172,14 +181,14 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
       .forEach((schedule) => {
         byDay[parseDate(schedule.date).getDay()].push({
           id: schedule.id,
-          category: categoryIconMap[schedule.category],
+          category: resolveGroupCategory(schedule, categories),
           title: schedule.title,
           onClick: () => handleScheduleClick(schedule, null),
         });
       });
 
     return byDay;
-  }, [weekPersonal, weekGroup]);
+  }, [weekPersonal, weekGroup, categories]);
 
   const monthLabel = selectedDate
     ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
@@ -341,7 +350,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                 $dayIndex={parseDate(schedule.date).getDay()}
               >
                 <ScheduleBlock
-                  category={categoryIconMap[schedule.category]}
+                  category={resolveGroupCategory(schedule, categories)}
                   text={schedule.title}
                   onClick={() => handleScheduleClick(schedule, null)}
                 />

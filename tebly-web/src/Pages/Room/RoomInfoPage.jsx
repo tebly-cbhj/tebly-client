@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRoomStore } from '../../store/RoomStore';
 import { useFriendStore } from '../../store/FriendStore';
+import { useScheduleStore } from '../../store/ScheduleStore';
+import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 import apiClient from '../../api/client';
 import RoomSummarySection from '../../components/room/RoomSummarySection';
 import TabBtn from '../../components/common/TabBtn';
@@ -125,6 +127,8 @@ export default function RoomInfoPage() {
   const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
   const myProfile = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
+  const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const [isHost, setIsHost] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [members, setMembers] = useState([]);
@@ -135,10 +139,16 @@ export default function RoomInfoPage() {
     setTimeout(() => setToastMessage(''), 2000);
   }
 
+  function getCategoryImage(categoryId) {
+    const iconKey = categories.find((c) => c.categoryId === categoryId)?.categoryIcon;
+    return CATEGORY_ICON_MAP[iconKey]?.SelectedIcon;
+  }
+
   useEffect(() => {
     fetchRoomDetail(Number(roomId));
     fetchMyProfile();
-  }, [roomId, fetchRoomDetail, fetchMyProfile]);
+    fetchCategories();
+  }, [roomId, fetchRoomDetail, fetchMyProfile, fetchCategories]);
 
   useEffect(() => {
     if (!myProfile) return;
@@ -220,6 +230,7 @@ export default function RoomInfoPage() {
               location={promise.location}
               acceptedCount={promise.acceptedCount}
               totalCount={promise.totalMemberCount}
+              CategoryImage={getCategoryImage(promise.myCategoryId)}
               chipLabel={getChipLabel(promise, currentTab === 'tab2')}
               onClick={() =>
                 navigate('/my-appointments', {

@@ -33,6 +33,7 @@ const ContentArea = styled.div`
   flex-direction: column;
   padding-top: 16px;
   flex: 1;
+  min-height: 0;
 `;
 
 const FriendsWrapper = styled.div`

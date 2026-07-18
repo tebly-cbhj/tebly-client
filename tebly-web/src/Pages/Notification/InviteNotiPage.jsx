@@ -7,6 +7,7 @@ import ToggleBtn from '../../components/more/ToggleBtn';
 import RoomInviteCard from '../../components/notification/RoomInviteCard';
 import AppointmentInviteCard from '../../components/notification/AppointmentInviteCard';
 import { useInviteStore } from '../../store/InviteStore';
+import { useScheduleStore } from '../../store/ScheduleStore';
 
 const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
 const pad = (n) => String(n).padStart(2, '0');
@@ -73,10 +74,17 @@ export default function InviteNotiPage() {
     rejectAppointmentInvite,
     acceptAppointmentInvite,
     } = useInviteStore();
+  const categories = useScheduleStore((state) => state.categories);
+  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
 
   useEffect(() => {
     fetchInvitations();
-  }, [fetchInvitations]);
+    fetchCategories();
+  }, [fetchInvitations, fetchCategories]);
+
+  function getCategoryIcon(categoryId) {
+    return categories.find((c) => c.categoryId === categoryId)?.categoryIcon;
+  }
 
   async function handleRespond(action, id) {
     try {
@@ -129,7 +137,7 @@ export default function InviteNotiPage() {
                 time={formatTimeLabel(invite.startTime, invite.endTime)}
                 location={invite.location}
                 roomName={invite.roomName}
-                // TODO: categoryId 없음 — 백엔드 응답에 카테고리 정보 추가되면 연동
+                categoryId={getCategoryIcon(invite.myCategoryId)}
                 onReject={() => handleRespond(rejectAppointmentInvite, invite.promiseId)}
                 onAccept={() => handleRespond(acceptAppointmentInvite, invite.promiseId)}
                 />
