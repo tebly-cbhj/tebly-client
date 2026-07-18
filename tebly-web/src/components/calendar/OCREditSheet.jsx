@@ -35,7 +35,8 @@ const Overlay = styled.div`
 `;
 
 const Sheet = styled.div`
-  width: 390px;
+  width: 100%;
+  max-width: 490px;
   height: 90vh;
   background: ${({ theme }) => theme.colors.bg || '#F5F5F5'};
   border-radius: 20px 20px 0 0;
@@ -302,7 +303,8 @@ const TimePickerOverlay = styled.div`
 `;
 
 const TimePickerSheet = styled.div`
-  width: 390px;
+  width: 100%;
+  max-width: 490px;
   background: #fefefe;
   border-radius: 2rem 2rem 0 0;
   box-shadow: 0 -4px 12px 0 rgba(68, 68, 68, 0.08);

@@ -15,7 +15,7 @@ const Overlay = styled.div`
 
 const PageBox = styled.div`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   height: 100%;
   background: ${({ theme }) => theme.colors.bg};
   display: flex;
@@ -87,7 +87,7 @@ const BtnWrapper = styled.div`
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   padding: 12px 20px 28px;
   background: ${({ theme }) => theme.colors.bg};
   box-sizing: border-box;

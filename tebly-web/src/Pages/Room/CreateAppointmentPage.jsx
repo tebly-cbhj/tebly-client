@@ -42,8 +42,7 @@ const ScrollContent = styled.div`
 `;
 const InputContainer = styled.div`
   display: flex;
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
   padding: 8px 20px;
   flex-direction: column;
   align-items: flex-start;
@@ -59,8 +58,7 @@ const Label = styled.span`
 
 const SelectRowContainer = styled.div`
   display: flex;
-  width: 390px;
-  max-width: 100%;
+  width: 100%;
   padding: 0 20px;
   flex-direction: column;
   align-items: flex-start;
