@@ -138,6 +138,7 @@ export default function TermsAgreementPage() {
         <Btn
           text="다음"
           disabled={!canNext}
+          variant={canNext ? 'primary' : 'primary50'}
           onClick={() => navigate('/signup/profile')} // TODO: 다음 단계 이동
         />
       </BtnWrapper>

@@ -126,6 +126,10 @@ export default function CreateAppointmentPage() {
     setTimeout(() => setToastMessage(''), 2000);
   }
 
+  const isComplete = Boolean(
+    appointmentName.trim() && dateRange?.start && minDurationMinutes && category && selectedMembers.length > 0
+  );
+
   function handleNext() {
     if (!appointmentName.trim()) {
       showToast('약속 이름을 입력해주세요.');
@@ -268,7 +272,12 @@ export default function CreateAppointmentPage() {
       </ScrollContent>
 
       <BtnWrapper>
-        <Btn text="다음" onClick={handleNext} />
+        <Btn
+          text="다음"
+          onClick={handleNext}
+          disabled={!isComplete}
+          variant={isComplete ? 'primary' : 'primary50'}
+        />
       </BtnWrapper>
 
       <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
