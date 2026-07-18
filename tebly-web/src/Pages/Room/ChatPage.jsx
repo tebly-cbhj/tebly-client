@@ -29,7 +29,7 @@ const NoticeCard = styled.div`
   flex-direction: column;
   align-items: flex-start;
   gap: 12px;
-  padding: 20px;
+  padding: 12px 20px;
   margin: 0.5rem 1.25rem;
   border-radius: 12px;
   background: ${({ theme }) => theme.colors.bg};

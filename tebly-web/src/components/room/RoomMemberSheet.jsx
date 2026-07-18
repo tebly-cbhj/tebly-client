@@ -17,7 +17,7 @@ const Overlay = styled.div`
 `;
 
 const Sheet = styled.div`
-  width: 390px;
+  width: 480px;
   max-width: 100%;
   max-height: 75vh;
   box-sizing: border-box;
