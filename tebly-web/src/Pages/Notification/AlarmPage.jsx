@@ -42,7 +42,7 @@ function getFixedTimeLeft(notiId, liveMinutes) {
 // max-width/높이/배경만 가져온 버전
 const PageContainer = styled.div`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   margin: 0 auto;
   height: 100vh;
   overflow: hidden;

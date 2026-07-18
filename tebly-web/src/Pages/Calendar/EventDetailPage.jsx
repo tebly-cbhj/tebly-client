@@ -150,7 +150,8 @@ const BottomNavBar = styled.div`
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 390px;
+  width: 100%;
+  max-width: 480px;
   padding: 8px 24px 28px;
   background: ${({ theme }) => theme.colors.white};
   display: flex;

@@ -55,7 +55,7 @@ const Toast = styled.div`
 const InputContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 0.5rem 1.25rem;
+  padding: 0.5rem 0;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
@@ -69,7 +69,7 @@ const Label = styled.span`
 
 const DateTimeSection = styled.div`
   width: 100%;
-  padding: 16px 20px;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -135,7 +135,8 @@ const TimePickerOverlay = styled.div`
 `;
 
 const TimePickerSheet = styled.div`
-  width: 390px;
+  width: 100%;
+  max-width: 490px;
   background: var(--grayscale-white, #fefefe);
   border-radius: 2rem 2rem 0 0;
   box-shadow: 0 -4px 12px 0 rgba(68, 68, 68, 0.08);
@@ -288,7 +289,7 @@ const RepeatEndText = styled.span`
 const SelectRowContainer = styled.div`
   display: flex;
   width: 100%;
-  padding: 0 1.25rem;
+  padding: 0;
   flex-direction: column;
   align-items: flex-start;
   box-sizing: border-box;
@@ -299,7 +300,8 @@ const BtnWrapper = styled.div`
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 390px;
+  width: 100%;
+  max-width: 480px;
   padding: 0.75rem 1.25rem 2rem;
   background: ${({ theme }) => theme.colors.bg};
   box-sizing: border-box;

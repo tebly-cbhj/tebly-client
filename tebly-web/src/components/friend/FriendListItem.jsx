@@ -3,7 +3,7 @@ import IconStar from './IconStar';
 
 const Container = styled.div`
   display: flex;
-  width: 390px;
+  width: 100%;
   height: 72px;
   padding: 12px 20px;
   align-items: center;

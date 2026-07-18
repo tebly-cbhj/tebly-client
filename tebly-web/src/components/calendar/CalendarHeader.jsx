@@ -8,7 +8,7 @@ import DatePickerPopup from './month/DatePickerPopup';
 
 const Container = styled.div`
   display: flex;
-  width: 390px;
+  width: 100%;
   padding: 12px 20px;
   justify-content: space-between;
   align-items: center;

@@ -19,7 +19,8 @@ const Overlay = styled.div`
 `;
 
 const Sheet = styled.div`
-  width: 390px;
+  width: 100%;
+  max-width: 490px;
   height: 539px;
   border-radius: 32px 32px 0 0;
   background: ${({ theme }) => theme.colors.white};

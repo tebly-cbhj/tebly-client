@@ -14,7 +14,7 @@ import ChevronDownIcon from '../../assets/icons/chevron-down.svg?react';
 
 const ChatContainer = styled.div`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   height: 100vh;
   margin: 0 auto;
   display: flex;

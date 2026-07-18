@@ -11,7 +11,7 @@ import DateCell from '../../components/calendar/month/DateCell';
 import CalendarFab from '../../components/calendar/CalendarFab';
 
 const Container = styled.div`
-  width: 390px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   background: transparent;

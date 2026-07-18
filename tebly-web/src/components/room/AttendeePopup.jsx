@@ -19,7 +19,7 @@ const Overlay = styled.div`
 
 const Sheet = styled.div`
   display: inline-flex;
-  max-width: 390px;
+  max-width: 480px;
   box-sizing: border-box;
   padding: 12px 20px 44px 20px;
   flex-direction: column;
