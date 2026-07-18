@@ -93,6 +93,12 @@ const FloatingWrapper = styled.div`
 const PROMISE_STATUS_LABEL = { PENDING: '진행 중', CONFIRMED: '확정', CANCELED: '취소됨' };
 const MY_STATUS_LABEL = { ACCEPTED: '참석', REJECTED: '불참', PENDING: '미응답' };
 
+function getChipLabel(promise, isInvitedTab) {
+  if (promise.promiseStatus === 'CANCELED') return PROMISE_STATUS_LABEL.CANCELED;
+  if (new Date(promise.endTime) < new Date()) return '완료';
+  return isInvitedTab ? MY_STATUS_LABEL[promise.myStatus] : PROMISE_STATUS_LABEL[promise.promiseStatus];
+}
+
 function formatPromiseDate(promise) {
   const start = new Date(promise.startTime);
   const end = new Date(promise.endTime);
@@ -205,11 +211,7 @@ export default function RoomInfoPage() {
               location={promise.location}
               acceptedCount={promise.acceptedCount}
               totalCount={promise.totalMemberCount}
-              chipLabel={
-                currentTab === 'tab1'
-                  ? PROMISE_STATUS_LABEL[promise.promiseStatus]
-                  : MY_STATUS_LABEL[promise.myStatus]
-              }
+              chipLabel={getChipLabel(promise, currentTab === 'tab2')}
               onClick={() =>
                 navigate('/my-appointments', {
                   state: {
