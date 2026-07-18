@@ -37,6 +37,10 @@ const ContentArea = styled.div`
 
 const FriendsWrapper = styled.div`
   margin-top: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 140px;
   &::-webkit-scrollbar {
     display: none;
   }

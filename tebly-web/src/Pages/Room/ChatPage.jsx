@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../../components/common/Header';
@@ -93,6 +93,7 @@ export default function ChatPage() {
   const accessToken = localStorage.getItem('accessToken') || import.meta.env.VITE_ACCESS_TOKEN;
 
   const [inputValue, setInputValue] = useState('');
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     if (!myProfile) fetchMyProfile();
@@ -117,6 +118,11 @@ export default function ChatPage() {
     if (!accessToken) return;
     connect(roomId, accessToken, myProfile.id);
   }, [roomId, myProfile, accessToken]);
+
+  // 방에 들어오면(첫 메시지 로딩)/새 메시지가 오면 항상 맨 아래(최신 메시지)로 스크롤
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: 'end' });
+  }, [messages.length]);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
@@ -158,6 +164,7 @@ export default function ChatPage() {
             />
           )
         )}
+        <div ref={bottomRef} />
       </MessageList>
 
       <InputBar>
