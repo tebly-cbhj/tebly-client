@@ -103,11 +103,13 @@ function getChipLabel(promise, isInvitedTab) {
   return isInvitedTab ? MY_STATUS_LABEL[promise.myStatus] : PROMISE_STATUS_LABEL[promise.promiseStatus];
 }
 
-// 정렬 우선순위: 0=진행 중(맨 위), 1=확정+아직 안 지남(날짜 가까운 순), 2=완료/만료/취소됨(맨 아래)
+// 정렬 우선순위(확정 여부는 안 보고 오직 시각만 기준): 0=지금 진행 중(맨 위),
+// 1=아직 시작 전(날짜 가까운 순), 2=이미 끝남/취소됨(맨 아래)
 function getPromiseSortPriority(promise) {
-  const isExpired = new Date(promise.endTime) < new Date();
-  if (promise.promiseStatus === 'CANCELED' || isExpired) return 2;
-  if (promise.promiseStatus === 'PENDING') return 0;
+  if (promise.promiseStatus === 'CANCELED') return 2;
+  const now = new Date();
+  if (now > new Date(promise.endTime)) return 2;
+  if (now >= new Date(promise.startTime)) return 0;
   return 1;
 }
 
