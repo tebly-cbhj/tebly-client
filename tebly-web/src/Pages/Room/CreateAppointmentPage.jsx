@@ -131,7 +131,7 @@ export default function CreateAppointmentPage() {
       showToast('약속 이름을 입력해주세요.');
       return;
     }
-    if (!dateRange?.start || !dateRange?.end) {
+    if (!dateRange?.start) {
       showToast('약속 기간을 선택해주세요.');
       return;
     }
@@ -156,7 +156,7 @@ export default function CreateAppointmentPage() {
         categoryId: category?.categoryId,
         location,
         proposeStartDate: dateRange?.start,
-        proposeEndDate: dateRange?.end,
+        proposeEndDate: dateRange?.end ?? dateRange?.start,
         minDuration: minDurationMinutes,
         notificationLeadMinutes: getNotificationLeadMinutes(alarmTime),
         selectedMemberIds: selectedMembers.map((m) => m.id),
