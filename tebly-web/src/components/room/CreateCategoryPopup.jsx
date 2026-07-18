@@ -118,14 +118,42 @@ const ButtonWrapper = styled.div`
   width: 149px;
 `;
 
+const Toast = styled.div`
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: rgba(26, 26, 26, 0.85);
+  border-radius: 0.75rem;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.white};
+  white-space: nowrap;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10001;
+`;
+
 export default function CreateCategoryPopup({ onClose, onSave, title = "카테고리 추가", initialName = '', initialIconId = null }) {
   const [categoryName, setCategoryName] = useState(initialName);
   const [selectedIconId, setSelectedIconId] = useState(initialIconId);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const canSave = categoryName.trim() !== '' && selectedIconId !== null;
+  function showToast(message) {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(''), 2000);
+  }
 
   function handleSave() {
-    if (!canSave) return;
+    if (categoryName.trim() === '') {
+      showToast('카테고리 명을 추가해주세요');
+      return;
+    }
+    if (selectedIconId === null) {
+      showToast('아이콘을 선택해주세요');
+      return;
+    }
 
     onSave?.({
       name: categoryName.trim(),
@@ -188,11 +216,12 @@ export default function CreateCategoryPopup({ onClose, onSave, title = "카테�
           <Btn
             text="저장"
             size="medium"
-            disabled={!canSave}
             onClick={handleSave}
           />
         </ButtonWrapper>
       </ButtonRow>
+
+      <Toast $visible={!!toastMessage}>{toastMessage}</Toast>
     </PopupBox>
   );
 }

@@ -19,7 +19,7 @@ const NAV_ITEMS = [
 
 const NavContainer = styled.nav`
   width: 100%;
-  max-width: 390px;
+  max-width: 480px;
   padding: 8px 24px 28px 24px;
   display: flex;
   justify-content: space-between;

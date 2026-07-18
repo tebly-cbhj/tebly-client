@@ -96,7 +96,9 @@ const MemberName = styled.span`
 `;
 
 export default function RoomMemberSheet({ onClose, members = [] }) {
-  const host = members.find((m) => m.role === 'HOST');
+  const joinedMembers = members.filter((m) => m.status === 'ACCEPTED');
+  const host = joinedMembers.find((m) => m.role === 'HOST');
+  const sortedMembers = [...joinedMembers].sort((a, b) => a.nickname.localeCompare(b.nickname, 'ko'));
 
   return (
     <Overlay onClick={onClose}>
@@ -119,8 +121,8 @@ export default function RoomMemberSheet({ onClose, members = [] }) {
           )}
 
           <Section>
-            <SectionLabel>멤버 {members.length}명</SectionLabel>
-            {members.map((member) => (
+            <SectionLabel>멤버 {sortedMembers.length}명</SectionLabel>
+            {sortedMembers.map((member) => (
               <MemberRow key={member.userId}>
                 <Avatar $imgUrl={member.profileImageUrl ?? member.profileImage ?? DefaultProfile} />
                 <MemberName>{member.nickname}</MemberName>

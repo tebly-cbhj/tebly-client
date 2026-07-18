@@ -19,7 +19,6 @@ const Container = styled.div`
 const TextArea = styled.div`
   display: flex;
   height: 32px;
-  padding-left: 12px;
   align-items: center;
   gap: 10px;
   flex: 1 0 0;
