@@ -66,7 +66,9 @@ export const useScheduleStore = create((set, get) => ({
       return promises
         .filter((p) => {
           const key = String(p.promiseId);
-          if (p.promiseStatus !== 'CONFIRMED' || seen.has(key)) return false;
+          // 확정된 약속이라도 내가 참석(ACCEPTED)으로 응답한 것만 캘린더에 보여줘야 함
+          // (미응답/불참인데도 뜨는 버그가 있었음)
+          if (p.promiseStatus !== 'CONFIRMED' || p.myStatus !== 'ACCEPTED' || seen.has(key)) return false;
           seen.add(key);
           return true;
         })
