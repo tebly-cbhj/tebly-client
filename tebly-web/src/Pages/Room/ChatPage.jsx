@@ -12,6 +12,14 @@ import { useFriendStore } from '../../store/FriendStore';
 import MemberIcon from '../../assets/icons/member.svg?react';
 import ChevronDownIcon from '../../assets/icons/chevron-down.svg?react';
 
+// 화면이 390px보다 넓으면 ChatContainer 바깥 여백에 body의 회색(bg)이 비쳐서
+// 채팅만 하얀 배경인 게 어색해 보임 — 바깥도 흰색으로 채워서 감싸는 용도
+const ChatOuter = styled.div`
+  width: 100%;
+  height: 100vh;
+  background: var(--grayscale-white, #FEFEFE);
+`;
+
 const ChatContainer = styled.div`
   width: 100%;
   max-width: 390px;
@@ -164,6 +172,18 @@ export default function ChatPage() {
   const messages = messagesByRoom[roomId] ?? [];
   const accessToken = localStorage.getItem('accessToken') || import.meta.env.VITE_ACCESS_TOKEN;
 
+  // 채팅 화면만 흰 배경이라 브라우저 상태바 색+body 배경도 같이 흰색으로 맞춤 — 나가면 원복
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const original = meta?.getAttribute('content');
+    meta?.setAttribute('content', '#FEFEFE');
+    document.body.setAttribute('data-chat-page', 'true');
+    return () => {
+      if (original) meta?.setAttribute('content', original);
+      document.body.removeAttribute('data-chat-page');
+    };
+  }, []);
+
   const [inputValue, setInputValue] = useState('');
   const [isNoticeExpanded, setIsNoticeExpanded] = useState(true);
   const bottomRef = useRef(null);
@@ -204,6 +224,7 @@ export default function ChatPage() {
   };
 
   return (
+    <ChatOuter>
     <ChatContainer>
       <HeaderWrapper>
         <Header
@@ -283,5 +304,6 @@ export default function ChatPage() {
         />
       </InputBar>
     </ChatContainer>
+    </ChatOuter>
   );
 }
