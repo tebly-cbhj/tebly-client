@@ -9,6 +9,7 @@ import DatePickerPopup from '../../components/calendar/month/DatePickerPopup';
 import MonthWeekToggle from '../../components/calendar/MonthWeekToggle';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
+import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -126,6 +127,18 @@ const TimeLabel = styled.span`
   justify-content: center;
 `;
 
+const GridBlock = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  justify-self: stretch;
+  grid-row: ${({ $startRow }) => $startRow} / span ${({ $spanRows }) => $spanRows};
+  grid-column: ${({ $dayIndex }) => $dayIndex + 2} / span 1;
+  position: relative;
+  z-index: 1;
+`;
+
 function formatDateKey(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -186,10 +199,17 @@ export default function FriendCalendarPage() {
   const sunday = useMemo(() => getWeekSunday(selectedDate), [selectedDate]);
 
   useEffect(() => {
-    const y = currentMonthDate.getFullYear();
-    const m = String(currentMonthDate.getMonth() + 1).padStart(2, '0');
-    fetchFriendSchedules(friendId, 'monthly', `${y}-${m}-01`);
-  }, [friendId, currentMonthDate, fetchFriendSchedules]);
+    if (viewMode === 'week') {
+      const y = sunday.getFullYear();
+      const m = String(sunday.getMonth() + 1).padStart(2, '0');
+      const d = String(sunday.getDate()).padStart(2, '0');
+      fetchFriendSchedules(friendId, 'weekly', `${y}-${m}-${d}`);
+    } else {
+      const y = currentMonthDate.getFullYear();
+      const m = String(currentMonthDate.getMonth() + 1).padStart(2, '0');
+      fetchFriendSchedules(friendId, 'monthly', `${y}-${m}-01`);
+    }
+  }, [friendId, currentMonthDate, sunday, viewMode, fetchFriendSchedules]);
 
   const schedulesByDate = useMemo(() => {
     const grouped = {};
@@ -204,6 +224,30 @@ export default function FriendCalendarPage() {
     });
     return grouped;
   }, [friendEvents]);
+
+  const weekEvents = useMemo(() => {
+    if (viewMode !== 'week') return [];
+    const weekEnd = new Date(sunday.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+    return friendEvents
+      .filter((event) => {
+        const start = new Date(event.startAt);
+        return start >= sunday && start <= weekEnd;
+      })
+      .map((event) => {
+        const start = new Date(event.startAt);
+        const end = new Date(event.endAt);
+        const startMinutes = start.getHours() * 60 + start.getMinutes();
+        const durationMinutes = Math.max(5, (end - start) / 60000);
+        return {
+          id: event.eventId,
+          title: event.title,
+          category: event.category?.categoryIcon || 'Other',
+          dayIndex: start.getDay(),
+          startRow: Math.floor(startMinutes / 5) + 1,
+          spanRows: Math.floor(durationMinutes / 5),
+        };
+      });
+  }, [friendEvents, sunday, viewMode]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -322,6 +366,17 @@ export default function FriendCalendarPage() {
                   </Fragment>
                 );
               })}
+
+              {weekEvents.map((event) => (
+                <GridBlock
+                  key={event.id}
+                  $startRow={event.startRow}
+                  $spanRows={event.spanRows}
+                  $dayIndex={event.dayIndex}
+                >
+                  <ScheduleBlock category={event.category} text={event.title} />
+                </GridBlock>
+              ))}
             </TimeTableWrapper>
           </ScrollArea>
         </>
