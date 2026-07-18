@@ -55,13 +55,17 @@ export const useScheduleStore = create((set, get) => ({
       )
     );
 
+    // promiseId를 문자열로 정규화해서 방 단위가 아니라 전체 기준으로 중복 제거한다.
+    // (myPromises/invitedPromises가 같은 방 안에서도 겹칠 수 있고, 드물게 promiseId가
+    // 숫자/문자열로 섞여 내려오는 경우가 있어서 Set 비교가 실패해 중복이 남을 수 있었음)
+    const seen = new Set();
     const schedules = roomDetails.flatMap(({ roomId, detail }) => {
       const promises = [...(detail.myPromises || []), ...(detail.invitedPromises || [])];
-      const seen = new Set();
       return promises
         .filter((p) => {
-          if (p.promiseStatus !== 'CONFIRMED' || seen.has(p.promiseId)) return false;
-          seen.add(p.promiseId);
+          const key = String(p.promiseId);
+          if (p.promiseStatus !== 'CONFIRMED' || seen.has(key)) return false;
+          seen.add(key);
           return true;
         })
         .map((p) => mapPromiseToSchedule(p, roomId));
