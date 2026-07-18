@@ -5,7 +5,7 @@ const TabContainer = styled.div`
   width: 100%;
   justify-content: center; 
   gap: 16px;
-  padding: 12px 20px;
+  padding: 12px 0;
 `;
 
 const TabButton = styled.button`

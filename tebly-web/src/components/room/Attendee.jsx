@@ -5,6 +5,8 @@ const AttendeeWrapper = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  width: 100%;
 `;
 
 const ProfileImage = styled.img`
@@ -19,6 +21,11 @@ const ProfileImage = styled.img`
 const Name = styled.span`
   ${({ theme }) => theme.typography.btn1};
   color: ${({ theme }) => theme.colors.gray900};
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export default function Attendee({ name, profileImage, available = true }) {
