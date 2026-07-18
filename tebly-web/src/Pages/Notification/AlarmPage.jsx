@@ -206,6 +206,7 @@ export default function AlarmPage() {
             senderNickname={noti.senderNickname}
             senderProfileImageUrl={noti.senderProfileImageUrl}
             scheduleName={noti.scheduleName}
+            timeLeftMinutes={noti.timeLeftMinutes}
             notifiedAt={formatNotifiedAt(noti.createdAt, noti.type === 'POKE')}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
