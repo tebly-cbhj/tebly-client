@@ -92,7 +92,6 @@ const AttendanceWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
   box-sizing: border-box;
-  transform: translateZ(0);
 
   &::-webkit-scrollbar {
     display: none;
