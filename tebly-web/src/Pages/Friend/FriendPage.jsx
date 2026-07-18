@@ -264,8 +264,6 @@ export default function FriendPage() {
           onChange={(e) => setQuery(e.target.value)}
         />
         </SearchBarWrapper>
-
-        <FriendCountLabel>친구 {friends.length}명</FriendCountLabel>
       </StickyHeader>
 
       <MyProfileContainer>
@@ -277,6 +275,8 @@ export default function FriendPage() {
           {myProfile?.bio && <Intro>{myProfile.bio}</Intro>}
         </TextArea>
       </MyProfileContainer>
+
+      <FriendCountLabel>친구 {friends.length}명</FriendCountLabel>
 
       <Divider />
 
