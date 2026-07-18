@@ -92,6 +92,7 @@ const AttendanceWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
   box-sizing: border-box;
+  transform: translateZ(0);
 
   &::-webkit-scrollbar {
     display: none;
@@ -242,7 +243,9 @@ export default function MyAppointmentPage() {
     }
   }
 
-  const isAlreadyConfirmed = !isEditing && !isInvited && promise.promiseStatus === 'CONFIRMED';
+  // 확정된 약속은 초대받은 사람이 응답을 더 이상 못 바꾸게 함(방장이 시간 수정하는 흐름은 별개라 그대로 둠)
+  const responseLocked = isInvited && promise.promiseStatus === 'CONFIRMED';
+  const isAlreadyConfirmed = promise.promiseStatus === 'CONFIRMED' && (isInvited || !isEditing);
 
   async function handleDelete() {
     await apiClient.delete(`/promises/${promiseId}`);
@@ -311,7 +314,7 @@ export default function MyAppointmentPage() {
                   key={value}
                   text={label}
                   selected={myResponse === value}
-                  onClick={isEditing ? () => setMyResponse(myResponse === value ? null : value) : undefined}
+                  onClick={isEditing && !responseLocked ? () => setMyResponse(myResponse === value ? null : value) : undefined}
                 />
               ))}
             </ChipArea>
