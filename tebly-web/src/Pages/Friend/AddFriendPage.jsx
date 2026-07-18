@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import DigitSlot from '../../components/friend/DigitSlot';
 import CopyIcon from '../../assets/icons/copy.svg?react';
 import { useFriendStore } from '../../store/FriendStore';
+import Btn from '../../components/common/Btn';
 
 const CODE_LENGTH = 6;
 
@@ -181,23 +182,6 @@ const BottomArea = styled.div`
   flex-shrink: 0;
 `;
 
-const SubmitBtn = styled.button`
-  width: 100%;
-  padding: 16px 10px;
-  background: ${({ theme }) => theme.colors.primary50};
-  border-radius: 16px;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-`;
-
-const SubmitBtnText = styled.span`
-  ${({ theme }) => theme.typography.h3};
-  color: ${({ theme }) => theme.colors.gray900};
-`;
-
 const ProfileCard = styled.div`
   width: 100%;
   max-width: 440px;
@@ -323,7 +307,7 @@ export default function AddFriendPage() {
       const friend = await previewFriendByCode(code);
       setFoundFriend(friend);
     } catch (err) {
-      showError(err.message || '존재하지 않는 코드예요');
+      showError(err.response?.data?.message || '사용자를 찾을 수 없습니다');
     } finally {
       setIsSubmitting(false);
     }
@@ -420,9 +404,12 @@ export default function AddFriendPage() {
       </ContentArea>
 
       <BottomArea>
-        <SubmitBtn type="button" onClick={handleSubmit} disabled={code.length < CODE_LENGTH || isSubmitting}>
-          <SubmitBtnText>{isSubmitting ? '조회하는 중...' : '입력 완료'}</SubmitBtnText>
-        </SubmitBtn>
+        <Btn
+          text={isSubmitting ? '조회하는 중...' : '입력 완료'}
+          onClick={handleSubmit}
+          disabled={code.length < CODE_LENGTH || isSubmitting}
+          variant={code.length === CODE_LENGTH ? 'primary' : 'primary50'}
+        />
       </BottomArea>
 
     </Wrapper>
