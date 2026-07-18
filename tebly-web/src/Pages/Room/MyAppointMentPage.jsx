@@ -381,8 +381,13 @@ export default function MyAppointmentPage() {
           <PokePopup
             onClose={() => setSelectedMember(null)}
             onPoke={async () => {
-              await apiClient.post(`/promises/${promiseId}/poke`, { targetUserId: selectedMember.userId });
-              setSelectedMember(null);
+              try {
+                await apiClient.post(`/promises/${promiseId}/poke`, { targetUserId: selectedMember.userId });
+                setSelectedMember(null);
+              } catch (err) {
+                setSelectedMember(null);
+                showToast(err.response?.data?.message || '오늘 이미 해당 멤버에게 콕 지르기를 보냈습니다.');
+              }
             }}
           />
         )}
