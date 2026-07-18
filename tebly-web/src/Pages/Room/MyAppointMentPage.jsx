@@ -93,6 +93,7 @@ const AttendanceWrapper = styled.div`
   width: 100%;
   box-sizing: border-box;
   transform: translateZ(0);
+  touch-action: pan-x;
 
   &::-webkit-scrollbar {
     display: none;

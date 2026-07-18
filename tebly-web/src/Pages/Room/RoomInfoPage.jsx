@@ -103,6 +103,27 @@ function getChipLabel(promise, isInvitedTab) {
   return isInvitedTab ? MY_STATUS_LABEL[promise.myStatus] : PROMISE_STATUS_LABEL[promise.promiseStatus];
 }
 
+// 정렬 우선순위: 0=진행 중(맨 위), 1=확정+아직 안 지남(날짜 가까운 순), 2=완료/만료/취소됨(맨 아래)
+function getPromiseSortPriority(promise) {
+  const isExpired = new Date(promise.endTime) < new Date();
+  if (promise.promiseStatus === 'CANCELED' || isExpired) return 2;
+  if (promise.promiseStatus === 'PENDING') return 0;
+  return 1;
+}
+
+function sortPromises(promises) {
+  return [...promises].sort((a, b) => {
+    const priorityDiff = getPromiseSortPriority(a) - getPromiseSortPriority(b);
+    if (priorityDiff !== 0) return priorityDiff;
+
+    // 완료/만료 그룹은 최근에 끝난 순, 나머지는 약속 날짜가 가까운 순
+    if (getPromiseSortPriority(a) === 2) {
+      return new Date(b.endTime) - new Date(a.endTime);
+    }
+    return new Date(a.startTime) - new Date(b.startTime);
+  });
+}
+
 function formatPromiseDate(promise) {
   const start = new Date(promise.startTime);
   const end = new Date(promise.endTime);
@@ -163,7 +184,7 @@ export default function RoomInfoPage() {
 
   if (!room) return null; // TODO: 로딩 스피너로 교체
 
-  const promises = currentTab === 'tab1' ? room.myPromises : room.invitedPromises;
+  const promises = sortPromises(currentTab === 'tab1' ? room.myPromises : room.invitedPromises);
 
   async function handleLeaveRoom() {
     setIsSheetOpen(false);
