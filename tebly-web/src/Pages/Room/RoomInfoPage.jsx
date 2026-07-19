@@ -146,6 +146,8 @@ export default function RoomInfoPage() {
 
   const room = useRoomStore((state) => state.roomDetail);
   const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
+  const rooms = useRoomStore((state) => state.rooms);
+  const fetchRooms = useRoomStore((state) => state.fetchRooms);
   const myProfile = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
   const categories = useScheduleStore((state) => state.categories);
@@ -169,7 +171,8 @@ export default function RoomInfoPage() {
     fetchRoomDetail(Number(roomId));
     fetchMyProfile();
     fetchCategories();
-  }, [roomId, fetchRoomDetail, fetchMyProfile, fetchCategories]);
+    fetchRooms();
+  }, [roomId, fetchRoomDetail, fetchMyProfile, fetchCategories, fetchRooms]);
 
   useEffect(() => {
     if (!myProfile) return;
@@ -180,8 +183,8 @@ export default function RoomInfoPage() {
     });
   }, [roomId, myProfile]);
 
-  // TODO: GET /api/rooms/:id/unread — 안 읽은 채팅 여부 API 연동 후 교체
-  const hasUnreadChat = false;
+  // 방 상세 API 자체엔 unreadCount가 없어서, 방 목록 API(RoomListResponse)에 있는 값을 대신 씀
+  const hasUnreadChat = (rooms.find((r) => r.roomId === Number(roomId))?.unreadCount ?? 0) > 0;
 
   if (!room) return null; // TODO: 로딩 스피너로 교체
 

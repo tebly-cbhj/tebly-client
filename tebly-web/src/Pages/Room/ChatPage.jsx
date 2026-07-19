@@ -170,6 +170,7 @@ export default function ChatPage() {
   const room = useRoomStore((state) => state.rooms.find((r) => r.id === Number(roomId)));
   const roomDetail = useRoomStore((state) => state.roomDetail);
   const fetchRoomDetail = useRoomStore((state) => state.fetchRoomDetail);
+  const markChatAsRead = useRoomStore((state) => state.markChatAsRead);
   const { connect, sendMessage, fetchMessages, messagesByRoom } = useChatStore();
   const myProfile = useFriendStore((state) => state.myProfile);
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
@@ -187,6 +188,12 @@ export default function ChatPage() {
       document.body.removeAttribute('data-chat-page');
     };
   }, []);
+
+  // 채팅방에 들어오면 읽음 처리
+  useEffect(() => {
+    markChatAsRead(roomId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
 
   const [inputValue, setInputValue] = useState('');
   const [isNoticeExpanded, setIsNoticeExpanded] = useState(true);
