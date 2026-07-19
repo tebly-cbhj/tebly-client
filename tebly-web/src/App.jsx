@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import { GlobalStyle } from './GlobalStyle';
+import SplashScreen from './components/common/SplashScreen';
 import RoomListPage from './Pages/Room/RoomListPage';
 import CreateRoomPage from './Pages/Room/CreateRoomPage'; 
 import SelectFriendPage from './Pages/Room/SelectFriendPage';
@@ -107,9 +108,15 @@ function Layout() {
 }
 
 export default function App() {
+  // TeblyApp(RN)에선 이미 네이티브 스플래시가 웹뷰 위를 덮어주므로,
+  // 웹 스플래시는 브라우저로 직접 접속했을 때만 보여준다(중복 방지).
+  const isInApp = typeof window !== 'undefined' && window.ReactNativeWebView;
+  const [showSplash, setShowSplash] = useState(!isInApp);
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       <BrowserRouter>
         <Layout />
       </BrowserRouter>
