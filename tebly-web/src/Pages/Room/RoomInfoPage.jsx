@@ -73,7 +73,6 @@ const CardList = styled.div`
   flex-direction: column;
   width: 100%;
   align-items: center;
-  gap: 12px;
 
   & > * {
     flex-shrink: 0;
