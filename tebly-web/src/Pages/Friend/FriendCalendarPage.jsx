@@ -104,6 +104,13 @@ const DateGrid = styled.div`
   justify-content: center;
 `;
 
+const WeekDivider = styled.div`
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0.0625rem;
+  background: var(--grayscale-gray-300, #DCDCDC);
+`;
+
 const WeekHeaderRow = styled.div`
   width: 340px;
   padding-left: 32px;
@@ -322,14 +329,14 @@ export default function FriendCalendarPage() {
         <ScrollArea>
           <WeekDayRow />
           <DateGrid>
-            {monthDates.map((date) => {
+            {monthDates.flatMap((date, index) => {
               const dateKey = formatDateKey(date);
               const isCurrentMonth = date.getMonth() === currentMonthDate.getMonth();
               const isSelected = isSameDate(date, selectedDate);
               let variant = 'default';
               if (!isCurrentMonth) variant = 'muted';
               if (isSelected) variant = 'selected';
-              return (
+              const cell = (
                 <DateCell
                   key={dateKey}
                   date={date.getDate()}
@@ -339,6 +346,12 @@ export default function FriendCalendarPage() {
                   onScheduleClick={() => {}}
                 />
               );
+
+              if ((index + 1) % 7 === 0 && index < monthDates.length - 1) {
+                return [cell, <WeekDivider key={`divider-${index}`} />];
+              }
+
+              return [cell];
             })}
           </DateGrid>
         </ScrollArea>
@@ -354,7 +367,7 @@ export default function FriendCalendarPage() {
                 return (
                   <Fragment key={hour}>
                     <TimeLabel style={{ gridRow: `${(hour - 1) * 12 + 1} / span 12`, gridColumn: 1 }}>
-                      {`${hour}:00`}
+                      {`${hour - 1}:00`}
                     </TimeLabel>
                     {Array.from({ length: 7 }, (_, j) => (
                       <TimeSlotCell
