@@ -302,7 +302,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             return (
               <Fragment key={hour}>
                 <TimeLabel style={{ gridRow: `${(hour - 1) * 12 + 1} / span 12`, gridColumn: 1 }}>
-                  {`${hour}:00`}
+                  {`${hour - 1}:00`}
                 </TimeLabel>
 
                 {Array.from({ length: 7 }, (_, j) => (
