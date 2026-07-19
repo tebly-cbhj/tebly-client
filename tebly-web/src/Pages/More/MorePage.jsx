@@ -180,12 +180,6 @@ export default function MorePage() {
         {/* 계정 섹션 */}
         <SectionCard title="계정">
           <SelectRow
-            text_empty="비밀번호 변경"
-            state="empty"
-            right_icon={true}
-            onClick={() => console.log('비밀번호 변경')} // TODO: 비밀번호 변경 페이지로 이동
-          />
-          <SelectRow
             text_empty="로그아웃"
             state="empty"
             right_icon={true}
