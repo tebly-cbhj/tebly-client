@@ -51,7 +51,7 @@ const CancelButtonWrapper = styled.div`
 `;
 
 const ConfirmButtonWrapper = styled.div`
-  width: 204px;
+  flex: 1;
 `;
 
 export default function DatePickerPopup({ onClose, onConfirm, initialDate }) { // initialDate 추가

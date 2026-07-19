@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Btn from '../common/Btn';
 import { CATEGORY_ICONS } from '../room/CategoryIcons';
+import SparkleIcon from '../../assets/icons/sparkle.svg?react';
 
 const Card = styled.div`
   display: flex;
@@ -10,9 +11,19 @@ const Card = styled.div`
   align-items: flex-start;
   gap: 20px;
   border-radius: 12px;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme, $isFromDecisionBot }) =>
+    $isFromDecisionBot ? theme.colors.primary10 : theme.colors.white};
   box-sizing: border-box;
   box-shadow: 0 4px 8px 0 rgba(21, 42, 38, 0.12);
+  position: relative;
+`;
+
+const SparkleWrapper = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
 `;
 
 const TopRow = styled.div`
@@ -53,6 +64,12 @@ const DetailText = styled.span`
   color: ${({ theme }) => theme.colors.gray800};
 `;
 
+const ConflictText = styled.p`
+  margin: 0;
+  ${({ theme }) => theme.typography.body2};
+  color: ${({ theme }) => theme.colors.gray900};
+`;
+
 const ButtonRow = styled.div`
   display: flex;
   align-items: center;
@@ -79,12 +96,20 @@ export default function AppointmentInviteCard({
   categoryId,
   onReject,
   onAccept,
+  isFromDecisionBot = false,
+  conflictMessage,
 }) {
   const categoryIcon = CATEGORY_ICONS.find((c) => c.id === categoryId);
   const Icon = categoryIcon?.Icon;
 
   return (
-    <Card>
+    <Card $isFromDecisionBot={isFromDecisionBot}>
+      {isFromDecisionBot && (
+        <SparkleWrapper>
+          <SparkleIcon width={24} height={24} />
+        </SparkleWrapper>
+      )}
+
       <TopRow>
         <IconWrapper>
           {Icon && <Icon width={80} height={80} />}
@@ -99,6 +124,8 @@ export default function AppointmentInviteCard({
           </DetailWrapper>
         </TextContainer>
       </TopRow>
+
+      {conflictMessage && <ConflictText>{conflictMessage}</ConflictText>}
 
       <ButtonRow>
         <RejectButtonWrapper>
