@@ -89,7 +89,7 @@ const WaveCrestImage = styled.div`
 const WaveRect = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.colors.primary100};
-  margin-top: -2px;
+  margin-top: -8px;
 `;
 
 const LogoWrapper = styled.div`
