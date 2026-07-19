@@ -76,7 +76,7 @@ const EditIconWrapper = styled.div`
 const InputName = styled.div`
   display: flex;
   width: 100%;
-  padding: 8px 20px;
+  padding: 8px 0;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;

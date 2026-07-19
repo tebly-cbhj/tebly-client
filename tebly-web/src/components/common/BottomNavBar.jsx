@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import CalendarLine from '../../assets/icons/calendar-line.svg?react';
 import CalendarFill from '../../assets/icons/calendar-fill.svg?react';
 import FriendsGray from '../../assets/icons/friends-gray.svg?react';
-import Friends from '../../assets/icons/friends.svg?react';
+import Friends from '../../assets/icons/friends-fill.svg?react';
 import RoomLine from '../../assets/icons/room-line.svg?react';
 import RoomFill from '../../assets/icons/room-fill.svg?react';
 import MoreLine from '../../assets/icons/more-line.svg?react';
