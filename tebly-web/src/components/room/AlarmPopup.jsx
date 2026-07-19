@@ -72,8 +72,7 @@ const OptionText = styled.span`
 `;
 
 const ButtonWrapper = styled.div`
-  width: 350px;
-  margin: 18.5px;
+  margin: 18.5px 20px;
 `;
 
 export default function AlarmPopup({ onClose, onSelect }) {
