@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 import { useNotificationStore } from '../../store/NotificationStore';
 import { PageWrapper } from '../../PageWrapper';
@@ -54,13 +53,7 @@ function normalizeCategory(category) {
   return CATEGORY_MAP[key] || key || 'Other';
 }
 
-// 방 약속(schedule.categoryId만 있음)은 카테고리 목록에서 직접 찾아야 하고,
-// 개인 일정(schedule.category가 전체 객체)은 기존 방식 그대로 사용
-function resolveScheduleCategory(schedule, categories) {
-  if (schedule.categoryId) {
-    const found = categories.find((c) => c.categoryId === schedule.categoryId);
-    return normalizeCategory(found);
-  }
+function resolveScheduleCategory(schedule) {
   return normalizeCategory(schedule.category);
 }
 
@@ -152,10 +145,6 @@ function expandScheduleDates(schedule) {
 export default function MonthCalendarPage({ viewMode, onViewModeChange, selectedDate: initialSelectedDate, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const confirmedSchedules = useScheduleStore((state) => state.schedules);
-  const fetchConfirmedSchedules = useScheduleStore((state) => state.fetchConfirmedSchedules);
-  const categories = useScheduleStore((state) => state.categories);
-  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const personalSchedules = usePersonalScheduleStore((state) => state.schedules);
   const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
   const notifications = useNotificationStore((state) => state.notifications);
@@ -163,10 +152,8 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
   const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
-    fetchConfirmedSchedules();
-    fetchCategories();
     fetchNotifications();
-  }, [fetchConfirmedSchedules, fetchCategories, fetchNotifications]);
+  }, [fetchNotifications]);
 
   // openFab 플래그는 온보딩에서 넘어온 최초 진입에서만 한 번 소비되어야 한다.
   // location.state는 뷰모드 전환(월간<->주간)으로 인한 리마운트에도 그대로 남아있어서,
@@ -227,7 +214,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
 
   // TODO: OCR 파싱으로 들어오는 불안정한 데이터 포맷에 대한 방어 예외 처리 추가
   const allSchedules = useMemo(() => {
-    return [...confirmedSchedules, ...personalSchedules].flatMap((schedule) => {
+    return personalSchedules.flatMap((schedule) => {
       const scheduleDates = expandScheduleDates(schedule);
 
       return scheduleDates.map((date) => ({
@@ -238,7 +225,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         occurrenceEnd: schedule.occurrenceEnd,
         repeatType: schedule.repeatType,
         date,
-        category: resolveScheduleCategory(schedule, categories),
+        category: resolveScheduleCategory(schedule),
         originalCategory: schedule.category,
         label: schedule.title,
         time: schedule.time,
@@ -248,7 +235,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         repeat: schedule.repeat ? `${REPEAT_TYPE_TO_KO[schedule.repeat.type] || schedule.repeat.type} 반복` : '반복 없음',
       }));
     });
-  }, [confirmedSchedules, personalSchedules, categories]);
+  }, [personalSchedules]);
 
   function getScheduleStartMinutes(timeText) {
     if (!timeText) return Number.MAX_SAFE_INTEGER;

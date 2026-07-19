@@ -12,7 +12,6 @@ const Card = styled.div`
   box-sizing: border-box;
   position: relative;
   border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
-  opacity: 0.8;
 `;
 
 const Thumbnail = styled.div`
@@ -46,7 +45,7 @@ const Title = styled.span`
 
 const SubText = styled.span`
   ${({ theme }) => theme.typography.body3};
-  color: ${({ theme }) => theme.colors.gray500};
+  color: ${({ theme }) => theme.colors.gray800};
 `;
 
 const ParticipantContainer = styled.div`

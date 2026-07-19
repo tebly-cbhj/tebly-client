@@ -3,13 +3,12 @@ import { useMemo, Fragment, useState, useRef, useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '../../PageWrapper';
-import { parseDate, parseTime, expandRepeatingSchedules } from '../../utils/DateUtils';
+import { parseTime, expandRepeatingSchedules } from '../../utils/DateUtils';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDateCell from '../../components/calendar/week/WeekDateCell';
 import WeekAllDayRow from '../../components/calendar/week/WeekAllDayRow';
 import TimeSlotCell from '../../components/calendar/week/TimeSlotCell';
 import ScheduleBlock from '../../components/calendar/week/ScheduleBlock';
-import { useScheduleStore } from '../../store/ScheduleStore';
 import { usePersonalScheduleStore, REPEAT_TYPE_TO_KO } from '../../store/PersonalScheduleStore';
 import { useNotificationStore } from '../../store/NotificationStore';
 import CalendarFab from '../../components/calendar/CalendarFab';
@@ -77,12 +76,6 @@ const categoryIconMap = {
   '기타': 'Other',
 };
 
-// 방 약속(schedule.categoryId만 있음)은 카테고리 목록에서 직접 찾아야 함
-function resolveGroupCategory(schedule, categories) {
-  const found = categories.find((c) => c.categoryId === schedule.categoryId);
-  return found?.categoryIcon || 'Other';
-}
-
 const FloatingWrapper = styled.div`
   position: fixed;
   bottom: 108px;
@@ -118,21 +111,13 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     useShallow((state) => state.schedules)
   );
   const fetchSchedules = usePersonalScheduleStore((state) => state.fetchSchedules);
-  const fetchConfirmedSchedules = useScheduleStore((state) => state.fetchConfirmedSchedules);
-  const groupSchedules = useScheduleStore(
-    useShallow((state) => state.schedules.filter((s) => s.confirmed))
-  );
-  const categories = useScheduleStore((state) => state.categories);
-  const fetchCategories = useScheduleStore((state) => state.fetchCategories);
   const notifications = useNotificationStore((state) => state.notifications);
   const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
   const hasUnreadNotification = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
-    fetchConfirmedSchedules();
-    fetchCategories();
     fetchNotifications();
-  }, [fetchConfirmedSchedules, fetchCategories, fetchNotifications]);
+  }, [fetchNotifications]);
 
   const { sunday, saturday } = useMemo(() => {
     const base = selectedDate
@@ -153,13 +138,6 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
     fetchSchedules('weekly', `${y}-${m}-${d}`);
   }, [sunday, fetchSchedules]);
 
-  const weekGroup = useMemo(() =>
-    groupSchedules.filter((s) => {
-      const date = parseDate(s.date);
-      return date >= sunday && date <= saturday;
-    }), [groupSchedules, sunday, saturday]
-  );
-
   const getDayIndex = (schedule) => schedule._occurrenceDate.getDay();
 
   const allDayEventsByDay = useMemo(() => {
@@ -176,19 +154,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
         });
       });
 
-    weekGroup
-      .filter((schedule) => isAllDayTime(schedule.time))
-      .forEach((schedule) => {
-        byDay[parseDate(schedule.date).getDay()].push({
-          id: schedule.id,
-          category: resolveGroupCategory(schedule, categories),
-          title: schedule.title,
-          onClick: () => handleScheduleClick(schedule, null),
-        });
-      });
-
     return byDay;
-  }, [weekPersonal, weekGroup, categories]);
+  }, [weekPersonal]);
 
   const monthLabel = selectedDate
     ? `${selectedDate.year}.${String(selectedDate.month).padStart(2, '0')}`
@@ -332,27 +299,6 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                   category={schedule.category?.categoryIcon}
                   text={schedule.title}
                   onClick={() => handleScheduleClick(schedule, schedule._occurrenceDate)}
-                />
-              </GridBlock>
-            );
-          })}
-
-          {/* 그룹 일정 블록 (종일 일정은 위쪽 종일 칩 줄에서 표시하므로 제외) */}
-          {weekGroup.filter((schedule) => !isAllDayTime(schedule.time)).map((schedule) => {
-            const { startMinutes, durationMinutes } = parseTime(schedule.time);
-            const startRow = Math.floor(startMinutes / 5) + 1;
-            const spanRows = Math.floor(durationMinutes / 5);
-            return (
-              <GridBlock
-                key={schedule.id}
-                $startRow={startRow}
-                $spanRows={spanRows}
-                $dayIndex={parseDate(schedule.date).getDay()}
-              >
-                <ScheduleBlock
-                  category={resolveGroupCategory(schedule, categories)}
-                  text={schedule.title}
-                  onClick={() => handleScheduleClick(schedule, null)}
                 />
               </GridBlock>
             );
