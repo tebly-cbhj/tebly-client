@@ -19,8 +19,8 @@ function toTimeStr(isoDateTime) {
 }
 
 // RoomPromiseResponse엔 카테고리가 myCategoryId(id)로만 내려오고 전체 카테고리 객체가
-// 없어서, 화면에서 categories 목록으로 직접 찾아 써야 함(category는 못 찾을 때의 fallback)
-function mapPromiseToSchedule(promise, roomId) {
+// 없어서, categories 목록에서 직접 찾아 넣어줘야 함(못 찾으면 기타로 대체)
+function mapPromiseToSchedule(promise, roomId, categories) {
   return {
     id: promise.promiseId,
     sourceType: 'PROMISE',
@@ -30,7 +30,7 @@ function mapPromiseToSchedule(promise, roomId) {
     time: `${toTimeStr(promise.startTime)} - ${toTimeStr(promise.endTime)}`,
     location: promise.location || '',
     categoryId: promise.myCategoryId,
-    category: 'Other',
+    category: categories.find((c) => c.categoryId === promise.myCategoryId) ?? 'Other',
     alarmTime: '',
     memo: '',
     repeat: null,
@@ -50,6 +50,11 @@ export const useScheduleStore = create((set, get) => ({
   // 캘린더에 뜨는 "확정된 방 약속" — 방 목록 전체를 돌면서 각 방의 약속을 모아옴
   // (약속 전체를 한번에 주는 API가 없어서 방 개수만큼 요청이 나감)
   fetchConfirmedSchedules: async () => {
+    if (get().categories.length === 0) {
+      await get().fetchCategories();
+    }
+    const categories = get().categories;
+
     const roomsRes = await apiClient.get('/rooms');
     const roomDetails = await Promise.all(
       roomsRes.data.map((room) =>
@@ -72,7 +77,7 @@ export const useScheduleStore = create((set, get) => ({
           seen.add(key);
           return true;
         })
-        .map((p) => mapPromiseToSchedule(p, roomId));
+        .map((p) => mapPromiseToSchedule(p, roomId, categories));
     });
 
     set({ schedules });
