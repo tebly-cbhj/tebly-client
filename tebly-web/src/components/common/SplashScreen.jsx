@@ -112,6 +112,17 @@ export default function SplashScreen({ onFinish }) {
   const [stage, setStage] = useState(STAGE.INIT);
   const [dims] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
 
+  // 스플래시가 떠있는 동안만 상태바를 투명 처리해서 배경색이 상태바 영역까지 이어져 보이게 하고,
+  // 끝나면 원래 값으로 되돌린다(다른 화면은 상태바 안전영역 대응이 안 돼있어서 계속 두면 레이아웃이 깨짐).
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    const original = meta?.getAttribute('content');
+    meta?.setAttribute('content', 'black-translucent');
+    return () => {
+      if (original) meta?.setAttribute('content', original);
+    };
+  }, []);
+
   const ellipseTargetScale = (Math.sqrt(dims.w * dims.w + dims.h * dims.h) / ELLIPSE_SIZE) * 1.3;
   const waveEffectiveWidth = Math.min(dims.w, WAVE_MAX_EFFECTIVE_WIDTH);
   const waveCrestHeight = Math.round(
