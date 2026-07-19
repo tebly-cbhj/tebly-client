@@ -42,6 +42,29 @@ const CardList = styled.div`
   }
 `;
 
+const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 80px 20px 0;
+  text-align: center;
+`;
+
+const EmptyTitle = styled.p`
+  margin: 0;
+  ${({ theme }) => theme.typography.s2};
+  color: ${({ theme }) => theme.colors.gray900};
+`;
+
+const EmptySubtext = styled.p`
+  margin: 0;
+  ${({ theme }) => theme.typography.body3};
+  color: ${({ theme }) => theme.colors.gray500};
+`;
+
 const BottomArea = styled.div`
   position: fixed;
   bottom: 0;
@@ -837,22 +860,29 @@ const isUpdateMode = Boolean(promiseId);
       </FilterBar>
 
       <CardList>
-        {options.map((option) => (
-          <TimeOptionCard
-            key={option.id}
-            date={option.date}
-            dayOfWeek={option.dayOfWeek}
-            timeRange={option.timeRange}
-            memberCount={option.memberCount}
-            totalCount={option.totalCount}
-            selected={selectedId === option.id}
-            onClick={() => {
-              setSelectedId(option.id);
-              openTimeAdjust(option);
-            }}
-            onAttendeeClick={() => setAttendeePopupOption(option)}
-          />
-        ))}
+        {!isLoading && options.length === 0 ? (
+          <EmptyState>
+            <EmptyTitle>가능한 시간이 없어요</EmptyTitle>
+            <EmptySubtext>일정을 늘려보시는 것은 어떨까요?</EmptySubtext>
+          </EmptyState>
+        ) : (
+          options.map((option) => (
+            <TimeOptionCard
+              key={option.id}
+              date={option.date}
+              dayOfWeek={option.dayOfWeek}
+              timeRange={option.timeRange}
+              memberCount={option.memberCount}
+              totalCount={option.totalCount}
+              selected={selectedId === option.id}
+              onClick={() => {
+                setSelectedId(option.id);
+                openTimeAdjust(option);
+              }}
+              onAttendeeClick={() => setAttendeePopupOption(option)}
+            />
+          ))
+        )}
       </CardList>
 
       <BottomArea>
