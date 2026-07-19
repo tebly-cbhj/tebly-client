@@ -322,6 +322,13 @@ function toIsoDateTime(dateObj, timeStr) {
   return `${dateObj.year}-${pad(dateObj.month)}-${pad(dateObj.day)}T${timeStr}:00`;
 }
 
+// repeatUntil은 parseDateString으로 다시 읽을 수 있어야 하므로, 화면 표시용
+// toDisplayDate("M월 D일 요일")가 아니라 숫자 구분자 형식으로 저장해야 한다.
+function toDateKeyString(dateObj) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${dateObj.year}-${pad(dateObj.month)}-${pad(dateObj.day)}`;
+}
+
 function getNotificationLeadMinutes(alarmTime) {
   if (!alarmTime) return [];
   return alarmTime
@@ -345,8 +352,10 @@ function parseRepeatString(repeat) {
   // PersonalScheduleStore에서 오는 반복 일정은 {type, interval, until} 객체 형태
   if (typeof repeat === 'object') return REPEAT_TYPE_TO_KO[repeat.type] || '없음';
   if (repeat === '반복 없음') return '없음';
-  const match = repeat.match(/^(\w+) 반복$/);
-  return match ? (REPEAT_TYPE_TO_KO[match[1]] || '없음') : '없음';
+  // 캘린더 화면들이 이미 "매주 반복"처럼 한글 라벨로 변환해서 넘겨주므로,
+  // \w(영문/숫자만 매칭)가 아니라 아무 문자나 매칭하는 .+를 써야 한다.
+  const match = repeat.match(/^(.+) 반복$/);
+  return match ? match[1] : '없음';
 }
 
 export default function CreateSchedulePage() {
@@ -369,8 +378,10 @@ export default function CreateSchedulePage() {
   const [category, setCategory] = useState(initialSchedule?.category || null);
   const [alarmTime, setAlarmTime] = useState(initialSchedule?.alarmTime || '');
   const [repeat, setRepeat] = useState(() => parseRepeatString(initialSchedule?.repeat));
-  const [repeatEnd, setRepeatEnd] = useState(initialSchedule?.repeat?.until ? '날짜' : '안 함');
-  const [repeatEndDate, setRepeatEndDate] = useState(() => parseDateString(initialSchedule?.repeat?.until));
+  // repeat는 캘린더 화면에서 이미 "매주 반복" 같은 문자열로 바뀐 값이라 종료일(until)이
+  // 안 남아있음 — 캘린더가 별도로 넘겨주는 repeatUntil(원본 문자열)을 대신 사용한다.
+  const [repeatEnd, setRepeatEnd] = useState(initialSchedule?.repeatUntil ? '날짜' : '안 함');
+  const [repeatEndDate, setRepeatEndDate] = useState(() => parseDateString(initialSchedule?.repeatUntil));
   const [showRepeatEndMenu, setShowRepeatEndMenu] = useState(false);
   const [showRepeatEndDatePopup, setShowRepeatEndDatePopup] = useState(false);
   const [editingField, setEditingField] = useState(null);
@@ -441,6 +452,7 @@ export default function CreateSchedulePage() {
           category,
           alarmTime,
           repeat: repeat !== '없음' ? `${repeat} 반복` : '반복 없음',
+          repeatUntil: repeatEnd === '날짜' && repeatEndDate ? toDateKeyString(repeatEndDate) : undefined,
         });
       } else {
         await apiClient.post('/schedules/events', payload);
