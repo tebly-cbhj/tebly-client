@@ -161,6 +161,11 @@ function parseDateString(dateStr) {
   return { year, month, day };
 }
 
+function truncate(text, maxLength) {
+  if (!text || text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+}
+
 function getNotificationLeadMinutes(alarmTime) {
   if (!alarmTime) return [];
   return alarmTime
@@ -307,7 +312,7 @@ export default function MyAppointmentPage() {
       <ContentArea>
         <CardWrapper>
           <ScheduleInfo
-            title={canEditFields ? editTitle : promise.title}
+            title={canEditFields ? editTitle : truncate(promise.title, 10)}
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
@@ -342,7 +347,7 @@ export default function MyAppointmentPage() {
           <SelectRow
             LeftIcon={EditIcon}
             text_empty="메모"
-            text_selected={canEditFields ? editMemo : promise.comment}
+            text_selected={canEditFields ? editMemo : truncate(promise.comment, 10)}
             state={
               !canEditFields
                 ? (promise.comment ? 'selected' : 'empty')
