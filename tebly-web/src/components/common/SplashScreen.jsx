@@ -138,8 +138,20 @@ export default function SplashScreen({ onFinish }) {
   const waveRectHeight = dims.h + WAVE_BOTTOM_BUFFER;
 
   useEffect(() => {
+    const setThemeColor = (color) => {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      meta?.setAttribute('content', color);
+    };
+
     const raf = requestAnimationFrame(() => setStage(STAGE.ELLIPSE_GROW));
     const timers = [
+      // 원이 화면을 다 덮은 순간 잠깐 primary100으로, 크로스페이드가 끝나 원이 사라지고
+      // 다시 배경(bg)이 드러나는 순간 원래 색으로 복귀.
+      setTimeout(() => setThemeColor('#34BAA0'), ELLIPSE_DURATION),
+      setTimeout(
+        () => originalThemeColorRef.current && setThemeColor(originalThemeColorRef.current),
+        ELLIPSE_DURATION + CROSSFADE_DURATION
+      ),
       setTimeout(() => setStage(STAGE.CROSSFADE_TO_LOGO), ELLIPSE_DURATION),
       setTimeout(
         () => setStage(STAGE.WAVE_RISE),
