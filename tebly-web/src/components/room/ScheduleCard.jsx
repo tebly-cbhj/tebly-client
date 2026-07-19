@@ -6,7 +6,7 @@ const Card = styled.div`
   display: flex;
   width: 100%;
   padding: 20px 20px 24px 20px;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   cursor: pointer;
   box-sizing: border-box;

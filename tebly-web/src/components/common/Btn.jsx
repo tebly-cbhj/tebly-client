@@ -30,7 +30,7 @@ const StyledButton = styled.button`
   
   background-color: ${(props) => {
     if (props.$variant === 'primary50') return props.theme.colors.primary50;
-    if (props.disabled) return props.theme.colors.primary30;
+    if (props.disabled) return props.theme.colors.primary50;
     if (props.$variant === 'gray') return props.theme.colors.gray200;
     if (props.$variant === 'white') return props.theme.colors.white;
     if (props.$variant === 'danger') return props.theme.colors.alert;
