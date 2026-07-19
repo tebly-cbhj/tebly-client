@@ -7,7 +7,13 @@ import LogoWhite from '../../assets/logo/text-logo-white.svg?react';
 // TeblyApp(RN)의 SplashScreen.tsx와 동일한 연출을 웹에서 재현한 버전.
 // react-native-svg + Animated 대신 CSS transition으로 단계를 구현한다.
 const ELLIPSE_SIZE = 40;
-const WAVE_CREST_HEIGHT = 240;
+// 물결 굴곡의 높이를 고정 픽셀값으로 두면, 화면 폭이 좁아질 때 가로로만 눌려서
+// 봉우리들이 다닥다닥 뭉쳐 보인다(고정 세로 높이 대비 가로 폭만 줄어드는 왜곡).
+// 그래서 폭 기준으로 비례하도록 계산한다 — 390px 폭 기준으로 240px 높이가 되도록 디자인된
+// 비율을 유지하고, 앱 전체가 데스크탑에서도 폰 폭(480px)로 제한하는 것과 동일하게 상한을 둔다.
+const WAVE_DESIGN_WIDTH = 390;
+const WAVE_DESIGN_CREST_HEIGHT = 240;
+const WAVE_MAX_EFFECTIVE_WIDTH = 480;
 const WAVE_BOTTOM_BUFFER = 150;
 
 const LOGO_WIDTH = 155;
@@ -92,6 +98,10 @@ export default function SplashScreen({ onFinish }) {
   const [dims] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
 
   const ellipseTargetScale = (Math.sqrt(dims.w * dims.w + dims.h * dims.h) / ELLIPSE_SIZE) * 1.3;
+  const waveEffectiveWidth = Math.min(dims.w, WAVE_MAX_EFFECTIVE_WIDTH);
+  const waveCrestHeight = Math.round(
+    waveEffectiveWidth * (WAVE_DESIGN_CREST_HEIGHT / WAVE_DESIGN_WIDTH)
+  );
   const waveRectHeight = dims.h + WAVE_BOTTOM_BUFFER;
 
   useEffect(() => {
@@ -128,7 +138,7 @@ export default function SplashScreen({ onFinish }) {
   const logoOpacity = stage >= STAGE.LOGO_TO_WHITE ? 0 : stage >= STAGE.CROSSFADE_TO_LOGO ? 1 : 0;
   const logoDuration = stage >= STAGE.LOGO_TO_WHITE ? LOGO_COLOR_CROSSFADE : CROSSFADE_DURATION;
   const logoWhiteOpacity = stage >= STAGE.LOGO_TO_WHITE ? 1 : 0;
-  const waveTranslateY = stage >= STAGE.WAVE_RISE ? -WAVE_CREST_HEIGHT : dims.h;
+  const waveTranslateY = stage >= STAGE.WAVE_RISE ? -waveCrestHeight : dims.h;
 
   return (
     <Root>
@@ -139,13 +149,13 @@ export default function SplashScreen({ onFinish }) {
       <WaveWrapper $translateY={waveTranslateY}>
         <svg
           width="100%"
-          height={WAVE_CREST_HEIGHT}
+          height={waveCrestHeight}
           viewBox="0 0 400 160"
           preserveAspectRatio="none"
           style={{ display: 'block' }}
         >
           <path
-            d="M0,140 C33.35,140 33.35,20 66.7,20 C100,20 100,140 133.3,140 C166.65,140 166.65,20 200,20 C233.35,20 233.35,140 266.7,140 C300,140 300,20 333.3,20 C366.65,20 366.65,140 400,140 L400,160 L0,160 Z"
+            d="M0,150 C33.35,150 33.35,100 66.7,100 C100,100 100,120 133.3,120 C166.65,120 166.65,70 200,70 C233.35,70 233.35,90 266.7,90 C300,90 300,40 333.3,40 C366.65,40 366.65,60 400,60 L400,160 L0,160 Z"
             fill={theme.colors.primary100}
           />
         </svg>
