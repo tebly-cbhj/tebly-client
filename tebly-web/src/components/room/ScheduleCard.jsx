@@ -48,6 +48,11 @@ const SubText = styled.span`
   color: ${({ theme }) => theme.colors.gray800};
 `;
 
+const DateLocationGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const ParticipantContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -109,8 +114,10 @@ export default function ScheduleCard({
 
       <RightSection>
         <Title>{title}</Title>
-        <SubText>{date}</SubText>
-        <SubText>{location}</SubText>
+        <DateLocationGroup>
+          <SubText>{date}</SubText>
+          <SubText>{location}</SubText>
+        </DateLocationGroup>
 
         <ParticipantContainer>
           <CountContainer>
