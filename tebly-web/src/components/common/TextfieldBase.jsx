@@ -24,6 +24,7 @@ export const FieldInput = styled.input`
   background: transparent;
 
   ${(props) => props.theme.typography.body3}
+  font-size: 16px; /* iOS Safari가 16px 미만 input에서 포커스 시 자동 확대하는 것 방지 */
   color: ${(props) => props.theme.colors.gray800};
 
   &::placeholder {

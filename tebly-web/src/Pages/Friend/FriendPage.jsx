@@ -95,7 +95,7 @@ const SearchInput = styled.input`
   background: transparent;
   outline: none;
   font-family: 'Pretendard Variable';
-  font-size: 0.875rem;
+  font-size: 16px; /* iOS Safari가 16px 미만 input에서 포커스 시 자동 확대하는 것 방지 */
   font-weight: 400;
   line-height: 140%;
   letter-spacing: -0.02188rem;
