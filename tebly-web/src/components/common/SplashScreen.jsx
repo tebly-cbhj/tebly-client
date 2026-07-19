@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { theme } from '../../theme';
 import LogoPrimary from '../../assets/logo/text-logo.svg?react';
 import LogoWhite from '../../assets/logo/text-logo-white.svg?react';
+import waveImg from '../../assets/icons/wave-transparent.png';
 
 // TeblyApp(RN)의 SplashScreen.tsx와 동일한 연출을 웹에서 재현한 버전.
 // react-native-svg + Animated 대신 CSS transition으로 단계를 구현한다.
@@ -81,10 +81,19 @@ const WaveWrapper = styled.div`
   pointer-events: none;
 `;
 
+// 사용자가 직접 만들어준 물결 이미지 — 비율 왜곡 없이 꽉 채우고(cover), 좌우가
+// 잘리는 건 괜찮다고 확인받음. 이미지 하단이 아래 WaveRect와 이어지도록 하단 기준 정렬.
+const WaveCrestImage = styled.div`
+  width: 100%;
+  background-image: url(${({ $src }) => $src});
+  background-size: cover;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+`;
+
 const WaveRect = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.colors.primary100};
-  /* svg가 인라인 요소라 밑에 미세한 틈이 생길 수 있어서, 살짝 겹쳐서 틈을 없앤다 */
   margin-top: -2px;
 `;
 
@@ -162,18 +171,7 @@ export default function SplashScreen({ onFinish }) {
       </EllipseWrapper>
 
       <WaveWrapper $size={waveDiagonalSize} $translateY={waveTranslateY}>
-        <svg
-          width={waveDiagonalSize}
-          height={waveCrestHeight}
-          viewBox="0 0 400 160"
-          preserveAspectRatio="none"
-          style={{ display: 'block' }}
-        >
-          <path
-            d="M0,0 C52,0 52,150 104,150 C148,150 148,15 192,15 C228,15 228,158 264,158 C296,158 296,50 328,50 C364,50 364,155 400,155 L400,160 L0,160 Z"
-            fill={theme.colors.primary100}
-          />
-        </svg>
+        <WaveCrestImage $src={waveImg} style={{ height: waveCrestHeight }} />
         <WaveRect style={{ height: waveRectHeight }} />
       </WaveWrapper>
 
