@@ -7,7 +7,7 @@ import LogoWhite from '../../assets/logo/text-logo-white.svg?react';
 // TeblyApp(RN)의 SplashScreen.tsx와 동일한 연출을 웹에서 재현한 버전.
 // react-native-svg + Animated 대신 CSS transition으로 단계를 구현한다.
 const ELLIPSE_SIZE = 40;
-const WAVE_CREST_HEIGHT = 160;
+const WAVE_CREST_HEIGHT = 240;
 const WAVE_BOTTOM_BUFFER = 150;
 
 const LOGO_WIDTH = 155;
@@ -145,7 +145,7 @@ export default function SplashScreen({ onFinish }) {
           style={{ display: 'block' }}
         >
           <path
-            d="M0,155 C24,155 48,50 72,50 C93,50 115,158 136,158 C160,158 184,15 208,15 C237,15 267,150 296,150 C331,150 365,0 400,0 L400,160 L0,160 Z"
+            d="M0,140 C33.35,140 33.35,20 66.7,20 C100,20 100,140 133.3,140 C166.65,140 166.65,20 200,20 C233.35,20 233.35,140 266.7,140 C300,140 300,20 333.3,20 C366.65,20 366.65,140 400,140 L400,160 L0,160 Z"
             fill={theme.colors.primary100}
           />
         </svg>
