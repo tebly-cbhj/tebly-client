@@ -17,7 +17,7 @@ import { ALARM_TO_MINUTES } from '../../store/PersonalScheduleStore';
 import PlaceIcon from '../../assets/icons/place.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
-import DateIcon from '../../assets/icons/calendar-fill.svg?react';
+import DateIcon from '../../assets/icons/calendar-line-dark.svg?react';
 import FriendsIcon from '../../assets/icons/friends.svg?react';
 import ClockIcon from '../../assets/icons/clock.svg?react';
 
