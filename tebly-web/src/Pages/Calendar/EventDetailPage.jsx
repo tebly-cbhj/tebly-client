@@ -137,6 +137,18 @@ const DateTimeRow = styled.div`
   padding-left: 32px;
 `;
 
+const StartDateTimeRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const StartDateGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 const DateLabel = styled.span`
   ${({ theme }) => theme.typography.body2};
   color: ${({ theme }) => theme.colors.gray900};
@@ -309,10 +321,13 @@ export default function EventDetailPage() {
           )}
           {!allDay && (
             <>
-              <DateTimeRow>
-                <DateLabel>{schedule.startDate}</DateLabel>
+              <StartDateTimeRow>
+                <StartDateGroup>
+                  <IconBox><ClockIcon /></IconBox>
+                  <DateLabel>{schedule.startDate}</DateLabel>
+                </StartDateGroup>
                 <TimeLabel>{schedule.startTime}</TimeLabel>
-              </DateTimeRow>
+              </StartDateTimeRow>
               <DateTimeRow>
                 <DateLabel>{schedule.endDate}</DateLabel>
                 <TimeLabel>{schedule.endTime}</TimeLabel>
