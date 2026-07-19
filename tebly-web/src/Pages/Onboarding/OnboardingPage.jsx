@@ -85,7 +85,7 @@ const BtnWrapper = styled.div`
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 350px;
+  max-width: 480px;
 `;
 
 const NextBtn = styled.button`

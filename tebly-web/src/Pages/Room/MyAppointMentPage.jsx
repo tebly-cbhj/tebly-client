@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useScheduleStore } from '../../store/ScheduleStore';
-import { MINUTES_TO_ALARM } from '../../store/PersonalScheduleStore';
+import { MINUTES_TO_ALARM, ALARM_TO_MINUTES } from '../../store/PersonalScheduleStore';
 import apiClient from '../../api/client';
 import { PageWrapper } from '../../PageWrapper';
 import Header from '../../components/common/Header';
@@ -16,12 +16,15 @@ import PokePopup from '../../components/room/PokePopup';
 import DatePopup from '../../components/room/DatePopup';
 import TimePickerPopup from '../../components/room/TimePickerPopup';
 import MinTimePickerPopup from '../../components/room/MinTimePickerPopup';
+import CategoryPopup from '../../components/room/CategoryPopup';
+import AlarmPopup from '../../components/room/AlarmPopup';
 
 import PlaceIcon from '../../assets/icons/place.svg?react';
 import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
 import FriendsIcon from '../../assets/icons/friends.svg?react';
 import CalendarCheckIcon from '../../assets/icons/calendar-check.svg?react';
+import EditIcon from '../../assets/icons/edit.svg?react';
 
 import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 
@@ -158,6 +161,14 @@ function parseDateString(dateStr) {
   return { year, month, day };
 }
 
+function getNotificationLeadMinutes(alarmTime) {
+  if (!alarmTime) return [];
+  return alarmTime
+    .split(',')
+    .map((label) => ALARM_TO_MINUTES[label.trim()])
+    .filter((n) => n !== undefined);
+}
+
 export default function MyAppointmentPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -195,6 +206,28 @@ export default function MyAppointmentPage() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
 
+  const [editTitle, setEditTitle] = useState('');
+  const [editMemo, setEditMemo] = useState('');
+  const [editLocation, setEditLocation] = useState('');
+  const [editCategory, setEditCategory] = useState(null);
+  const [editAlarmTime, setEditAlarmTime] = useState('');
+  const [editingField, setEditingField] = useState(null);
+  const [popupType, setPopupType] = useState(null);
+
+  function startEditing() {
+    setEditTitle(promise.title);
+    setEditMemo(promise.comment || '');
+    setEditLocation(promise.location || '');
+    setEditCategory({ categoryId: promise.myCategoryId, categoryName: promise.categoryName });
+    setEditAlarmTime(
+      (promise.notificationLeadMinutes || [])
+        .map((minutes) => MINUTES_TO_ALARM[minutes])
+        .filter(Boolean)
+        .join(', ')
+    );
+    setIsEditing(true);
+  }
+
   function showToast(message) {
     setToastMessage(message);
     setTimeout(() => setToastMessage(''), 2000);
@@ -222,20 +255,18 @@ export default function MyAppointmentPage() {
       showToast('저장을 완료했어요.');
       setTimeout(() => navigate(-1), 700);
     } else if (isEditing) {
-      if (pendingStartTimeIso && pendingEndTimeIso) {
-        await apiClient.patch(`/promises/${promiseId}`, {
-          title: promise.title,
-          comment: promise.comment,
-          categoryId: promise.myCategoryId,
-          proposeStartDate: promise.proposeStartDate,
-          proposeEndDate: promise.proposeEndDate,
-          startTime: pendingStartTimeIso,
-          endTime: pendingEndTimeIso,
-          location: promise.location,
-          notificationLeadMinutes: promise.notificationLeadMinutes,
-          minDuration: promise.minDuration,
-        });
-      }
+      await apiClient.patch(`/promises/${promiseId}`, {
+        title: editTitle,
+        comment: editMemo,
+        categoryId: editCategory?.categoryId ?? promise.myCategoryId,
+        proposeStartDate: promise.proposeStartDate,
+        proposeEndDate: promise.proposeEndDate,
+        startTime: pendingStartTimeIso ?? promise.startTime,
+        endTime: pendingEndTimeIso ?? promise.endTime,
+        location: editLocation,
+        notificationLeadMinutes: getNotificationLeadMinutes(editAlarmTime),
+        minDuration: promise.minDuration,
+      });
       setIsEditing(false);
       fetchDetail();
     } else {
@@ -251,6 +282,8 @@ export default function MyAppointmentPage() {
 
   // 확정된 약속은 초대받은 사람이 응답을 더 이상 못 바꾸게 함(방장이 시간 수정하는 흐름은 별개라 그대로 둠)
   const responseLocked = isInvited && promise.promiseStatus === 'CONFIRMED';
+  // 제목/장소/카테고리/알림/메모는 '수정' 흐름(방장, 초대 응답이 아닌 경우)에서만 편집 가능
+  const canEditFields = isEditing && !isInvited;
   const isAlreadyConfirmed = promise.promiseStatus === 'CONFIRMED' && (isInvited || !isEditing);
 
   async function handleDelete() {
@@ -274,13 +307,15 @@ export default function MyAppointmentPage() {
       <ContentArea>
         <CardWrapper>
           <ScheduleInfo
-            title={promise.title}
+            title={canEditFields ? editTitle : promise.title}
             date={formatDateLabel(promise.startTime)}
             time={displayTime}
             CategoryImage={CATEGORY_ICON_MAP[categoryIcon]?.SelectedIcon}
             isEditing={promise.isSender && !isLocked}
+            titleEditable={canEditFields}
+            onTitleChange={(e) => setEditTitle(e.target.value)}
             onEditTime={() => {
-              setIsEditing(true);
+              startEditing();
               setShowDateSheet(true);
             }}
           />
@@ -290,23 +325,59 @@ export default function MyAppointmentPage() {
           <SelectRow
             LeftIcon={PlaceIcon}
             text_empty="약속 장소"
-            text_selected={promise.location}
-            state={promise.location ? 'selected' : 'empty'}
+            text_selected={canEditFields ? editLocation : promise.location}
+            state={
+              !canEditFields
+                ? (promise.location ? 'selected' : 'empty')
+                : editingField === 'location'
+                  ? 'typing'
+                  : editLocation ? 'selected' : 'empty'
+            }
+            value={editLocation}
+            onClick={canEditFields ? () => setEditingField('location') : undefined}
+            onChange={(e) => setEditLocation(e.target.value)}
+            onBlur={() => setEditingField(null)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setEditingField(null); }}
+          />
+          <SelectRow
+            LeftIcon={EditIcon}
+            text_empty="메모"
+            text_selected={canEditFields ? editMemo : promise.comment}
+            state={
+              !canEditFields
+                ? (promise.comment ? 'selected' : 'empty')
+                : editingField === 'memo'
+                  ? 'typing'
+                  : editMemo ? 'selected' : 'empty'
+            }
+            value={editMemo}
+            onClick={canEditFields ? () => setEditingField('memo') : undefined}
+            onChange={(e) => setEditMemo(e.target.value)}
+            onBlur={() => setEditingField(null)}
+            onKeyDown={(e) => { if (e.key === 'Enter') setEditingField(null); }}
           />
           <SelectRow
             LeftIcon={CategoryIcon}
+            right_icon={canEditFields}
             text_empty="카테고리"
-            text_selected={promise.categoryName}
-            state={promise.categoryName ? 'selected' : 'empty'}
+            text_selected={canEditFields ? editCategory?.categoryName : promise.categoryName}
+            state={(canEditFields ? editCategory?.categoryName : promise.categoryName) ? 'selected' : 'empty'}
+            onClick={canEditFields ? () => setPopupType('category') : undefined}
           />
           <SelectRow
             LeftIcon={BellIcon}
+            right_icon={canEditFields}
             text_empty="알람을 줄 시간"
-            text_selected={(promise.notificationLeadMinutes || [])
-              .map((minutes) => MINUTES_TO_ALARM[minutes])
-              .filter(Boolean)
-              .join(', ')}
-            state={promise.notificationLeadMinutes?.length ? 'selected' : 'empty'}
+            text_selected={
+              canEditFields
+                ? editAlarmTime
+                : (promise.notificationLeadMinutes || [])
+                    .map((minutes) => MINUTES_TO_ALARM[minutes])
+                    .filter(Boolean)
+                    .join(', ')
+            }
+            state={(canEditFields ? editAlarmTime : promise.notificationLeadMinutes?.length) ? 'selected' : 'empty'}
+            onClick={canEditFields ? () => setPopupType('alarm') : undefined}
           />
 
           <MyResponseRow>
@@ -382,7 +453,7 @@ export default function MyAppointmentPage() {
           option1Text={!isLocked ? '수정' : undefined}
           option2Text="일정 삭제"
           option2Color="#E31818"
-          onOption1={() => { setIsSheetOpen(false); setIsEditing(true); }}
+          onOption1={() => { setIsSheetOpen(false); startEditing(); }}
           onOption2={handleDelete}
         />
 
@@ -445,6 +516,28 @@ export default function MyAppointmentPage() {
               setPendingEndTimeIso(endIso);
               setDisplayTime(`${pad(Number(pendingStart.hour))}:${pad(Number(pendingStart.minute))} - ${pad(Number(hour))}:${pad(Number(minute))}`);
               setShowEndPicker(false);
+            }}
+          />
+        )}
+
+        {popupType === 'category' && (
+          <CategoryPopup
+            selectedCategoryId={editCategory?.categoryId}
+            defaultOnly
+            onClose={() => setPopupType(null)}
+            onSelect={(value) => {
+              setEditCategory(value);
+              setPopupType(null);
+            }}
+          />
+        )}
+
+        {popupType === 'alarm' && (
+          <AlarmPopup
+            onClose={() => setPopupType(null)}
+            onSelect={(value) => {
+              setEditAlarmTime(value.join(', '));
+              setPopupType(null);
             }}
           />
         )}

@@ -138,6 +138,9 @@ export default function InviteNotiPage() {
                 location={invite.location}
                 roomName={invite.roomName}
                 categoryId={getCategoryIcon(invite.myCategoryId)}
+                // TODO: PromiseInvitationResponse에 발신 주체 구분 필드가 없어서 아직 판단 불가.
+                // 백엔드에 isFromDecisionBot(또는 senderType) 필드 추가되면 여기 연결.
+                isFromDecisionBot={false}
                 onReject={() => handleRespond(rejectAppointmentInvite, invite.promiseId)}
                 onAccept={() => handleRespond(acceptAppointmentInvite, invite.promiseId)}
                 />
