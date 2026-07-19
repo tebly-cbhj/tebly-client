@@ -36,7 +36,7 @@ const ChevronWrapper = styled.div`
   flex-shrink: 0;
 `;
 
-export default function CheckBoxRow({ label, checked, onChange, showChevron = true, bold = false }) {
+export default function CheckBoxRow({ label, checked, onChange, showChevron = true, bold = false, onChevronClick }) {
   return (
     <Row>
       <LeftArea>
@@ -50,7 +50,7 @@ export default function CheckBoxRow({ label, checked, onChange, showChevron = tr
       </LeftArea>
 
       {showChevron && (
-        <ChevronWrapper>
+        <ChevronWrapper onClick={onChevronClick} style={{ cursor: onChevronClick ? 'pointer' : 'default' }}>
           <ChevronRightIcon width={24} height={24} />
         </ChevronWrapper>
       )}

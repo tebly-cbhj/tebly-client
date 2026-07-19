@@ -6,13 +6,23 @@ import Header from '../../components/common/Header';
 import ProgressBar from '../../components/common/ProgressBar';
 import CheckBoxRow from '../../components/common/CheckBoxRow';
 import Btn from '../../components/common/Btn';
+import TermsDetailOverlay from '../../components/onboarding/TermsDetailOverlay';
 import AppTypo from '../../assets/onboarding/app-typo.svg?react';
+
+import termsOfService from '../../content/termsOfService.md?raw';
+import privacyPolicy from '../../content/privacyPolicy.md?raw';
+import marketingConsent from '../../content/marketingConsent.md?raw';
+
+const TERMS_DETAIL = {
+  service: { title: '서비스 이용약관', content: termsOfService },
+  privacy: { title: '개인정보 처리방침', content: privacyPolicy },
+  marketing: { title: '마케팅 정보 수신 동의', content: marketingConsent },
+};
 
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 20px;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -50,7 +60,7 @@ const Divider = styled.div`
 
 const BtnWrapper = styled.div`
   position: fixed;
-  bottom: 5px;
+  bottom: 21px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
@@ -65,6 +75,7 @@ export default function TermsAgreementPage() {
     privacy: false,
     marketing: false,
   });
+  const [openedTerm, setOpenedTerm] = useState(null);
 
   function handleAllCheck() {
     const next = !allChecked;
@@ -117,19 +128,19 @@ export default function TermsAgreementPage() {
             label="[필수] 서비스 이용약관 동의"
             checked={terms.service}
             onChange={() => handleCheck('service')}
-            onClick={() => console.log('서비스 이용약관')} // TODO: 약관 상세 페이지 연동
+            onChevronClick={() => setOpenedTerm('service')}
           />
           <CheckBoxRow
             label="[필수] 개인정보 처리방침 동의"
             checked={terms.privacy}
             onChange={() => handleCheck('privacy')}
-            onClick={() => console.log('개인정보 처리방침')} // TODO: 약관 상세 페이지 연동
+            onChevronClick={() => setOpenedTerm('privacy')}
           />
           <CheckBoxRow
             label="[선택] 마케팅 정보 수신 동의"
             checked={terms.marketing}
             onChange={() => handleCheck('marketing')}
-            onClick={() => console.log('마케팅 정보 수신')} // TODO: 약관 상세 페이지 연동
+            onChevronClick={() => setOpenedTerm('marketing')}
           />
         </CheckListWrapper>
       </ContentWrapper>
@@ -142,6 +153,14 @@ export default function TermsAgreementPage() {
           onClick={() => navigate('/signup/profile')} // TODO: 다음 단계 이동
         />
       </BtnWrapper>
+
+      {openedTerm && (
+        <TermsDetailOverlay
+          title={TERMS_DETAIL[openedTerm].title}
+          content={TERMS_DETAIL[openedTerm].content}
+          onClose={() => setOpenedTerm(null)}
+        />
+      )}
     </PageWrapper>
   );
 }

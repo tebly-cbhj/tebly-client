@@ -257,7 +257,7 @@ const SelectFriendPage = () => {
               data: { userIds: removedMembers.map((f) => f.id) },
             });
           } catch (err) {
-            showToast(err.response?.data?.message || '멤버를 추방할 수 없어요.');
+            showToast(err.response?.data?.message || '멤버를 내보낼 수 없어요.');
             return;
           }
         }
@@ -330,8 +330,8 @@ const SelectFriendPage = () => {
 
       <ConfirmPopup
         visible={!!pendingRemoveFriend}
-        title={`${pendingRemoveFriend?.name}님을\n방에서 추방할까요?`}
-        confirmText="추방"
+        title={`${pendingRemoveFriend?.name}님을\n방에서 내보낼까요?`}
+        confirmText="내보내기"
         danger
         onCancel={() => setPendingRemoveFriend(null)}
         onConfirm={confirmRemoveMember}

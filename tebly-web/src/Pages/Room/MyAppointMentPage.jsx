@@ -38,7 +38,6 @@ const CardWrapper = styled.div`
 
 const SelectRowWrapper = styled.div`
   margin-top: 12px;
-  padding: 0 20px;
 `;
 
 const MyResponseRow = styled.div`
@@ -89,7 +88,7 @@ const LeftSection = styled.div`
 const AttendanceWrapper = styled.div`
   margin-top: 4px;
   display: flex;
-  padding: 8px 20px;
+  padding: 8px 0;
   align-items: flex-start;
   gap: 16px;
   overflow-x: auto;
@@ -111,7 +110,7 @@ const BtnWrapper = styled.div`
   transform: translateX(-50%);
   width: 100%;
   max-width: 440px;
-  padding: 12px 20px 34px 20px;
+  padding: 12px 0 34px 0;
   box-sizing: border-box;
 `;
 

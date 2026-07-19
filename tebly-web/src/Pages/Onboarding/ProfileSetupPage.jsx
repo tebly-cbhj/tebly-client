@@ -124,7 +124,7 @@ const Label = styled.span`
 
 const BtnWrapper = styled.div`
   position: fixed;
-  bottom: 5px;
+  bottom: 21px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
