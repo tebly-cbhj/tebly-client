@@ -61,7 +61,7 @@ const ConfirmWrapper = styled.div`
   flex: 1;
 `;
 
-export default function TimePickerPopup({ onClose, onConfirm, initialHour, initialMinute, title }) {
+export default function TimePickerPopup({ onClose, onConfirm, initialHour, initialMinute, title, confirmText = '수정 완료' }) {
   const [time, setTime] = useState({
     hour: String(initialHour ?? new Date().getHours()).padStart(2, '0'),
     minute: String(Math.round((initialMinute ?? new Date().getMinutes()) / 5) * 5 % 60).padStart(2, '0'),
@@ -86,7 +86,7 @@ export default function TimePickerPopup({ onClose, onConfirm, initialHour, initi
           </CancelWrapper>
           <ConfirmWrapper>
             <Btn
-              text="수정 완료"
+              text={confirmText}
               size="medium"
               onClick={() => onConfirm?.(time)}
             />

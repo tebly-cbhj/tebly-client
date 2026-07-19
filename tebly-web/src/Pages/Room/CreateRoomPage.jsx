@@ -39,6 +39,7 @@ const BtnWrapper = styled.div`
   bottom: 21px;
   transform: translateX(-50%);
   width: calc(100% - 40px);
+  max-width: 480px;
 `;
 
 const CreateRoom = () => {
