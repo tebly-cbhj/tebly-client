@@ -111,6 +111,8 @@ const AllDayRow = styled.div`
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
+  /* 종일 일정이라 이 줄만 단독으로 보일 땐 위쪽이 허전해 보여서 살짝 내려줌 */
+  margin-top: ${({ $solo }) => ($solo ? '6px' : '0')};
 `;
 
 const AllDayLabel = styled.span`
@@ -298,11 +300,13 @@ export default function EventDetailPage() {
         </ScheduleHeaderSection>
 
         <DateTimeSection>
-          <AllDayRow>
-            <IconBox><ClockIcon /></IconBox>
-            <AllDayLabel>종일</AllDayLabel>
-            <Toggle isOn={allDay} />
-          </AllDayRow>
+          {allDay && (
+            <AllDayRow $solo>
+              <IconBox><ClockIcon /></IconBox>
+              <AllDayLabel>종일</AllDayLabel>
+              <Toggle isOn={allDay} />
+            </AllDayRow>
+          )}
           {!allDay && (
             <>
               <DateTimeRow>

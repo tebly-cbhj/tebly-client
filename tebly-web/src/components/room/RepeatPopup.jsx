@@ -75,8 +75,7 @@ const CheckSvg = () => (
 );
 
 const ButtonWrapper = styled.div`
-  width: 350px;
-  margin: 18.5px auto 0;
+  margin: 18.5px 20px 0;
 `;
 
 export default function RepeatPopup({ selected = '없음', onClose, onSelect }) {

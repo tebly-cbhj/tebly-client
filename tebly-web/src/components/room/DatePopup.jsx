@@ -55,7 +55,7 @@ const ResetButtonWrapper = styled.div`
 `;
 
 const ConfirmButtonWrapper = styled.div`
-  width: 204px;
+  flex: 1;
 `;
 
 function toMs(d) {

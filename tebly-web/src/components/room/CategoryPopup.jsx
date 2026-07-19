@@ -103,7 +103,7 @@ const ResetButtonWrapper = styled.div`
 `;
 
 const ConfirmButtonWrapper = styled.div`
-  width: ${({ $fullWidth }) => ($fullWidth ? '336px' : '204px')};
+  flex: 1;
 `;
 
 const AddPopupLayer = styled.div`
