@@ -71,7 +71,8 @@ const WaveWrapper = styled.div`
   left: 0;
   width: 100%;
   transform: translateY(${({ $translateY }) => $translateY}px);
-  transition: transform ${WAVE_DURATION}ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  /* 서서히 시작해서 점점 빨라지는(가속) 느낌으로 - easeInCubic 계열 */
+  transition: transform ${WAVE_DURATION}ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
   pointer-events: none;
 `;
 
