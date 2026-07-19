@@ -14,7 +14,7 @@ const ELLIPSE_SIZE = 40;
 const WAVE_DESIGN_WIDTH = 390;
 const WAVE_DESIGN_CREST_HEIGHT = 240;
 const WAVE_MAX_EFFECTIVE_WIDTH = 480;
-const WAVE_BOTTOM_BUFFER = 150;
+const WAVE_BOTTOM_BUFFER = 400;
 
 const LOGO_WIDTH = 155;
 const LOGO_HEIGHT = 60;
@@ -75,6 +75,8 @@ const WaveWrapper = styled.div`
 const WaveRect = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.colors.primary100};
+  /* svg가 인라인 요소라 밑에 미세한 틈이 생길 수 있어서, 살짝 겹쳐서 틈을 없앤다 */
+  margin-top: -2px;
 `;
 
 const LogoWrapper = styled.div`
