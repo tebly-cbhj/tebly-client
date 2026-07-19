@@ -94,6 +94,19 @@ const ChipWrapper = styled.div`
   right: 20px;
 `;
 
+// 공백은 글자 수에서 제외하고, 공백 아닌 글자가 10개를 넘으면 그 지점에서 잘라 "..."을 붙인다.
+function truncateTitle(title, limit = 10) {
+  if (!title) return title;
+  let nonSpaceCount = 0;
+  for (let i = 0; i < title.length; i++) {
+    if (title[i] !== ' ') nonSpaceCount++;
+    if (nonSpaceCount > limit) {
+      return title.slice(0, i) + '...';
+    }
+  }
+  return title;
+}
+
 export default function ScheduleCard({
   title,
   date,
@@ -113,7 +126,7 @@ export default function ScheduleCard({
       </Thumbnail>
 
       <RightSection>
-        <Title>{title}</Title>
+        <Title>{truncateTitle(title)}</Title>
         <DateLocationGroup>
           <SubText>{date}</SubText>
           <SubText>{location}</SubText>
