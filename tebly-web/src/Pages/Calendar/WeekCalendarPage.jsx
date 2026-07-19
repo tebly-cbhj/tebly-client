@@ -190,6 +190,7 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
             : (categoryIconMap[schedule.category] || schedule.category || 'Other'),
           alarmTime: schedule.alarmTime || '',
           repeat: schedule.repeat ? `${REPEAT_TYPE_TO_KO[schedule.repeat.type] || schedule.repeat.type} 반복` : '반복 없음',
+          repeatUntil: schedule.repeat?.until,
           sourceType: schedule.sourceType,
           occurrenceStart: schedule.occurrenceStart,
           occurrenceEnd: schedule.occurrenceEnd,

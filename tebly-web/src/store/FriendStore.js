@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import apiClient from '../api/client';
 
-export const useFriendStore = create((set) => ({
+export const useFriendStore = create((set, get) => ({
   myProfile: null,
   inviteCode: null,
 
@@ -40,18 +40,33 @@ export const useFriendStore = create((set) => ({
         name: f.nickname,
         intro: f.bio,
         profileImage: f.profileImageUrl,
-        isFavorite: false,
+        isFavorite: f.isFavorite,
       })),
     });
   },
 
-  // 즐겨찾기는 백엔드 지원 없음 — 로컬 전용, 새로고침/재조회하면 초기화됨
-  toggleFavorite: (id) =>
+  toggleFavorite: async (id) => {
+    const target = get().friends.find((f) => f.id === id);
+    if (!target) return;
+    const nextIsFavorite = !target.isFavorite;
+
     set((state) => ({
       friends: state.friends.map((f) =>
-        f.id === id ? { ...f, isFavorite: !f.isFavorite } : f
+        f.id === id ? { ...f, isFavorite: nextIsFavorite } : f
       ),
-    })),
+    }));
+
+    try {
+      await apiClient.patch(`/friends/${id}/favorite`, { isFavorite: nextIsFavorite });
+    } catch {
+      // 실패하면 화면에 미리 반영해둔 것도 원래대로 되돌림
+      set((state) => ({
+        friends: state.friends.map((f) =>
+          f.id === id ? { ...f, isFavorite: !nextIsFavorite } : f
+        ),
+      }));
+    }
+  },
 
   deleteFriend: async (id) => {
     await apiClient.delete(`/friends/${id}`);

@@ -198,6 +198,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           category: schedule.originalCategory,
           alarmTime: schedule.alarmTime,
           repeat: schedule.repeat,
+          repeatUntil: schedule.repeatUntil,
           sourceType: schedule.sourceType,
           occurrenceStart: schedule.occurrenceStart,
           occurrenceEnd: schedule.occurrenceEnd,
@@ -233,6 +234,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
         place: schedule.location || '',
         alarmTime: schedule.alarmTime || '',
         repeat: schedule.repeat ? `${REPEAT_TYPE_TO_KO[schedule.repeat.type] || schedule.repeat.type} 반복` : '반복 없음',
+        repeatUntil: schedule.repeat?.until,
       }));
     });
   }, [personalSchedules]);
