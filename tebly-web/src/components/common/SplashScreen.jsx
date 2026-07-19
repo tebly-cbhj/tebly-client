@@ -162,7 +162,7 @@ export default function SplashScreen({ onFinish }) {
           style={{ display: 'block' }}
         >
           <path
-            d="M0,130 C85,130 85,70 170,70 C195,70 195,130 220,130 C295,130 295,60 370,60 C385,60 385,90 400,90 L400,160 L0,160 Z"
+            d="M0,130 C50,130 50,50 100,50 C150,50 150,130 200,130 C255,130 255,40 310,40 C355,40 355,110 400,110 L400,160 L0,160 Z"
             fill={theme.colors.primary100}
           />
         </svg>
