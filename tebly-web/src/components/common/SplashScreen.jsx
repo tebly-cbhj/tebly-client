@@ -12,9 +12,12 @@ const ELLIPSE_SIZE = 40;
 // 그래서 폭 기준으로 비례하도록 계산한다 — 390px 폭 기준으로 240px 높이가 되도록 디자인된
 // 비율을 유지하고, 앱 전체가 데스크탑에서도 폰 폭(480px)로 제한하는 것과 동일하게 상한을 둔다.
 const WAVE_DESIGN_WIDTH = 390;
-const WAVE_DESIGN_CREST_HEIGHT = 240;
+const WAVE_DESIGN_CREST_HEIGHT = 420;
 const WAVE_MAX_EFFECTIVE_WIDTH = 480;
 const WAVE_BOTTOM_BUFFER = 400;
+// 대기 상태에서 화면 아래로 완전히 숨겨둘 때, 실제 화면 높이 측정이 살짝 작게 잡히는
+// 환경(모바일 브라우저 주소창 등)에서도 확실히 안 보이도록 여유를 더 둔다.
+const WAVE_HIDE_EXTRA_MARGIN = 200;
 
 const LOGO_WIDTH = 155;
 const LOGO_HEIGHT = 60;
@@ -140,7 +143,8 @@ export default function SplashScreen({ onFinish }) {
   const logoOpacity = stage >= STAGE.LOGO_TO_WHITE ? 0 : stage >= STAGE.CROSSFADE_TO_LOGO ? 1 : 0;
   const logoDuration = stage >= STAGE.LOGO_TO_WHITE ? LOGO_COLOR_CROSSFADE : CROSSFADE_DURATION;
   const logoWhiteOpacity = stage >= STAGE.LOGO_TO_WHITE ? 1 : 0;
-  const waveTranslateY = stage >= STAGE.WAVE_RISE ? -waveCrestHeight : dims.h;
+  const waveTranslateY =
+    stage >= STAGE.WAVE_RISE ? -waveCrestHeight : dims.h + WAVE_HIDE_EXTRA_MARGIN;
 
   return (
     <Root>
