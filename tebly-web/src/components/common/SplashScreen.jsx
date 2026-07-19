@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import LogoPrimary from '../../assets/logo/text-logo.svg?react';
 import LogoWhite from '../../assets/logo/text-logo-white.svg?react';
-import waveImg from '../../assets/icons/wave-transparent.png';
+import waveImg from '../../assets/icons/wave.png';
 
 // TeblyApp(RN)의 SplashScreen.tsx와 동일한 연출을 웹에서 재현한 버전.
 // react-native-svg + Animated 대신 CSS transition으로 단계를 구현한다.
@@ -17,9 +17,7 @@ const WAVE_MAX_EFFECTIVE_WIDTH = 480;
 // 대기 상태에서 화면 아래로 완전히 숨겨둘 때, 실제 화면 높이 측정이 살짝 작게 잡히는
 // 환경(모바일 브라우저 주소창 등)에서도 확실히 안 보이도록 여유를 더 둔다.
 const WAVE_HIDE_EXTRA_MARGIN = 200;
-// 오른쪽 아래에서 대각선으로 스윽 올라오는 느낌을 주기 위해, 회전을 고정해두고
-// translateY만 애니메이션하면 이동 경로 자체가 그 각도만큼 기운 대각선이 된다.
-const WAVE_ROTATION_DEG = -18;
+const WAVE_BOTTOM_BUFFER = 400;
 
 const LOGO_WIDTH = 155;
 const LOGO_HEIGHT = 60;
@@ -68,14 +66,11 @@ const Ellipse = styled.div`
 `;
 
 const WaveWrapper = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: ${({ $size }) => $size}px;
-  margin-left: ${({ $size }) => -$size / 2}px;
-  margin-top: ${({ $size }) => -$size / 2}px;
-  transform-origin: center center;
-  transform: rotate(${WAVE_ROTATION_DEG}deg) translateY(${({ $translateY }) => $translateY}px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(${({ $translateY }) => $translateY}px);
   /* 서서히 시작해서 점점 빨라지는(가속) 느낌으로 - easeInCubic 계열 */
   transition: transform ${WAVE_DURATION}ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
   pointer-events: none;
@@ -122,10 +117,7 @@ export default function SplashScreen({ onFinish }) {
   const waveCrestHeight = Math.round(
     waveEffectiveWidth * (WAVE_DESIGN_CREST_HEIGHT / WAVE_DESIGN_WIDTH)
   );
-  // 대각선으로 기울어진 채 움직여도 화면 네 귀퉁이가 안 비게, 화면보다 훨씬 큰
-  // 정사각형을 만들어서 회전시킨다(가운데 정렬해두면 기울어져 있어도 항상 화면을 덮음).
-  const waveDiagonalSize = Math.max(dims.w, dims.h) * 2.2;
-  const waveRectHeight = waveDiagonalSize - waveCrestHeight;
+  const waveRectHeight = dims.h + WAVE_BOTTOM_BUFFER;
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setStage(STAGE.ELLIPSE_GROW));
@@ -162,7 +154,7 @@ export default function SplashScreen({ onFinish }) {
   const logoDuration = stage >= STAGE.LOGO_TO_WHITE ? LOGO_COLOR_CROSSFADE : CROSSFADE_DURATION;
   const logoWhiteOpacity = stage >= STAGE.LOGO_TO_WHITE ? 1 : 0;
   const waveTranslateY =
-    stage >= STAGE.WAVE_RISE ? 0 : waveDiagonalSize + WAVE_HIDE_EXTRA_MARGIN;
+    stage >= STAGE.WAVE_RISE ? -waveCrestHeight : dims.h + WAVE_HIDE_EXTRA_MARGIN;
 
   return (
     <Root>
@@ -170,7 +162,7 @@ export default function SplashScreen({ onFinish }) {
         <Ellipse $scale={ellipseScale} />
       </EllipseWrapper>
 
-      <WaveWrapper $size={waveDiagonalSize} $translateY={waveTranslateY}>
+      <WaveWrapper $translateY={waveTranslateY}>
         <WaveCrestImage $src={waveImg} style={{ height: waveCrestHeight }} />
         <WaveRect style={{ height: waveRectHeight }} />
       </WaveWrapper>
