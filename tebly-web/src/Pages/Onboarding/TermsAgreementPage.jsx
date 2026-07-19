@@ -23,7 +23,6 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0 20px;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -61,7 +60,7 @@ const Divider = styled.div`
 
 const BtnWrapper = styled.div`
   position: fixed;
-  bottom: 5px;
+  bottom: 21px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
