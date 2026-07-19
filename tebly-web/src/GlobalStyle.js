@@ -12,6 +12,7 @@ export const GlobalStyle = createGlobalStyle`
     height: 100%;
     margin: 0;
     padding: 0;
+    touch-action: manipulation; /* iOS Safari 더블탭 확대(zoom) 방지 — 핀치 줌은 그대로 유지 */
   }
 
   body {

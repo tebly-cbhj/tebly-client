@@ -45,11 +45,16 @@ const TextContainer = styled.div`
   align-items: flex-start;
   gap: 8px;
   flex: 1 0 0;
+  min-width: 0;
+  /* 결정이 카드일 때 우상단 반짝이 아이콘과 제목이 겹치지 않도록 여유 공간 확보 */
+  padding-right: ${({ $isFromDecisionBot }) => ($isFromDecisionBot ? '28px' : '0')};
+  box-sizing: border-box;
 `;
 
 const AppointmentName = styled.span`
   ${({ theme }) => theme.typography.s1};
   color: ${({ theme }) => theme.colors.gray900};
+  overflow-wrap: break-word;
 `;
 
 const DetailWrapper = styled.div`
@@ -115,7 +120,7 @@ export default function AppointmentInviteCard({
           {Icon && <Icon width={80} height={80} />}
         </IconWrapper>
 
-        <TextContainer>
+        <TextContainer $isFromDecisionBot={isFromDecisionBot}>
           <AppointmentName>{appointmentName}</AppointmentName>
           <DetailWrapper>
             <DetailText>{`${date} ${time}`}</DetailText>

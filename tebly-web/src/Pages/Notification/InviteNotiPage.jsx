@@ -12,6 +12,9 @@ import { useScheduleStore } from '../../store/ScheduleStore';
 const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
 const pad = (n) => String(n).padStart(2, '0');
 
+// 결정이 초대장의 충돌 안내 문구 분기 — 카테고리 정책이 바뀌면 백엔드와 같이 맞춰야 함
+const ADJUSTABLE_CATEGORY_NAMES = new Set(['여가', '자기개발', '기타', '약속']);
+
 function formatDateLabel(isoDateTime) {
   const d = new Date(isoDateTime);
   return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} (${WEEKDAY_KO[d.getDay()]})`;
@@ -82,8 +85,34 @@ export default function InviteNotiPage() {
     fetchCategories();
   }, [fetchInvitations, fetchCategories]);
 
+  function getCategory(categoryId) {
+    return categories.find((category) => category.categoryId === categoryId);
+  }
+
   function getCategoryIcon(categoryId) {
-    return categories.find((c) => c.categoryId === categoryId)?.categoryIcon;
+    return getCategory(categoryId)?.categoryIcon;
+  }
+
+  function getConflictMessage(invite) {
+    // 일반 사용자가 만든 약속에는 결정이 전용 충돌 문구를 표시하지 않는다.
+    if (!invite.isFromDecisionBot) return null;
+    // 결정이가 만든 약속이라도 일정 충돌이 없으면 문구를 표시하지 않는다.
+    if (!invite.hasScheduleConflict) return null;
+
+    // 백엔드가 내려준 이름을 우선 사용하고, 없으면 categoryId로 내 카테고리에서 찾는다.
+    const categoryName =
+      invite.conflictingCategoryName ?? getCategory(invite.conflictingCategoryId)?.categoryName;
+
+    // ID 또는 이름이 일시적으로 불일치하는 경우에도 초대장 화면이 깨지지 않도록 처리한다.
+    if (!categoryName) {
+      return '이 시간엔 다른 일정이 있어요. 그래도 참여가 가능하신가요?';
+    }
+
+    if (ADJUSTABLE_CATEGORY_NAMES.has(categoryName)) {
+      return `이 시간엔 ${categoryName} 일정이 있어요. 조정하실 수 있나요?`;
+    }
+
+    return `이 시간엔 ${categoryName} 일정이 있어요. 그래도 참여가 가능하신가요?`;
   }
 
   async function handleRespond(action, id) {
@@ -138,9 +167,8 @@ export default function InviteNotiPage() {
                 location={invite.location}
                 roomName={invite.roomName}
                 categoryId={getCategoryIcon(invite.myCategoryId)}
-                // TODO: PromiseInvitationResponse에 발신 주체 구분 필드가 없어서 아직 판단 불가.
-                // 백엔드에 isFromDecisionBot(또는 senderType) 필드 추가되면 여기 연결.
-                isFromDecisionBot={false}
+                isFromDecisionBot={invite.isFromDecisionBot}
+                conflictMessage={getConflictMessage(invite)}
                 onReject={() => handleRespond(rejectAppointmentInvite, invite.promiseId)}
                 onAccept={() => handleRespond(acceptAppointmentInvite, invite.promiseId)}
                 />
