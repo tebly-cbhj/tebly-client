@@ -131,6 +131,13 @@ export default function SplashScreen({ onFinish }) {
   }, [stage]);
 
   const ellipseTargetScale = (Math.sqrt(dims.w * dims.w + dims.h * dims.h) / ELLIPSE_SIZE) * 1.3;
+  // 원이 대각선(네 모서리)까지 다 덮기 전에, 세로(위/아래)에 먼저 닿는 시점을 계산.
+  // CSS easing(cubic-bezier(0.215,0.61,0.355,1))은 easeOutCubic(1-(1-x)^3)과 거의 같은 곡선이라
+  // 그 역함수로 근사 계산한다 — 화면 크기(dims)에 따라 매번 달라지는 값이라 고정 ms로 못 박을 수 없음.
+  const verticalTouchProgress = Math.min(1, dims.h / ELLIPSE_SIZE / ellipseTargetScale);
+  const ellipseVerticalTouchDelay = Math.round(
+    ELLIPSE_DURATION * (1 - Math.cbrt(1 - verticalTouchProgress))
+  );
   const waveEffectiveWidth = Math.min(dims.w, WAVE_MAX_EFFECTIVE_WIDTH);
   const waveCrestHeight = Math.round(
     waveEffectiveWidth * (WAVE_DESIGN_CREST_HEIGHT / WAVE_DESIGN_WIDTH)
@@ -145,9 +152,9 @@ export default function SplashScreen({ onFinish }) {
 
     const raf = requestAnimationFrame(() => setStage(STAGE.ELLIPSE_GROW));
     const timers = [
-      // 원이 화면을 다 덮은 순간 잠깐 primary100으로, 크로스페이드가 끝나 원이 사라지고
+      // 원이 세로(위/아래)에 닿는 순간 잠깐 primary100으로, 크로스페이드가 끝나 원이 사라지고
       // 다시 배경(bg)이 드러나는 순간 원래 색으로 복귀.
-      setTimeout(() => setThemeColor('#34BAA0'), ELLIPSE_DURATION),
+      setTimeout(() => setThemeColor('#34BAA0'), ellipseVerticalTouchDelay),
       setTimeout(
         () => originalThemeColorRef.current && setThemeColor(originalThemeColorRef.current),
         ELLIPSE_DURATION + CROSSFADE_DURATION
