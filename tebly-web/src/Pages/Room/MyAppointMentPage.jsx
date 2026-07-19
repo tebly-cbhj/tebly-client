@@ -42,7 +42,7 @@ const SelectRowWrapper = styled.div`
 
 const MyResponseRow = styled.div`
   display: flex;
-  padding: 8.46px 0;
+  padding: 14.81px 0;
   align-items: center;
   gap: 8px;
   align-self: stretch;
@@ -51,7 +51,7 @@ const MyResponseRow = styled.div`
 const AttendanceRow = styled.div`
   display: flex;
   width: 100%;
-  padding: 8.46px 0;
+  padding: 14.81px 0;
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
