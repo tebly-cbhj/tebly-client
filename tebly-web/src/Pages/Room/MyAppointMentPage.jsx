@@ -42,7 +42,7 @@ const SelectRowWrapper = styled.div`
 
 const MyResponseRow = styled.div`
   display: flex;
-  padding: 20px 0;
+  padding: 8.46px 0;
   align-items: center;
   gap: 8px;
   align-self: stretch;
@@ -51,7 +51,7 @@ const MyResponseRow = styled.div`
 const AttendanceRow = styled.div`
   display: flex;
   width: 100%;
-  padding: 1.25rem 0;
+  padding: 8.46px 0;
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
@@ -110,7 +110,7 @@ const BtnWrapper = styled.div`
   transform: translateX(-50%);
   width: 100%;
   max-width: 440px;
-  padding: 12px 0 34px 0;
+  padding: 12px 20px 34px 20px;
   box-sizing: border-box;
 `;
 
