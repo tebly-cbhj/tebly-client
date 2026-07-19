@@ -65,7 +65,7 @@ const GoogleText = styled(KakaoText)``;
 
 const BtnWrapper = styled.div`
   width: calc(100% - 40px);
-  max-width: 350px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   gap: 12px;

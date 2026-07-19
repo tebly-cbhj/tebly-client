@@ -45,7 +45,7 @@ const Title = styled.p`
 const CheckListWrapper = styled.div`
   display: flex;
   width: 100%;
-  max-width: 350px;
+  max-width: 480px;
   flex-direction: column;
   align-items: flex-start;
   gap: 16px;
@@ -64,7 +64,7 @@ const BtnWrapper = styled.div`
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
-  max-width: 350px;
+  max-width: 480px;
 `;
 
 export default function TermsAgreementPage() {
