@@ -72,6 +72,7 @@ const DetailText = styled.span`
 const ConflictText = styled.p`
   margin: 0;
   ${({ theme }) => theme.typography.body2};
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
