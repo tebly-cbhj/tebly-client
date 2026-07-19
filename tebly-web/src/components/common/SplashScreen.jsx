@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import LogoPrimary from '../../assets/logo/text-logo.svg?react';
 import LogoWhite from '../../assets/logo/text-logo-white.svg?react';
@@ -111,6 +111,24 @@ const LogoLayer = styled.div`
 export default function SplashScreen({ onFinish }) {
   const [stage, setStage] = useState(STAGE.INIT);
   const [dims] = useState(() => ({ w: window.innerWidth, h: window.innerHeight }));
+
+  // 스플래시가 떠있는 동안 theme-color를 바꿔뒀다가, 끝나면(언마운트) 원래 값으로 되돌린다.
+  const originalThemeColorRef = useRef(null);
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    originalThemeColorRef.current = meta?.getAttribute('content') ?? null;
+    return () => {
+      if (originalThemeColorRef.current) meta?.setAttribute('content', originalThemeColorRef.current);
+    };
+  }, []);
+
+  // 물결이 화면을 다 채운 시점(로고가 흰색으로 바뀌는 단계)부터 primary100으로 전환.
+  useEffect(() => {
+    if (stage >= STAGE.LOGO_TO_WHITE) {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      meta?.setAttribute('content', '#34BAA0'); // theme.colors.primary100
+    }
+  }, [stage]);
 
   const ellipseTargetScale = (Math.sqrt(dims.w * dims.w + dims.h * dims.h) / ELLIPSE_SIZE) * 1.3;
   const waveEffectiveWidth = Math.min(dims.w, WAVE_MAX_EFFECTIVE_WIDTH);
