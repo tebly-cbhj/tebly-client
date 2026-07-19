@@ -7,6 +7,7 @@ import { PageWrapper } from '../../PageWrapper';
 import CalendarHeader from '../../components/calendar/CalendarHeader';
 import WeekDayRow from '../../components/calendar/month/WeekDayRow';
 import DateCell from '../../components/calendar/month/DateCell';
+import DayScheduleSheet from '../../components/calendar/month/DayScheduleSheet';
 import CalendarFab from '../../components/calendar/CalendarFab';
 
 const Container = styled.div`
@@ -174,6 +175,12 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
   );
 
   const [selectedDate, setSelectedDate] = useState(today);
+  const [sheetDate, setSheetDate] = useState(null);
+
+  function openDaySheet(date) {
+    setSelectedDate(date);
+    setSheetDate(date);
+  }
 
   useEffect(() => {
     const y = currentMonthDate.getFullYear();
@@ -309,6 +316,7 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
                 variant={variant}
                 onClick={() => setSelectedDate(date)}
                 onScheduleClick={handleScheduleClick}
+                onShowMore={() => openDaySheet(date)}
               />
             );
 
@@ -328,6 +336,18 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
           onAiRecognition={(file) => navigate('/ocr-loading', { state: { imageFile: file } })}
         />
       </FloatingWrapper>
+
+      {sheetDate && (
+        <DayScheduleSheet
+          dateLabel={`${sheetDate.getMonth() + 1}월 ${sheetDate.getDate()}일`}
+          schedules={schedulesByDate[formatDateKey(sheetDate)] || []}
+          onClose={() => setSheetDate(null)}
+          onScheduleClick={(schedule) => {
+            setSheetDate(null);
+            handleScheduleClick(schedule);
+          }}
+        />
+      )}
     </PageWrapper>
   );
 }
