@@ -276,6 +276,8 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
                   <TimeSlotCell
                     key={`cell-${hour}-${j}`}
                     $cellHeight={cellHeight}
+                    isFirstRow={hour === 1}
+                    isFirstCol={j === 0}
                     style={{ gridRow: `${(hour - 1) * 12 + 1} / span 12`, gridColumn: j + 2 }}
                   />
                 ))}
