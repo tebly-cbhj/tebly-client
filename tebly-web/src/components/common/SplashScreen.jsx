@@ -14,10 +14,12 @@ const ELLIPSE_SIZE = 40;
 const WAVE_DESIGN_WIDTH = 390;
 const WAVE_DESIGN_CREST_HEIGHT = 850;
 const WAVE_MAX_EFFECTIVE_WIDTH = 480;
-const WAVE_BOTTOM_BUFFER = 400;
 // 대기 상태에서 화면 아래로 완전히 숨겨둘 때, 실제 화면 높이 측정이 살짝 작게 잡히는
 // 환경(모바일 브라우저 주소창 등)에서도 확실히 안 보이도록 여유를 더 둔다.
 const WAVE_HIDE_EXTRA_MARGIN = 200;
+// 오른쪽 아래에서 대각선으로 스윽 올라오는 느낌을 주기 위해, 회전을 고정해두고
+// translateY만 애니메이션하면 이동 경로 자체가 그 각도만큼 기운 대각선이 된다.
+const WAVE_ROTATION_DEG = -18;
 
 const LOGO_WIDTH = 155;
 const LOGO_HEIGHT = 60;
@@ -66,11 +68,14 @@ const Ellipse = styled.div`
 `;
 
 const WaveWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  transform: translateY(${({ $translateY }) => $translateY}px);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: ${({ $size }) => $size}px;
+  margin-left: ${({ $size }) => -$size / 2}px;
+  margin-top: ${({ $size }) => -$size / 2}px;
+  transform-origin: center center;
+  transform: rotate(${WAVE_ROTATION_DEG}deg) translateY(${({ $translateY }) => $translateY}px);
   /* 서서히 시작해서 점점 빨라지는(가속) 느낌으로 - easeInCubic 계열 */
   transition: transform ${WAVE_DURATION}ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
   pointer-events: none;
@@ -108,7 +113,10 @@ export default function SplashScreen({ onFinish }) {
   const waveCrestHeight = Math.round(
     waveEffectiveWidth * (WAVE_DESIGN_CREST_HEIGHT / WAVE_DESIGN_WIDTH)
   );
-  const waveRectHeight = dims.h + WAVE_BOTTOM_BUFFER;
+  // 대각선으로 기울어진 채 움직여도 화면 네 귀퉁이가 안 비게, 화면보다 훨씬 큰
+  // 정사각형을 만들어서 회전시킨다(가운데 정렬해두면 기울어져 있어도 항상 화면을 덮음).
+  const waveDiagonalSize = Math.max(dims.w, dims.h) * 2.2;
+  const waveRectHeight = waveDiagonalSize - waveCrestHeight;
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setStage(STAGE.ELLIPSE_GROW));
@@ -145,7 +153,7 @@ export default function SplashScreen({ onFinish }) {
   const logoDuration = stage >= STAGE.LOGO_TO_WHITE ? LOGO_COLOR_CROSSFADE : CROSSFADE_DURATION;
   const logoWhiteOpacity = stage >= STAGE.LOGO_TO_WHITE ? 1 : 0;
   const waveTranslateY =
-    stage >= STAGE.WAVE_RISE ? -waveCrestHeight : dims.h + WAVE_HIDE_EXTRA_MARGIN;
+    stage >= STAGE.WAVE_RISE ? 0 : waveDiagonalSize + WAVE_HIDE_EXTRA_MARGIN;
 
   return (
     <Root>
@@ -153,16 +161,16 @@ export default function SplashScreen({ onFinish }) {
         <Ellipse $scale={ellipseScale} />
       </EllipseWrapper>
 
-      <WaveWrapper $translateY={waveTranslateY}>
+      <WaveWrapper $size={waveDiagonalSize} $translateY={waveTranslateY}>
         <svg
-          width="100%"
+          width={waveDiagonalSize}
           height={waveCrestHeight}
           viewBox="0 0 400 160"
           preserveAspectRatio="none"
           style={{ display: 'block' }}
         >
           <path
-            d="M0,100 L80,100 C120,100 120,55 160,55 C200,55 200,100 240,100 C320,100 320,35 400,35 L400,160 L0,160 Z"
+            d="M0,0 C52,0 52,150 104,150 C148,150 148,15 192,15 C228,15 228,158 264,158 C296,158 296,50 328,50 C364,50 364,155 400,155 L400,160 L0,160 Z"
             fill={theme.colors.primary100}
           />
         </svg>
