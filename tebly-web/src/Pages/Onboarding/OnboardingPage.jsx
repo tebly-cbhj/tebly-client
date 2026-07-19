@@ -66,7 +66,7 @@ const IndicatorWrapper = styled.div`
   align-items: center;
   gap: 12px;
   position: fixed;
-  bottom: ${54 + 5 + 60}px;
+  bottom: ${54 + 21 + 60}px;
   left: 50%;
   transform: translateX(-50%);
 `;
@@ -81,7 +81,7 @@ const Dot = styled.div`
 
 const BtnWrapper = styled.div`
   position: fixed;
-  bottom: 5px;
+  bottom: 21px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
