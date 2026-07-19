@@ -97,6 +97,7 @@ const TimeText = styled.p`
 const DescText = styled.p`
   margin: 0;
   ${({ theme }) => theme.typography.body3};
+  font-weight: 600;
   color: ${({ theme }) => theme.colors.gray800};
 `;
 
