@@ -15,6 +15,15 @@ export const useRoomStore = create((set) => ({
     set({ roomDetail: res.data });
   },
 
+  markChatAsRead: async (roomId) => {
+    await apiClient.patch(`/rooms/${roomId}/chat/read`);
+    set((state) => ({
+      rooms: state.rooms.map((room) =>
+        room.roomId === Number(roomId) ? { ...room, unreadCount: 0 } : room
+      ),
+    }));
+  },
+
   uploadRoomImage: async (file) => {
     const formData = new FormData();
     formData.append('file', file);
