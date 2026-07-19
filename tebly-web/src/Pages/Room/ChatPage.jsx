@@ -127,6 +127,10 @@ const MessageList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const InputBar = styled.div`
