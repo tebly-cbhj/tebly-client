@@ -34,6 +34,18 @@ const Title = styled.h2`
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
+const TitleInput = styled.input`
+  margin: 0;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.gray300};
+  outline: none;
+  background: transparent;
+  padding: 0 0 2px;
+  ${({ theme }) => theme.typography.h2};
+  color: ${({ theme }) => theme.colors.gray900};
+`;
+
 const DateText = styled.p`
   margin: 0;
   ${({ theme }) => theme.typography.body2};
@@ -46,7 +58,7 @@ const TimeRow = styled.div`
   gap: 4px;
 `;
 
-export default function ScheduleInfo({ title, date, time, CategoryImage, isEditing, onEditTime }) {
+export default function ScheduleInfo({ title, date, time, CategoryImage, isEditing, onEditTime, titleEditable = false, onTitleChange }) {
   return (
     <Container>
       <ImageBox>
@@ -54,7 +66,15 @@ export default function ScheduleInfo({ title, date, time, CategoryImage, isEditi
       </ImageBox>
 
       <TextBox>
-        <Title>{title}</Title>
+        {titleEditable ? (
+          <TitleInput
+            value={title}
+            onChange={onTitleChange}
+            placeholder="약속 이름을 입력해 주세요"
+          />
+        ) : (
+          <Title>{title}</Title>
+        )}
         <TimeRow>
           <DateText>{date} {time}</DateText>
           {isEditing && (
