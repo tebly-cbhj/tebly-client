@@ -39,7 +39,7 @@ const ChipList = styled.div`
   gap: 2px;
 `;
 
-export default function DateCell({ date, schedules = [], variant = 'default', onClick, onScheduleClick }) {
+export default function DateCell({ date, schedules = [], variant = 'default', onClick, onScheduleClick, onShowMore }) {
   const visible = schedules.slice(0, 3);
   const remaining = schedules.length - 3;
 
@@ -63,7 +63,14 @@ export default function DateCell({ date, schedules = [], variant = 'default', on
         ))}
 
         {remaining > 0 && (
-          <ScheduleChip category="More" label={`+${remaining}`} />
+          <ScheduleChip
+            category="More"
+            label={`+${remaining}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onShowMore?.();
+            }}
+          />
         )}
       </ChipList>
     </Cell>

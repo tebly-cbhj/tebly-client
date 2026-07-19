@@ -120,6 +120,7 @@ const SelectFriendPage = () => {
   const fetchMyProfile = useFriendStore((state) => state.fetchMyProfile);
 
   const [roomMembers, setRoomMembers] = useState([]);
+  const [activePromiseMemberIds, setActivePromiseMemberIds] = useState(new Set());
   const [selected, setSelected] = useState(
     !appointmentMode && !currentRoomId ? (location.state?.selectedMembers ?? []) : []
   );
@@ -166,6 +167,30 @@ const SelectFriendPage = () => {
     }
   }, [isRoomInviteFlow, currentRoomId]);
 
+  // 나와 진행중/확정된 약속을 같이 하고 있는 멤버는 내보낼 수 없어야 해서,
+  // 방의 약속들을 훑어 그 약속 멤버 목록에 있는 유저 id를 모아둔다
+  useEffect(() => {
+    if (!isRoomInviteFlow) return;
+
+    apiClient.get(`/rooms/${currentRoomId}`).then(async (res) => {
+      const promises = [...(res.data.myPromises ?? []), ...(res.data.invitedPromises ?? [])];
+      const now = new Date();
+      const activePromises = promises.filter((p) =>
+        p.promiseStatus !== 'CANCELED' && new Date(p.endTime) >= now
+      );
+
+      const details = await Promise.all(
+        activePromises.map((p) => apiClient.get(`/promises/${p.promiseId}`))
+      );
+
+      const ids = new Set();
+      details.forEach((r) => {
+        (r.data.members ?? []).forEach((m) => ids.add(m.userId));
+      });
+      setActivePromiseMemberIds(ids);
+    });
+  }, [isRoomInviteFlow, currentRoomId]);
+
   const displayList = appointmentMode ? roomMembers : friendsList;
 
   const filteredList = displayList.filter((f) => f.name.includes(searchText));
@@ -177,6 +202,10 @@ const SelectFriendPage = () => {
 
     if (isRoomInviteFlow) {
       if (isSelected && isExistingMember(friend.id)) {
+        if (activePromiseMemberIds.has(friend.id)) {
+          showToast('진행 중인 약속이 있어 내보낼 수 없어요.');
+          return;
+        }
         // 이미 방에 있는 멤버를 체크 해제하는 건 곧 추방이라 확인을 받는다
         setPendingRemoveFriend(friend);
         return;
@@ -194,6 +223,10 @@ const SelectFriendPage = () => {
 
   const handleRemove = (friendId) => {
     if (isRoomInviteFlow && isExistingMember(friendId)) {
+      if (activePromiseMemberIds.has(friendId)) {
+        showToast('진행 중인 약속이 있어 내보낼 수 없어요.');
+        return;
+      }
       const friend = selected.find((f) => f.id === friendId);
       setPendingRemoveFriend(friend ?? { id: friendId, name: '이 친구' });
       return;
@@ -302,6 +335,11 @@ const SelectFriendPage = () => {
                     isRoomInviteFlow &&
                     !isExistingMember(friend.id) &&
                     sentInviteIds.includes(friend.id)
+                  }
+                  hasSharedPromise={
+                    isRoomInviteFlow &&
+                    isExistingMember(friend.id) &&
+                    activePromiseMemberIds.has(friend.id)
                   }
                 />
             ))}

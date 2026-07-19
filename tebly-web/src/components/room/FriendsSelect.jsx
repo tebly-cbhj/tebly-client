@@ -45,7 +45,7 @@ const InvitedLabel = styled.span`
   color: ${(props) => props.theme.colors.gray500};
 `;
 
-export default function FriendsSelect({ friend, selected, onToggle, alreadyInvited = false }) {
+export default function FriendsSelect({ friend, selected, onToggle, alreadyInvited = false, hasSharedPromise = false }) {
   return (
     <FriendItem>
       <FriendInfo>
@@ -59,6 +59,8 @@ export default function FriendsSelect({ friend, selected, onToggle, alreadyInvit
 
       {alreadyInvited ? (
         <InvitedLabel>이미 보냈어요</InvitedLabel>
+      ) : hasSharedPromise ? (
+        <InvitedLabel>진행 중인 약속이 있어요</InvitedLabel>
       ) : (
         <RadioBtn selected={selected} onToggle={onToggle} />
       )}
