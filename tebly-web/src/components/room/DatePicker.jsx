@@ -64,10 +64,10 @@ const CalendarDropdown = styled.div`
 
 const MonthHeader = styled.div`
   width: 336px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin: 0 auto 12px;
 `;
 
 const MonthLabel = styled.span`
