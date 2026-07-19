@@ -47,6 +47,7 @@ const BottomArea = styled.div`
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
+  width: 100%;
   max-width: 480px;
   padding: 0.75rem 1.25rem 2.125rem;
   box-sizing: border-box;

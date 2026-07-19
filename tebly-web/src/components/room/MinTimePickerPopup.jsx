@@ -33,6 +33,13 @@ const DragHandleWrapper = styled.div`
   padding-top: 12px;
 `;
 
+const Title = styled.p`
+  margin: 16px 0 0;
+  text-align: center;
+  ${({ theme }) => theme.typography.s1};
+  color: ${({ theme }) => theme.colors.gray900};
+`;
+
 const PickerWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -54,7 +61,7 @@ const ConfirmWrapper = styled.div`
   flex: 1;
 `;
 
-export default function MinTimePickerPopup({ onClose, onConfirm, confirmText = '선택 완료' }) {
+export default function MinTimePickerPopup({ onClose, onConfirm, confirmText = '선택 완료', title }) {
   const [time, setTime] = useState({ hour: '01', minute: '00' });
 
   return (
@@ -63,6 +70,8 @@ export default function MinTimePickerPopup({ onClose, onConfirm, confirmText = '
         <DragHandleWrapper>
           <DragHandleIcon />
         </DragHandleWrapper>
+
+        {title && <Title>{title}</Title>}
 
         <PickerWrapper>
           <MinTimePicker value={time} onChange={setTime} />

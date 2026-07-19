@@ -404,6 +404,7 @@ export default function MyAppointmentPage() {
         {showMinTimePicker && (
           <MinTimePickerPopup
             onClose={() => setShowMinTimePicker(false)}
+            title="최소 시간 설정"
             confirmText="추천 받기"
             onConfirm={({ hour, minute }) => {
               setShowMinTimePicker(false);
@@ -423,6 +424,7 @@ export default function MyAppointmentPage() {
         {showStartPicker && (
           <TimePickerPopup
             title="시작 시간"
+            confirmText="다음"
             onClose={() => setShowStartPicker(false)}
             onConfirm={(time) => {
               setPendingStart(time);
@@ -450,8 +452,8 @@ export default function MyAppointmentPage() {
         {showDateSheet && (
           <DatePopup
             onClose={() => setShowDateSheet(false)}
-            leftBtnText="시간 수정"
-            rightBtnText="시간 추천"
+            leftBtnText="직접 수정"
+            rightBtnText="시간 추천 받기"
             singleSelect
             disablePast
             onLeftBtn={({ start }) => {
