@@ -347,6 +347,11 @@ function parseDateString(dateStr) {
   return null;
 }
 
+function getTodayDateObj() {
+  const today = new Date();
+  return { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
+}
+
 function parseRepeatString(repeat) {
   if (!repeat) return '없음';
   // PersonalScheduleStore에서 오는 반복 일정은 {type, interval, until} 객체 형태
@@ -370,8 +375,8 @@ export default function CreateSchedulePage() {
   const [allDay, setAllDay] = useState(
     () => initialSchedule?.startTime === '00:00' && initialSchedule?.endTime === '23:59'
   );
-  const [startDate, setStartDate] = useState(() => parseDateString(initialSchedule?.startDate));
-  const [endDate, setEndDate] = useState(() => parseDateString(initialSchedule?.endDate));
+  const [startDate, setStartDate] = useState(() => parseDateString(initialSchedule?.startDate) ?? (isEditing ? null : getTodayDateObj()));
+  const [endDate, setEndDate] = useState(() => parseDateString(initialSchedule?.endDate) ?? (isEditing ? null : getTodayDateObj()));
   const [startTime, setStartTime] = useState(initialSchedule?.startTime || '09:00');
   const [endTime, setEndTime] = useState(initialSchedule?.endTime || '10:00');
   const [place, setPlace] = useState(initialSchedule?.place || '');

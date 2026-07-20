@@ -42,9 +42,14 @@ const ChipList = styled.div`
 export default function DateCell({ date, schedules = [], variant = 'default', onClick, onScheduleClick, onShowMore }) {
   const visible = schedules.slice(0, 3);
   const remaining = schedules.length - 3;
+  const hasOverflow = remaining > 0;
 
   return (
-    <Cell type="button" $variant={variant} onClick={onClick}>
+    <Cell
+      type="button"
+      $variant={variant}
+      onClick={hasOverflow ? onShowMore : onClick}
+    >
       <DateContainer>
         <DateText $variant={variant}>{date}</DateText>
       </DateContainer>
@@ -63,14 +68,7 @@ export default function DateCell({ date, schedules = [], variant = 'default', on
         ))}
 
         {remaining > 0 && (
-          <ScheduleChip
-            category="More"
-            label={`+${remaining}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onShowMore?.();
-            }}
-          />
+          <ScheduleChip category="More" label={`+${remaining}`} />
         )}
       </ChipList>
     </Cell>

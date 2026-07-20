@@ -56,6 +56,10 @@ const Label = styled.span`
   color: ${({ theme }) => theme.colors.gray900};
 `;
 
+const RequiredMark = styled.span`
+  color: ${({ theme }) => theme.colors.primary100};
+`;
+
 const SelectRowContainer = styled.div`
   display: flex;
   width: 100%;
@@ -172,7 +176,7 @@ export default function CreateAppointmentPage() {
       <ScrollContent>
         <ContentArea>
           <InputContainer>
-            <Label>약속 이름</Label>
+            <Label>약속 이름 <RequiredMark>*</RequiredMark></Label>
             <Textfield
               value={appointmentName}
               onChange={(e) => setAppointmentName(e.target.value)}
@@ -213,7 +217,7 @@ export default function CreateAppointmentPage() {
             <SelectRow
               LeftIcon={DateIcon}
               right_icon
-              text_empty="약속 기간 설정"
+              text_empty={<>약속 기간 설정 <RequiredMark>*</RequiredMark></>}
               text_selected={date}
               state={date ? 'selected' : 'empty'}
               onClick={() => setPopupType('date')}
@@ -222,7 +226,7 @@ export default function CreateAppointmentPage() {
             <SelectRow
               LeftIcon={ClockIcon}
               right_icon
-              text_empty="최소 시간 설정"
+              text_empty={<>최소 시간 설정 <RequiredMark>*</RequiredMark></>}
               text_selected={minTime}
               state={minTime ? 'selected' : 'empty'}
               onClick={() => setPopupType('minTime')}
@@ -231,7 +235,7 @@ export default function CreateAppointmentPage() {
             <SelectRow
               LeftIcon={CategoryIcon}
               right_icon
-              text_empty="카테고리 선택"
+              text_empty={<>카테고리 선택 <RequiredMark>*</RequiredMark></>}
               text_selected={category?.categoryName}
               state={category ? 'selected' : 'empty'}
               onClick={() => setPopupType('category')}
@@ -249,7 +253,7 @@ export default function CreateAppointmentPage() {
             <SelectRow
               LeftIcon={FriendsIcon}
               right_icon
-              text_empty="친구 선택"
+              text_empty={<>친구 선택 <RequiredMark>*</RequiredMark></>}
               text_selected={selectedMembers.length > 0 ? `${selectedMembers.length}명 선택됨` : ''}
               state={selectedMembers.length > 0 ? 'selected' : 'empty'}
               onClick={() => navigate('/select-friend', {
