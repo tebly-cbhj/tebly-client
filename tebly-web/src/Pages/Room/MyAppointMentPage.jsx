@@ -24,7 +24,7 @@ import CategoryIcon from '../../assets/icons/category.svg?react';
 import BellIcon from '../../assets/icons/bell-line.svg?react';
 import FriendsIcon from '../../assets/icons/friends.svg?react';
 import CalendarCheckIcon from '../../assets/icons/calendar-check.svg?react';
-import EditIcon from '../../assets/icons/edit.svg?react';
+import MemoIcon from '../../assets/icons/memo.svg?react';
 
 import { CATEGORY_ICON_MAP } from '../../components/room/CategoryIcons';
 
@@ -345,7 +345,7 @@ export default function MyAppointmentPage() {
             onKeyDown={(e) => { if (e.key === 'Enter') setEditingField(null); }}
           />
           <SelectRow
-            LeftIcon={EditIcon}
+            LeftIcon={MemoIcon}
             text_empty="메모"
             text_selected={canEditFields ? editMemo : truncate(promise.comment, 10)}
             state={

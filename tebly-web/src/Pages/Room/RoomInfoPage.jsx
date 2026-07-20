@@ -86,7 +86,7 @@ const SummaryWrapper = styled.div`
 
 const FloatingWrapper = styled.div`
   position: fixed;
-  bottom: 108px;
+  bottom: 24px;
   right: 20px;
   z-index: 100;
 `;
