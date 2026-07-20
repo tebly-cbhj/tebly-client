@@ -281,22 +281,36 @@ export default function ChatPage() {
       )}
 
       <MessageList>
-        {messages.map((msg) =>
-          msg.text?.includes('결정이가 약속 초대장을 전달했어요') ? (
-            <div key={msg.id}>
-              <DecisionBanner />
-              <DecisionCard content={msg.text} />
-            </div>
-          ) : (
+        {messages.map((msg, index) => {
+          if (msg.text?.includes('결정이가 약속 초대장을 전달했어요')) {
+            return (
+              <div key={msg.id}>
+                <DecisionBanner />
+                <DecisionCard content={msg.text} />
+              </div>
+            );
+          }
+
+          // 카카오톡처럼 같은 사람이 연속으로 보낸 메시지는 첫 번째에만
+          // 프로필 사진/이름을 보여주고, 발신자가 바뀌는 지점에서만 간격을 더 줌
+          const prevMsg = messages[index - 1];
+          const isSameSenderAsPrev =
+            !!prevMsg &&
+            ((msg.type === 'sent' && prevMsg.type === 'sent') ||
+              (msg.type === 'received-shown' && prevMsg.type !== 'sent' && prevMsg.senderId === msg.senderId));
+          const displayType = isSameSenderAsPrev && msg.type === 'received-shown' ? 'received-hidden' : msg.type;
+
+          return (
             <MessageBubble
               key={msg.id}
-              type={msg.type}
+              type={displayType}
               senderName={msg.senderName}
               text={msg.text}
               profileImage={msg.profileImage}
+              isGroupStart={!isSameSenderAsPrev}
             />
-          )
-        )}
+          );
+        })}
         <div ref={bottomRef} />
       </MessageList>
 
