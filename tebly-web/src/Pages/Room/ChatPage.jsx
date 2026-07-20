@@ -299,10 +299,14 @@ export default function ChatPage() {
           }
 
           // 카카오톡처럼 같은 사람이 연속으로 보낸 메시지는 첫 번째에만
-          // 프로필 사진/이름을 보여주고, 발신자가 바뀌는 지점에서만 간격을 더 줌
+          // 프로필 사진/이름을 보여주고, 발신자가 바뀌는 지점에서만 간격을 더 줌.
+          // 결정이 카드는 실제로는 결정이를 호출한 사람 명의의 메시지라 senderId가 같을 수 있는데,
+          // 카드 자체가 시각적으로 완전히 다른 요소라 바로 다음 메시지는 무조건 새 그룹으로 끊는다.
           const prevMsg = messages[index - 1];
+          const prevIsDecisionCard = prevMsg?.text?.includes('결정이가 약속 초대장을 전달했어요');
           const isSameSenderAsPrev =
             !!prevMsg &&
+            !prevIsDecisionCard &&
             ((msg.type === 'sent' && prevMsg.type === 'sent') ||
               (msg.type === 'received-shown' && prevMsg.type !== 'sent' && prevMsg.senderId === msg.senderId));
           const displayType = isSameSenderAsPrev && msg.type === 'received-shown' ? 'received-hidden' : msg.type;
