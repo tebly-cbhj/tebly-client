@@ -17,6 +17,7 @@ export const useChatStore = create((set, get) => ({
         [roomId]: res.data.map((msg) => ({
           id: msg.id,
           type: msg.senderId === myUserId ? 'sent' : 'received-shown',
+          senderId: msg.senderId,
           senderName: msg.senderNickname,
           profileImage: msg.senderProfileImageUrl,
           text: msg.content,

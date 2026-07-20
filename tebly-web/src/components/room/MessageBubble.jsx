@@ -8,6 +8,9 @@ const Wrapper = styled.div`
   gap: 0.25rem;
   width: 100%;
   padding-left: ${({ $type }) => $type === 'received-hidden' ? '2.875rem' : '0'};
+  /* 같은 사람이 연속으로 보낸 메시지끼리는 붙어 보이게, 발신자가 바뀌는 지점에서만
+     여백을 더 줘서 그룹이 시각적으로 구분되게 함 */
+  margin-top: ${({ $isGroupStart }) => ($isGroupStart ? '0.75rem' : '0')};
 `;
 
 const ReceivedRow = styled.div`
@@ -68,10 +71,10 @@ const SentBubble = styled.div`
   word-break: break-word;
 `;
 
-export default function MessageBubble({ type, senderName, text, profileImage }) {
+export default function MessageBubble({ type, senderName, text, profileImage, isGroupStart = true }) {
   if (type === 'sent') {
     return (
-      <Wrapper $type="sent">
+      <Wrapper $type="sent" $isGroupStart={isGroupStart}>
         <SentBubble>{text}</SentBubble>
       </Wrapper>
     );
@@ -79,7 +82,7 @@ export default function MessageBubble({ type, senderName, text, profileImage }) 
 
   if (type === 'received-hidden') {
     return (
-      <Wrapper $type="received-hidden">
+      <Wrapper $type="received-hidden" $isGroupStart={isGroupStart}>
         <ReceivedBubble>{text}</ReceivedBubble>
       </Wrapper>
     );
@@ -87,7 +90,7 @@ export default function MessageBubble({ type, senderName, text, profileImage }) 
 
   // received-shown
   return (
-    <Wrapper $type="received-shown">
+    <Wrapper $type="received-shown" $isGroupStart={isGroupStart}>
       <ReceivedRow>
         <ProfileCircle $image={profileImage} />
         <ContentColumn>
