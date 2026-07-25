@@ -334,7 +334,16 @@ export default function MonthCalendarPage({ viewMode, onViewModeChange, selected
       <FloatingWrapper>
         <CalendarFab
           initialOpen={location.state?.openFab ?? false}
-          onDirectInput={() => navigate('/calendar/create')}
+          onDirectInput={() =>
+            navigate('/calendar/create', {
+              state: {
+                schedule: {
+                  startDate: formatDateKey(selectedDate),
+                  endDate: formatDateKey(selectedDate),
+                },
+              },
+            })
+          }
           onAiRecognition={(file) => navigate('/ocr-loading', { state: { imageFile: file } })}
         />
       </FloatingWrapper>

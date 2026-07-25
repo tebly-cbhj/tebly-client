@@ -16,19 +16,6 @@ function parseServerDate(dateStr) {
   return new Date(dateStr);
 }
 
-// timeLeftMinutes는 서버가 "지금 시각 기준"으로 매번 새로 계산해서 내려주기 때문에,
-// 확인하는 시점에 따라 계속 줄어든다(볼 때마다 다르게 보임). 알림이 원래 몇 분 전
-// 알림으로 설정돼 있었는지(예: "12시간 전")는 항상 고정이어야 하므로, createdAt(생성
-// 고정 시각)과 지금 시점의 timeLeftMinutes를 조합해 실제 일정 시각을 역산한 뒤
-// (지금 시각 + timeLeftMinutes = 일정 시각, 언제 계산해도 동일), 그 일정 시각과
-// createdAt의 차이를 계산하면 확인 시점과 무관하게 항상 같은 값이 나온다.
-function getOriginalLeadMinutes(createdAt, liveMinutes) {
-  if (liveMinutes == null) return liveMinutes;
-  const createdAtMs = parseServerDate(createdAt).getTime();
-  const impliedEventTimeMs = Date.now() + liveMinutes * 60000;
-  return Math.round((impliedEventTimeMs - createdAtMs) / 60000);
-}
-
 // PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
 // 화면 끝까지 채우도록 리스트 영역은 엣지투엣지로 유지해야 해서,
 // max-width/높이/배경만 가져온 버전
@@ -216,7 +203,7 @@ export default function AlarmPage() {
             senderNickname={noti.senderNickname}
             senderProfileImageUrl={noti.senderProfileImageUrl}
             scheduleName={noti.scheduleName}
-            timeLeftMinutes={getOriginalLeadMinutes(noti.createdAt, noti.timeLeftMinutes)}
+            timeLeftMinutes={noti.timeLeftMinutes}
             notifiedAt={formatNotifiedAt(noti.createdAt)}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}

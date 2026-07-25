@@ -312,7 +312,14 @@ export default function WeekCalendarPage({ viewMode, onViewModeChange, selectedD
 
       <FloatingWrapper>
         <CalendarFab
-          onDirectInput={() => navigate('/calendar/create')}
+          onDirectInput={() => {
+            const dateKey = selectedDate
+              ? `${selectedDate.year}-${String(selectedDate.month).padStart(2, '0')}-${String(selectedDate.day).padStart(2, '0')}`
+              : undefined;
+            navigate('/calendar/create', {
+              state: dateKey ? { schedule: { startDate: dateKey, endDate: dateKey } } : undefined,
+            });
+          }}
           onAiRecognition={(file) => navigate('/ocr-loading', { state: { imageFile: file } })}
         />
       </FloatingWrapper>
