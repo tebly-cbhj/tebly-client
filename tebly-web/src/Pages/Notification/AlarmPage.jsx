@@ -16,6 +16,14 @@ function parseServerDate(dateStr) {
   return new Date(dateStr);
 }
 
+// timeLeftMinutes는 실시간으로 계속 줄어드는 값(일정이 지나면 0으로 바닥침)이라 고정
+// 표시엔 못 씀. 대신 content 문구("OO 일정이 N분 후에 시작돼요!")에 원래 설정한
+// 알림 시점이 고정 텍스트로 박혀있어서, 거기서 숫자만 뽑아 쓴다.
+function parseLeadMinutesFromContent(content) {
+  const match = content?.match(/(\d+)분 후에 시작돼요/);
+  return match ? Number(match[1]) : null;
+}
+
 // PageWrapper와 달리 좌우 패딩은 안 줌 — NotiCard가 안읽음 배경을
 // 화면 끝까지 채우도록 리스트 영역은 엣지투엣지로 유지해야 해서,
 // max-width/높이/배경만 가져온 버전
@@ -203,7 +211,7 @@ export default function AlarmPage() {
             senderNickname={noti.senderNickname}
             senderProfileImageUrl={noti.senderProfileImageUrl}
             scheduleName={noti.scheduleName}
-            timeLeftMinutes={noti.timeLeftMinutes}
+            timeLeftMinutes={parseLeadMinutesFromContent(noti.content)}
             notifiedAt={formatNotifiedAt(noti.createdAt)}
             isRead={noti.isRead}
             onClick={() => handleNotiClick(noti)}
